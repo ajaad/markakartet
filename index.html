@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+
+    <meta charset="UTF-8">
+    <link rel = "icon" href = "favicon.svg" type = "image/x-icon" />
+    <!-- gammel bibliotek 
+    <link rel="stylesheet" href="./libs/v6.5.0-dist/ol.css" type="text/css"> -->
+    <link rel="stylesheet" href="./libs/v6.6.1-dist/ol.css" type="text/css"> 
+
+    <!-- include my styling classes -->
+    <link rel="stylesheet" href="./style.css" type="text/css">
+    
+    <title>Markakartet</title>
+
+    <!-- norsk nettside-->
+    <meta http-equiv="Content-Language" content="text/html;charset=utf-8"/>
+
+    <!-- Autorefresh etter tre sekunder
+    <meta http-equiv="refresh" content="3" >
+    -->
+
+  </head>
+  <body>
+    <!-- include static java-script libraries -->
+    <!-- <script src="./libs/v6.5.0-dist/ol.js"></script> -->
+
+    <script src="./libs/v6.6.1-dist/ol.js"></script>
+    <script src="./libs/proj4.js"></script>
+
+
+    <!-- include my functions -->
+    <script src="./scripts/getvariables.js"></script>
+    <script src="./scripts/nySirkel.js"></script>
+
+    <script src="./scripts/functions.js"></script>
+
+
+
+    <!-- custom map title -->
+    <div class="venstreBoks">
+      <div class="innhold">
+        <img src="favicon.svg" height= "75" alt="Ikon" class="icoImage"/>
+        <p>
+        <h1>Markakartet</h1>
+        </p>
+      </div>
+    </div>
+
+    <div class="hoyreBoks">
+      <div class="innhold">
+        <div class="venstre">
+          <button class="markaButton"
+            id="apneOmMarkakartet"
+            onclick="infoButtonClick('omMarkakartet','omMarkakartetID','containerAbout')"
+            >
+            Om Markakartet
+          </button>
+        </div>
+        <div class="hoyre">
+          <button class="markaButton"
+            id="apneStotte"
+            onclick="infoButtonClick('omStotte','omStotteID','containerStotte')"
+            >
+            Støtt vårt arbeid
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Om Markakartet-->
+    <div class="model-container" id="containerAbout">
+      <div>
+        <button id="lukkeOmMarkakartet" class="lukkeKnapp">&times;</button>
+      </div>
+      <div class="modal">
+
+        <div id="omMarkakartetID">
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- "Støtt vårt arbeid" vindu  -->
+    <div class="model-container" id="containerStotte">
+      <div>
+        <button id="lukkeStotte" class="lukkeKnapp">&times;</button>
+      </div>
+      <div class="modal">
+
+        <div id="omStotteID">
+        </div>
+
+      </div>
+    </div>
+
+    <!--- Du ser på -->
+    <div class="model-container" id="containerDuSerPa">
+
+      <div>
+        <button id="tilbakeTilDuSerPaID" class="tilbakeTilDuSerPa start"></button>
+      </div>
+
+      <div>
+        <button id="lukkDuSerPa" class="lukkeKnapp">&times;</button>
+      </div>
+      <div class="modal" id="duSerPa">
+        <div class="hovedTitel">
+          <script>
+            document.write(titelfunc());
+          </script>
+        </div>
+        <p>
+          <script>
+            document.write(beskrivelseFunc());
+          </script>
+        </p>
+
+        <p>
+          <script>
+            document.write(printCoord());
+          </script>
+        </p>
+      </div>
+    </div>
+
+
+    <div class="model-container menuLeft-container" id="menuDelKartvisning-container">
+      <div class="modal">
+        <div>
+          <button id="lukkDelKartvisning" class="lukkeKnapp">&times;</button>
+        </div>
+
+        <div class="hovedTitel">
+          Del kartvisningen
+        </div>
+
+
+        <!-- Form -->
+        <form>
+          <label for="fname">Tittel:</label><br>
+          <input value="" type="text" id="titleForm"><br>
+
+          <label for="lname">Besrkivelse:</label><br>
+          <textarea id="beskrivelseForm"></textarea>
+            
+
+          <!-- koordinater -->
+          <div class="underTitel">
+            Koordinater <!-- <script>document.write(printCoordSys());</script> -->
+          </div>
+          <label>y:</label><br>
+          <input type="number" id="yCoordForm" onchange=oppdaterPekeSirkelManual()>
+          <br>
+
+
+          <label>x:</label><br>
+          <input type="number" id="xCoordForm" onchange=oppdaterPekeSirkelManual()>
+          <br>
+
+          <label>Koordinatsystem:</label><br>
+          <select
+              value="getCoordSysToForm"
+              id="epsgForm" type="number"
+              onchange=getCoordSys(this)>
+              
+            <option value="4326">Geodetisk (EPSG:4326)</option>
+            <option value="25831">ETRS89 / UTM sone 31 (EPSG: 25831)</option>
+            <option value="25832">ETRS89 / UTM sone 32 (EPSG: 25832)</option>
+            <option value="25833">ETRS89 / UTM sone 33 (EPSG: 25833)</option>
+          </select>
+          <br>
+          
+
+          <label>Zoom:</label><br>
+          <input type="number" id="zoomForm" onchange="oppdaterZoom()">
+          <br>
+
+
+          <label>Sirkeldiameter:</label><br>
+          <input value=20 type="number" id="sirkelForm" onchange=oppdaterPekeSirkelManual()>
+          <br>
+        </form> 
+
+        <div style="float:right;margin-top: 20px;">
+          <div>
+            <button id="genererUrlKnapp" class="markaButton">Generer URL</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- modal interrupt / presenter URL   -->
+    <div class="model-container interrupt-container" id="genererURLID">
+      <div class="modal" style="width: 500px; position: fixed;">
+        <div>
+          <button id="lukkURLgenerert" class="lukkeKnapp">&times;</button>
+        </div>
+        <div class="hovedTitel">
+          Del kartvisningen
+        </div>
+        <p>
+          Informasjonen du oppgav er fylt inn i nettadressen nedenfor:
+        </p>
+
+        <form>
+          <textarea id="textAreaURL" style="height: auto;min-height: 150px; min-width: 500px;"></textarea>
+        </form>
+
+        <div style="float:right;margin-top: 20px;">
+          <div>
+            <button id="kopierUrlKnapp"
+              class="markaButton"
+              onclick="copyURLutklippstavle()">
+              Kopier til utklippstavle
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- popupbox når jeg trykker på et objekt -->
+    <div id="popup" >
+      <div  class="infoPil"></div> <!-- peker-->
+      <div class="popupBox">
+
+        <div>
+          <div id="popup-content" class="popupContent"></div>
+
+          <button id="lukkInfoPopup"
+            class="lukkeKnapp popupLukk"
+            onclick="lukkInfoPopupFunc()">
+            &times;
+          </button>
+        </div>
+
+      </div>
+    </div> 
+
+    <!-- Main menu -->
+    </script>
+
+    <div class="model-container menuLeft-container" id="mainMenu-container">
+      <div class="modal">
+        <div>
+          <button
+            id="lukkHovedmeny"
+            class="lukkeKnapp"
+            onclick="lukkHovedmenyFunc()">
+              &times;
+          </button>
+        </div>
+
+        <!-- HENT HOVEDMENY! -->
+        <script src="./scripts/menu/addElementToMenu.js"></script>
+
+      </div>
+    </div>
+
+
+    <!-- Infobox  -->
+    <!--- <script src="./scripts/infoDict.js"></script> -->
+    <div class="model-container menuLeft-container" style='left:425px;' id="infoBoks-container">
+      <div class="modal">
+        <!-- <div> -->
+
+          <div id="infoBoks-tittel" class="popupTitle"></div>
+
+          <button
+            id="lukkInfoboks"
+            class="lukkeKnapp"
+            onclick="lukkBoksFunc('infoBoks-container')">
+              &times;
+          </button>
+
+          <div id="infoBoks-innhold" class="popupContent">
+            
+            <!-- injiser ingformasjon her  -->
+          </div>
+      </div>
+    </div>
+
+    <!-- Add the map-->
+    <div id="map" class="map">
+      
+      <script src="./scripts/main.js"></script>
+      <!-- <script src="./scripts/leggTilGeoJSON.js"></script> -->
+
+      <button id="apneHovedmeny"
+        class="lukkeKnapp apneHovedmenyKnapp hamburgerSym skjulKnapp"
+        onclick="apneHovedmenyFunc()">
+            <div class="hStrek"></div>
+            <div class="hStrek"></div>
+            <div class="hStrek"></div>
+      </button>
+
+
+      <div>
+        <button id="apneDuSerPa" class="lukkeKnapp kartutsnittKnapp skjulKnapp">Kartutsnitt</button>
+      </div>
+
+
+      <!-- målestokk -->
+      <div id="scale-line-id" class="scale-line"></div>
+
+      <div style="position:absolute;  z-index: 1; margin: 20px; right: 60px; bottom:160px;">
+        <div id="zoomknapper" class="zoom-control"></div>
+      </div>
+
+      <div>
+        <button class="markaButton" id="delKartvisnig">Del kartvisningen</button>
+      </div>
+    
+  </div>
+
+  <!-- <script src="./scripts/nySirkel.js"></script> -->
+  <script src="./scripts/about.js"></script>
+
+  <!-- kart slutt-->
+  <!--  END-->
+
+
+    <!--- goToStartPoint-->
+    <!-- add a custom WMS-layer (wmsmenu er satt til usynlig i css.)   -->
+    <form method="post" class="wmsmenu">
+      <br>
+      <label for="name">WMS URL: </label>
+      <input type="text" id="newurlwms" name="newurlwms">
+
+      <br>
+
+      <label for="name">WMS layer: </label>
+      <input type="text" id="newlayername" name="newlayername">
+      <input id="addwmslayer" type="button" value="Add a WMS-layer" onclick="doFunction();" />
+    </form> 
+    
+  </body>
+</html>

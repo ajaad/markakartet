@@ -1,0 +1,858 @@
+/* Font */
+* {
+  font-family: Arial, Helvetica;
+  font-size: 25px;
+  /* src: url("./PragmaticaMedium_he.otf") format("opentype"); */
+}
+
+/* Remove default padding from html and body */
+html,body {
+  margin:0;
+  padding:0;
+  font-size: 15px;
+}
+
+/* Default text size within paragraph tags */
+p,a,i,ul,li {
+  font-size: 15px;
+  /*font-size: 30px;*/
+}
+
+/* Define the colors */
+:root {
+  --light-green:#D8F1E3;
+  --main-green: #14B057;
+  --dark-green: #073A1C;
+  --transback: rgb(255, 255, 255,0.8);
+  --main-green-transback: rgb(20, 176, 87,0.8);
+  --main-fontsize: 15px;
+  --usynlig: rgb(0,0,0,0);
+}
+
+
+.map {
+  position:absolute;
+  top: 125px;
+  width: 100%;
+  bottom: 0px;
+}
+
+/* Målestokklinje */
+.scale-line {
+  position: fixed;
+  z-index: 3;
+  right: 0px;
+  margin: 20px;
+  bottom: 10px;
+  stroke-width: 3px;
+}
+
+.ol-scale-line {
+  position: relative;
+  z-index: 3;
+  color: black;
+  background-color: var(--main-green);
+  opacity: 0.8;
+  font-size: 30px;
+}
+
+.ol-scale-line-inner{
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  border: 3px solid white;
+  border-top: none;
+}
+
+
+/* Zoom buttons */
+.ol-zoom {
+  background: var(--main-green);
+  opacity: 0.8;
+}
+
+
+.ol-zoom:hover {
+  background: var(--main-green);
+  opacity: 1
+}
+
+.ol-control button {
+  background-color: var(--main-green);
+  opacity: 1;
+  color: white;
+
+  /* button size */ 
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+.ol-control button:hover {
+  background-color: var(--dark-green);
+  z-index: 3;
+}
+
+.ol-control button:visited {
+  background-color: var(--dark-green);
+  z-index: 3;
+}
+
+
+
+
+/*  */
+.icoImage {
+  float: left;
+  height: 60px;
+  margin: 30px;
+}
+.heading {
+  float:left;
+}
+.homebutton {
+  float:right;
+}
+.wmsmenu {
+  float:left;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Bokser for hoyre og venstre */ 
+.venstre {
+  float:left;
+  margin: 10px 10px;
+}
+
+.hoyre {
+  float:right;
+  margin: 10px 10px;
+}
+
+.venstreBoks {
+  float:left;
+  
+  height: 100px;
+  width: auto;
+
+  margin: 10px auto;
+  position:relative;
+
+  display: flex;
+}
+.hoyreBoks {
+  float:right;
+  
+  height: 100px;
+  width: auto;
+
+  margin: 10px 10px;
+  position:relative;
+
+  display: flex;
+}
+
+.innhold {
+  position:relative;
+  display: flex;
+  align-items: center;
+}
+
+.stotteKnapp {
+  background: var(--main-green);
+  color: #ffffff;
+
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 0px 0px;
+  padding: 20px;
+
+  font-size: large;
+  font-weight: bold;
+}
+
+
+.model-container {
+  position: fixed;
+  float: right;
+  right: 5px;
+  top: 130px;
+  /* height: auto; */
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+  transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
+  width: 400px;
+  margin: 10px;
+
+  /*overflow-y: scroll; */
+
+  
+}
+
+.model-container.show {
+  float: right;
+  pointer-events: auto;
+  opacity: 1;
+  z-index: 3;
+  transition: visibility 0.5s linear 0.5s, opacity 1s 0s, transform 0.5s;
+}
+
+
+.menuLeft-container {
+  left: 5px;
+  float:left;
+}
+
+.menuRight-container {
+  right: 5px;
+  float:right;
+}
+
+
+.modal {
+  background: rgba(255, 255, 255, 0.80);
+  float: right;
+  /* padding: 10px 10px; */
+  width: 300px;
+  padding: 30px 50px;
+
+  
+  /* margin: 10px; */
+
+  border: solid;
+  border-color: #14B057;
+  border-width: 3px;
+
+  z-index: 1;
+
+  border-radius: 5px;
+
+  /* Scrolling */
+  overflow-y: scroll;
+  max-height: 700px; /* over denne høyden starter scrollingen */
+
+
+  /* Stil fungerer kun i Mozilla Firefox */
+  scroll-margin-top: 30px;
+  scroll-margin: 40px;
+  scrollbar-width: 40px;
+  /* scroll-padding: 20px; fungerte ikke */
+  scrollbar-color: var(--main-green) transparent;
+}
+
+/* *********** */
+
+
+/* *********** */
+
+.interrupt-container {
+  position: fixed;
+  width: 600px;
+  height: 800px;
+  top: 50%;
+  left: 50%;
+
+  margin-top: -300px;
+  margin-left: -300px;
+
+}
+
+.hovedTitel {
+  border-bottom: 5px solid var(--main-green);
+  font-size: 25px;
+  font-style:normal;
+  font-weight: bold;
+}
+
+.underTitel {
+  border-bottom: 3px solid var(--main-green);
+  font-size: 18px;
+  font-style:normal;
+  font-weight: bold;
+  bottom: 5px;
+}
+
+
+#duSerPa {
+  /* You are looking at box
+  This box is red to match the color of the circle */
+  border-color: red;
+}
+
+/* Støtt vårt arbeid button */
+.markaButton {
+
+  pointer-events: inherit; /* Arver pointerevent fra div over */
+
+  background-color: var(--main-green);
+  font-size: large;
+  font-style:normal;
+  font-weight: bold;
+  padding: 20px;
+
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 3px 3px;
+  padding: 20px;
+
+  border-color:transparent;
+
+  z-index: 1;
+}
+
+.markaButton:hover {
+  border-color: var(--main-green) !important; 
+}
+
+#delKartvisnig {
+  background-color: var(--dark-green);
+  color: white;
+  border-color: var(--dark-green);
+
+  position: fixed;
+  left: 5px;
+  bottom: 1%;
+}
+
+#leggTilWMSWMTSKnapp {
+  background-color: var(--main-green);
+  border-color:  var(--main-green);
+  color: white;
+}
+
+#leggTilWMSWMTSKnapp:hover {
+  border-color: var(--dark-green) !important;
+}
+
+#apneStotte {
+  background-color: var(--main-green);
+  border-color:  var(--main-green);
+  color: white;
+}
+
+#apneStotte:hover {
+  border-color: var(--dark-green) !important;
+}
+
+
+#apneOmMarkakartet {
+  background-color: white;
+}
+
+
+#genererUrlKnapp {
+  color: white;
+}
+#genererUrlKnapp:hover {
+  border-color: var(--dark-green) !important;
+}
+
+#kopierUrlKnapp {
+  color: white;
+}
+#kopierUrlKnapp:hover {
+  border-color: var(--dark-green) !important;
+}
+/* Burde vært generalisert */
+
+/* Meny */
+
+.hovedmeny {
+  background-color: #073A1C;
+  font-size: large;
+  font-style:normal;
+  font-weight: bold;
+  color: #ffffff;
+
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 3px 3px;
+  padding: 20px;
+
+  border-color: #073A1C;
+
+  position: fixed;
+  left: 1%;
+  bottom: 1%;
+}
+
+/* Button for closing modalboxes*/ 
+
+.lukkeKnapp {
+  color: #073A1C;
+  font-weight: bolder;
+  font-size: 20px;
+
+  border-color: #073A1C;
+  background: var(--transback);
+
+  border-width: 3px 3px;
+  border-radius: 5px;
+
+  position: absolute;
+  margin: 10px;
+  top: 0px;
+  right: 0px;
+
+  height: 30px;
+  width: 30px;
+
+  z-index: 1;
+}
+
+.lukkeKnapp:hover {
+  color: #14B057;
+  border-color: #14B057;
+}
+
+.kartutsnittKnapp {
+  width: auto;
+  border-color:red;
+}
+
+.apneHovedmenyKnapp {
+  left: 5px; /* plassering i vindu */
+  height: auto;
+  width: auto;
+}
+
+.skjulKnapp {
+  pointer-events: none;
+  opacity: 0;
+  transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
+}
+
+/* */
+.tilbakeTilDuSerPa {
+  color: #073A1C;
+  font-weight: bolder;
+  font-size: 20px;
+
+  position: absolute;
+  margin: 10px;
+  top: 0px;
+  left: -6px;
+
+  border-width: 3px 3px;
+  border-radius: 5px;
+
+  background-color: white;
+
+  height: 30px;
+
+  border-color: #073A1C;
+  background: var(--transback);
+}
+
+.start {
+  background: none;
+  border-color: rgb(0,0,0,0);
+}
+
+.tilbake {
+  background: var(--transback);
+  border-color: #073A1C;
+}
+
+.start::before {
+  content: "Du ser på:";
+}
+
+.tilbake::before {
+  content: "Tilbake til:";
+}
+
+.tilbake:hover {
+  color: var(--main-green);
+  border-color: var(--main-green);
+}
+
+
+/* Du ser på */
+ul.duSerPa {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.duSerPa li{
+  font-size: 16px;
+ }
+
+ul.duSerPa li.x:before { content: "x: ";}
+ul.duSerPa li.y:before { content: "y: ";}
+
+/* Bredde og lengdegrader */
+ul.duSerPa li.lat:before { content: "Bredde: ";  }
+ul.duSerPa li.lon:before { content: "Lengde: ";  }
+
+ul.duSerPa li.ZoomLevel:before { content: "ZoomLevel: ";}
+ul.duSerPa li.sirkel:before { content: "Sirkeldiameter: ";}
+
+/* Form  */
+
+form input,label {
+  font-size: 16px;
+  width: 300px;
+}
+
+textarea {
+  font-size: 16px;
+  width: 300px;
+  margin-bottom: 10px;
+}
+
+form input {
+  margin-bottom: 10px;
+}
+
+select option {
+  font-size: 16px;
+  width: 300px;
+}
+
+select {
+  font-size: 16px;
+  width: 305px;
+  margin-bottom: 10px;
+}
+
+/* //////////////////// */
+
+.hStrek{
+  width: 30px;
+  height: 0px;
+  /* background-color: var(--dark-green); */
+  /* background-color: var(--dark-green); */
+  border: solid;
+  border-color: inherit;
+  margin: 6px 0;
+}
+
+.hamburgerSym{
+  border-color: var(--dark-green)
+}
+
+.hamburgerSym:hover{
+  border-color: var(--main-green)
+}
+
+
+.mainMenuLevel1 {
+  /*position: relative;
+  float: left; */
+
+  height: 25px; /* justere hoyden */
+}
+
+.infoButton {
+  color: var(--dark-green);
+  font-weight: bold;
+  font-size: 15px;
+  text-align: center; /* center all text */ 
+
+  /* justify-content:center; */
+
+  border:solid;
+  border-width: 1px;
+
+  border-color: var(--dark-green);
+  background:var(--transback);
+
+  border-radius: 15px;
+  
+  position: relative;
+  float: right;
+
+  width: 20px;
+  height: 20px;
+
+  /*
+  vertical-align: middle;
+  line-height: normal;
+  */
+  /* padding: 2px 9px; */
+  
+  z-index: 1;
+
+  /* bottom: 5px; */
+}
+
+.infoButton:hover {
+  background-color: var(--light-green);
+}
+
+
+.HexpandedButton {
+  /* path: "M 10,50 v -20 h 40 v -20"; */
+  /* clip-path: circle(50%); */
+  /* font-size: 40px; */
+  position:absolute;
+  width: 10px;
+  height: 10px;
+
+  right:-2px;
+
+  border-bottom: 5px solid black;
+  transform:
+      translateY(6px)
+      translateX(6px)
+      rotate(-45deg);
+}
+
+.VexpandedButton {
+  position:absolute;
+  width: 10px;
+  height: 10px;
+
+  left:-2px;
+
+  border-bottom: 5px solid black;
+  transform:
+      translateY(6px)
+      translateX(6px)
+      rotate(45deg);
+}
+
+.expandedButtonSymbol {
+  position: relative;
+  /* float: right; */
+  background-color: none;
+
+  width: 3px;
+  height: 10px;
+
+  margin: 10px 20px;
+
+  bottom: 10px;
+  left: -11px;
+}
+
+.expandedButton {
+  transition: 0.5s;
+
+  position: relative;
+  float: left;
+
+  width: 30px;
+
+  left: -35px; /* shift to the outside of the green stroke */
+
+  /* width: 30px; */
+  background-color: none;
+  bottom: 5px;
+}
+
+.rotated{
+  transition: 0.5s;
+  transform: rotate(-90deg);
+}
+
+
+.menutextButton {
+  /* Mulighet for å kunne trykke på titelen  */
+  position:relative;
+  float:left;
+
+  left: -35px;
+
+  border: none;
+  background: none;
+  font-size: inherit;
+  font-weight: inherit;
+
+  text-align: left;
+  min-width: 200px;
+}
+
+/*
+.menutextButton:hover{
+  color:var(--main-green);
+  background-color: var(--main-green);
+} */
+
+/* valgmulighet fra meny */
+.menuOption {
+  text-align: left;
+  background: none;
+  color: black;
+  float: left;
+  font-size: 15px;
+  font-weight: bold;
+
+  width: 300px;
+  
+  margin: 3px;
+
+  border-color: rgb(216, 88, 5,0);
+
+  /* border-left-color: var(--main-green); */
+  /* border-left: 4px dashed blue; */
+  /* border-width: 5px; */ 
+  /* background-color: red; 
+  background: linear-gradient(to left, var(--main-green) 5px, rgb(216, 88, 5,0) 0px);*/
+  /* background: linear-gradient(to left, var(--main-green) 5px, rgb(216, 88, 5,0) 0%) left; */
+  /*
+  background: linear-gradient(to left, rgb(216, 88, 5,1) 0%, red 98%, rgb(216, 88, 5,0) 1%);
+  border-left: 6px solid green;
+  /* border-radius: 15px; */
+}
+
+.menuOptionUncheck {
+  /* Gjør den vertikale linjen usynlig */
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.verticalLine{
+  /* Den vertikale linjen før valgmuligheten */
+  border-left: 6px solid var(--main-green);
+  position:relative;
+  left: -10px;
+  font-size: inherit;
+  font-weight: inherit;
+  transition: 0.2s;
+}
+
+.optionsFromMenu{
+  font-size: 0px;
+  position: relative;
+  opacity: 1;
+  margin: 5px;
+
+  top: 0px;
+
+  transition: 0.5s;
+
+  height: auto; /* Animerer ikke korrekt når jeg bruker auto */
+  /* z-index: 3; */
+  /* overflow: hidden; */
+  overflow: hidden;
+}
+  
+.menuOption:hover{
+  font-weight: bold;
+  color: var(--main-green);
+}
+
+.optionsHidden{
+  /* Funksjon for å lukke hele menyen */ 
+  margin: 5px;
+  position: relative;
+  opacity: 0;
+
+  top: -100px;
+
+  height: 0; /* Ingen høyde */
+
+  /* display: none; */
+
+  overflow: hidden; /* Fikser boksen */
+
+  /* z-index: 3; */
+  transition: 0.5s;
+}
+
+
+/* ////////////////////////////////////  */
+/* Map overlay -- popup for map features */
+
+.popupBox{
+  position: relative;
+  
+  background-color: var(--transback);
+  padding: 20px;
+
+  border: solid;
+  border-color: red;
+  border-radius: 5px;
+
+  height: auto;
+  width: auto;
+
+  left: 65px;
+  top: 68px;
+
+  /*transform: rotate(-45deg); */
+  /* pointer-events: none !important; *
+  /* background-repeat:no-repeat; */
+}
+
+/* gjem popup dersom det ikke er noe informasjon */
+.hidePopup{
+  /*opacity: 0;
+  pointer-events: none; */
+  pointer-events: none;
+  opacity: 0;
+}
+
+.popupContent{
+  font-weight: bold;
+  font-size: 15px;
+  padding: 5px; /* Ikke  */ 
+  /* pointer-events: none !important; */
+}
+
+.popupTitle {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 0px 40px 0px 0px; /* Tittel bør ikke komme borti lukkeknappen. Padding kun mot høyre */ 
+  /* pointer-events: none !important; */
+  vertical-align: top;
+  top: -20px;
+}
+
+.popupLukk{
+  /* position: relative; */
+  position: absolute;
+  margin: 10px;
+  float: right;
+  pointer-events: auto;
+}
+
+
+.infoPil {
+  /* path: "M 10,50 v -20 h 40 v -20"; */
+  /* clip-path: circle(50%); */
+  /* font-size: 40px; */
+  /* position:absolute; */
+  margin: 0px;
+  position: absolute;
+  
+  left: 0px;
+  top: 0px;
+  
+  /*
+  width: 50px;
+  height: 50px; */
+  
+  width: 100px;
+  height: 100px;
+
+  /* right:-2px; */
+
+  border-bottom: 5px solid red;
+  border-radius: 5px;
+  transform: translateY(-50px) translateX(20px) rotate(45deg);
+
+  /* pointer-events: none !important; */
+}
+
+.ol-selectable {
+  /* deaktiver pointerevents for openlayers overlay! 
+  Det fungerte ikke med overstyring pa annen mate. */
+  pointer-events: none !important;
+}
+
+.menu-rightshift {
+  left: 425px;
+  transition: 1s;
+}
+
+.lefthidden {
+  left: -1000px;
+  transition: 1s;
+}
