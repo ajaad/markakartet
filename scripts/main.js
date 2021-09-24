@@ -56,7 +56,8 @@ function init(){
         if (feature) {
           
           htmlString = "<div class='popupTitle'>" + feature.get('navn') + "</div>";
-          htmlString += "<br> Verdi: " + feature.get('verdi');
+          // Midlertidelig fjern verdiattribut fra visning
+          //htmlString += "<br> Verdi: " + feature.get('verdi');
           
           info.innerHTML = htmlString;
 
