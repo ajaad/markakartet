@@ -4,9 +4,9 @@ let myProjectionExtent = [364800, 7884645, 1600315, 9484620];
 
 
 // Sub-menu dictionary Turer
-turerDict = Object();
+//turerDict = Object();
 
-"https://openwms.statkart.no/skwms1/wms.friluftsruter2?request=GetCapabilities&service=WMS&version=1.3.0"
+//"https://openwms.statkart.no/skwms1/wms.friluftsruter2?request=GetCapabilities&service=WMS&version=1.3.0"
 
 
 // Datasettene jeg egentlig skal bruke er mangelfulle og rotete.
@@ -18,33 +18,9 @@ turerDict["RulleStol"] = {"name": "I rullestol / barnevogn","checked": 0, "lagGr
 turerDict["eventyrSkogTur"] = {"name": "I eventyrskoger ","checked": 0, "lagGruppe": "kartlagGruppe"};
 */
 // "https://openwms.statkart.no/skwms1/wms.friluftsruter2?request=GetCapabilities&service=WMS&version=1.3.0"
-FotruteData = ["WMSlayer", {
-    url: "https://openwms.statkart.no/skwms1/wms.friluftsruter2",
-    name: "Fotrute",
-    opacity: 1
-}];
-turerDict["Fotrute"] = {"name": "Fotrute", "checked": 0, "kartdata":FotruteData, "lagGruppe": "kartlagGruppe"};
 
-SkiloypeData = ["WMSlayer", {
-    url: "https://openwms.statkart.no/skwms1/wms.friluftsruter2",
-    name: "Skiloype",
-    opacity: 1
-}];
-turerDict["Skiloype"] = {"name": "Skiløype", "checked": 0, "kartdata":SkiloypeData, "lagGruppe": "kartlagGruppe"};
 
-SykkelruteData = ["WMSlayer", {
-    url: "https://openwms.statkart.no/skwms1/wms.friluftsruter2",
-    name: "Sykkelrute",
-    opacity: 1
-}];
-turerDict["Sykkelrute"] = {"name": "Sykkelrute", "checked": 0, "kartdata":SykkelruteData, "lagGruppe": "kartlagGruppe"};
 
-HistoriskData = ["WMSlayer", {
-    url: "https://openwms.statkart.no/skwms1/wms.friluftsruter2",
-    name: "Historisk",
-    opacity: 1
-}];
-turerDict["Historisk"] = {"name": "Historisk ferdselsrute", "checked": 0, "kartdata":HistoriskData, "lagGruppe": "kartlagGruppe"};
 
 
 ////////////////////////////////////////////////////////
@@ -149,7 +125,26 @@ forvaltningsforslagDict["Restaureringsomrader"] = {"name": "Restaureringsområde
                                                    "kartdata": RestaureringsomraderData,
                                                    "lagGruppe": "kartlagGruppe"};
 
+// 
+SammenhengendeVillmarkData = ["GeoJSONdata", {
+    data: "data/sammenhengendeVillmark.geojson",
+    strokeColor: [139,69,19,1],
+    fillColor: [139,69,19,0.4],
+    strokeWidth: 2,
+    strokeColorSelect: [139,69,19,1],
+    fillColorSelect: [139,69,19,0.7],
+    strokeWidthSelect: 4,
+    opacity: 1,
+    clickEvent: 1
+}];
 
+forvaltningsforslagDict["SammenhengendeVillmark"] = {"name": "Sammenhengende villmark",
+                                                   "checked": 0,
+                                                   "kartdata": SammenhengendeVillmarkData,
+                                                   "lagGruppe": "kartlagGruppe"};
+
+
+console.log(forvaltningsforslagDict);
 // Utelater sammenhengende villmark inntil videre
 //forvaltningsforslagDict["Sammenhengendevillmark"] = {"name": "Sammenhengende villmark","checked": 0, "lagGruppe": "kartlagGruppe"};
 
@@ -329,12 +324,28 @@ annetDict["markagrensa"] = {
         "lagGruppe": "kartlagGruppe"
     };
 
+// Fotruter flyttes til under annet
+FotruteData = ["WMSlayer", {
+    url: "https://openwms.statkart.no/skwms1/wms.friluftsruter2",
+    name: "Fotrute",
+    opacity: 1
+}];
+annetDict["Fotrute"] = {"name": "Fotrute", "checked": 0, "kartdata":FotruteData, "lagGruppe": "kartlagGruppe"};
+    
+    
+HistoriskData = ["WMSlayer", {
+    url: "https://openwms.statkart.no/skwms1/wms.friluftsruter2",
+    name: "Historisk",
+    opacity: 1
+}];
+annetDict["Historisk"] = {"name": "Historisk ferdselsrute", "checked": 0, "kartdata":HistoriskData, "lagGruppe": "kartlagGruppe"};
 
 
 /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
 /// Legg til elementene i hovedmenyen.. 
 var menyDict = Object();
-menyDict["Turer"] = {"name": "Turer", "dict": turerDict, "expanded": 0};
+
+//menyDict["Turer"] = {"name": "Turer", "dict": turerDict, "expanded": 0};
 
 menyDict["Naturopplevelser"] = {"name": "Naturopplevelser",
                                 "dict": naturoppDict,
@@ -353,7 +364,7 @@ menyDict["forvaltningforslag"] = {"name": "Våre forvaltningsforslag",
 
 menyDict["verneomrader"] = {"name": "Vernede områder",
                             "dict": vernedeomraderDict,
-                            "expanded": 1,
+                            "expanded": 0,
                             "lagGruppe": "verneomrader"};
 
 menyDict["annet"] = {"name": "Annet",
