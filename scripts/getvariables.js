@@ -177,7 +177,7 @@ function getGETvariables(){
 
     var zoomLevel = getUrlVars()["zoom"];
     if (zoomLevel == null){
-      zoomLevel = 8;
+      zoomLevel = 9;
       console.log("zoom er ikke vagt, default er 8");
     }
 
