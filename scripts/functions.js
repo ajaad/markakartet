@@ -279,7 +279,6 @@ let brukUndergruppe = 0;
 
 for (let i = 0; i < layer.length; i++) { 
 
-
     queryable = layer[i].getAttribute("queryable");
 
     // ESRI Lag har flere Layer under et Layer-objekt.. 

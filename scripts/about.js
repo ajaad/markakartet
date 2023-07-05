@@ -211,6 +211,10 @@ genererUrlKnapp.addEventListener('click',() => {
         alert("Tittel er påkrevd!");
     } else {
 
+        if (beskrivelse != "") {
+            URL += "&beskrivelse=" + beskrivelse;
+        }
+
         if (EPSG != "") {
             URL += "&EPSG=" + EPSG;
         }
@@ -222,14 +226,14 @@ genererUrlKnapp.addEventListener('click',() => {
         if (zoom != "") {
             URL += "&zoom=" + zoom;
         }
-    
-        if (sirkel != "" && coordFromView == 0 ) {
+
+        if (sirkel != "") {
             URL += "&sirkel=" + sirkel;
         }
     
-        if (beskrivelse != "") {
-            URL += "&beskrivelse=" + beskrivelse;
-        }
+        // if (sirkel != "" && coordFromView == 0 ) {
+        //     URL += "&sirkel=" + sirkel;
+        // }
         
         //alert(URL);
         console.log(URL);

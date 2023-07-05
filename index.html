@@ -35,10 +35,46 @@
 
     <script src="./scripts/functions.js"></script>
 
+    <!-- ERLEND: Alternativ header -->
 
+<!--     <div class="headerVenstre">
+      <img src="favicon.svg" height="75" alt="Ikon" class="icoImage" />
+      <h1>Markakartet</h1>
+    </div>
+    
+    <div class="headerHoyre">
+      <button class="markaButton" id="apneOmMarkakartet"
+        onclick="infoButtonClick('omMarkakartet','omMarkakartetID','containerAbout')">
+        Om Markakartet
+      </button>
+    
+      <button class="markaButton" id="apneStotte" onclick="infoButtonClick('omStotte','omStotteID','containerStotte')">
+        Støtt vårt arbeid
+      </button>
+    </div> -->
+
+    <div class="header">
+
+      <div class="headerVenstre">
+        <img src="favicon.svg" height="75" alt="Ikon" class="icoImage" />
+        <h1>Markakartet</h1>
+      </div>
+      
+      <div class="headerHoyre">
+        <button class="markaButton" id="apneOmMarkakartet"
+          onclick="infoButtonClick('omMarkakartet','omMarkakartetID','containerAbout')">
+          Om Markakartet
+        </button>
+      
+        <button class="markaButton" id="apneStotte" onclick="infoButtonClick('omStotte','omStotteID','containerStotte')">
+          Støtt vårt arbeid
+        </button>
+      </div>
+
+    </div>
 
     <!-- custom map title -->
-    <div class="venstreBoks">
+<!--     <div class="venstreBoks">
       <div class="innhold">
         <img src="favicon.svg" height= "75" alt="Ikon" class="icoImage"/>
         <p>
@@ -66,7 +102,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
 
@@ -99,6 +135,101 @@
     </div>
 
     <!--- Du ser på -->
+<!--     <div class="model-container" id="containerDuSerPa">
+
+      <div>
+        <button id="tilbakeTilDuSerPaID" class="tilbakeTilDuSerPa start"></button>
+      </div>
+
+      <div>
+        <button id="lukkDuSerPa" class="lukkeKnapp">&times;</button>
+      </div>
+      <div class="modal" id="duSerPa">
+        <div class="hovedTitel">
+          <script>
+            document.write(titelfunc());
+          </script>
+        </div>
+        <p>
+          <script>
+            document.write(beskrivelseFunc());
+          </script>
+        </p>
+
+        <p>
+          <script>
+            document.write(printCoord());
+          </script>
+        </p>
+      </div>
+    </div> -->
+
+    <div class="model-container menuLeft-container" id="menuDelKartvisning-container">
+      <div class="modal">
+
+        <div>
+          <button id="lukkDelKartvisning" class="lukkeKnapp">&times;</button>
+        </div>
+
+        <div class="hovedTitel">
+          Del kartvisningen
+        </div>
+
+        <!-- Form -->
+        <form>
+
+          <label for="fname">Tittel:</label><br>
+          <input value="" type="text" id="titleForm"><br>
+
+          <label for="lname">Beskrivelse:</label><br>
+          <textarea id="beskrivelseForm"></textarea>
+            
+          <!-- koordinater -->
+          <div class="underTitel">
+            Koordinater <!-- <script>document.write(printCoordSys());</script> -->
+          </div>
+
+          <label>Lengde (x):</label><br>
+          <input type="number" id="xCoordForm" onchange=oppdaterPekeSirkelManual()>
+          <br>
+
+          <label>Bredde (y):</label><br>
+          <input type="number" id="yCoordForm" onchange=oppdaterPekeSirkelManual()>
+          <br>
+
+          <label>Koordinatsystem:</label><br>
+          <select
+              value="getCoordSysToForm"
+              id="epsgForm" type="number"
+              onchange=getCoordSys(this)>
+              
+            <option value="4326">Geodetisk (EPSG:4326)</option>
+            <option value="25831">ETRS89 / UTM sone 31 (EPSG: 25831)</option>
+            <option value="25832">ETRS89 / UTM sone 32 (EPSG: 25832)</option>
+            <option value="25833">ETRS89 / UTM sone 33 (EPSG: 25833)</option>
+          </select>
+          <br>
+          
+          <label>Zoom:</label><br>
+          <input type="number" id="zoomForm" onchange="oppdaterZoom()">
+          <br>
+
+          <label>Sirkeldiameter:</label><br>
+          <input value=20 type="number" id="sirkelForm" onchange=oppdaterPekeSirkelManual()>
+          <br>
+
+        </form> 
+
+        <div style="float:right;margin-top: 20px;">
+          <div>
+            <button id="genererUrlKnapp" class="markaButton">Generer URL</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!--- Du ser på (flyttet under formen...) -->
     <div class="model-container" id="containerDuSerPa">
 
       <div>
@@ -127,74 +258,6 @@
         </p>
       </div>
     </div>
-
-
-    <div class="model-container menuLeft-container" id="menuDelKartvisning-container">
-      <div class="modal">
-        <div>
-          <button id="lukkDelKartvisning" class="lukkeKnapp">&times;</button>
-        </div>
-
-        <div class="hovedTitel">
-          Del kartvisningen
-        </div>
-
-
-        <!-- Form -->
-        <form>
-          <label for="fname">Tittel:</label><br>
-          <input value="" type="text" id="titleForm"><br>
-
-          <label for="lname">Beskrivelse:</label><br>
-          <textarea id="beskrivelseForm"></textarea>
-            
-
-          <!-- koordinater -->
-          <div class="underTitel">
-            Koordinater <!-- <script>document.write(printCoordSys());</script> -->
-          </div>
-          <label>y:</label><br>
-          <input type="number" id="yCoordForm" onchange=oppdaterPekeSirkelManual()>
-          <br>
-
-
-          <label>x:</label><br>
-          <input type="number" id="xCoordForm" onchange=oppdaterPekeSirkelManual()>
-          <br>
-
-          <label>Koordinatsystem:</label><br>
-          <select
-              value="getCoordSysToForm"
-              id="epsgForm" type="number"
-              onchange=getCoordSys(this)>
-              
-            <option value="4326">Geodetisk (EPSG:4326)</option>
-            <option value="25831">ETRS89 / UTM sone 31 (EPSG: 25831)</option>
-            <option value="25832">ETRS89 / UTM sone 32 (EPSG: 25832)</option>
-            <option value="25833">ETRS89 / UTM sone 33 (EPSG: 25833)</option>
-          </select>
-          <br>
-          
-
-          <label>Zoom:</label><br>
-          <input type="number" id="zoomForm" onchange="oppdaterZoom()">
-          <br>
-
-
-          <label>Sirkeldiameter:</label><br>
-          <input value=20 type="number" id="sirkelForm" onchange=oppdaterPekeSirkelManual()>
-          <br>
-        </form> 
-
-        <div style="float:right;margin-top: 20px;">
-          <div>
-            <button id="genererUrlKnapp" class="markaButton">Generer URL</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
 
     <!-- modal interrupt / presenter URL   -->
     <div class="model-container interrupt-container" id="genererURLID">
