@@ -812,14 +812,12 @@ function init(){
 
   window.infoButtonClick = function(title,tilBoks,tilContainer){
 
-    
     console.log("Informasjon om dette: " + title);
 
     //const infoboks = document.getElementById("infoBoks-container"); // finn element i html
     const infoboks = document.getElementById(tilContainer);
     infoboks.classList.remove("show");
     
-
     // tittel for infoboks
     const infoBoksTittel = document.getElementById("infoBoks-tittel");
 
@@ -830,7 +828,6 @@ function init(){
       nicetitle = title;
     }
       
-
     // infoboks innhold
     lesFil(title,tilBoks);
 
