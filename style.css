@@ -163,7 +163,7 @@ h1 {
 
   position: fixed;
   width: 100%;
-  height: 100%;
+  /* height: 10%; */
   z-index: 2;
 
 /*   display:flex;
@@ -311,19 +311,36 @@ h1 {
 /*   border-color: var(--dark-green) !important; */
 }
 
-.hovedMeny {
+/* .hovedMeny {
 
 }
 
 #hovedMenyVenstre {
 
-}
+} */
 
 .hovedVindu {
   /* display: flex; */
-  left: 1rem;
-  bottom: 1rem;
+/*   top: 0;
+  left: 0; */
+  /* bottom: 0; */
   margin: 0;
+  margin-top: 1rem;
+/*   margin-left: 1rem; */
+/*   max-width: 384px;
+  height: 100%; */
+
+  /* max-height: 128px; */
+  /* max-height: 100%; */
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: left;
+
+  background-color: rgb(0,0,0,0.5);
 }
 
 .model-container-erlend {
@@ -342,13 +359,22 @@ h1 {
 /*   left: 1rem;
   bottom: 1rem; */
   /* width: 50%; */
-  max-width: 512px;
+
+  /* position: relative; */
+
+  left: 0;
+  margin-left: 1rem;
+
+  /* height: 25%; */
+  max-width: 400px;
+  /* padding: 32px 48px; */
 
   pointer-events: none;
   opacity: 0;
   z-index: 3;
   transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
 
+  /* background-color: rgba(246, 255, 0, 0.5); */
 
   /* margin: 10px; */
 
@@ -363,7 +389,6 @@ h1 {
   transition: visibility 0.5s linear 0.5s, opacity 1s 0s, transform 0.5s;
 }
 
-
 .menuLeft-container-erlend {
   /* left: 5px; */
   /* float:left; */
@@ -375,9 +400,9 @@ h1 {
 }
 
 .modal-erlend {
-  width: 100%;
+/*   width: 100%;
   height: 100%;
-  display: block;
+  display: block; */
   position: relative;
   
   background: rgba(255, 255, 255, 0.80);
@@ -386,9 +411,9 @@ h1 {
   /* width: 300px; */
 
   /* padding: 30px 50px; */
+
   padding: 32px 48px;
 
-  
   /* margin: 10px; */
 
   border: solid;
@@ -401,7 +426,11 @@ h1 {
 
   /* Scrolling */
   overflow-y: scroll;
-  max-height: 500px; /* over denne høyden starter scrollingen */
+  /* height: 0; */
+
+  /* max-height: 50%; */
+
+  /* max-height: 500px; */ /* over denne høyden starter scrollingen */
 
   /* Stil fungerer kun i Mozilla Firefox */
   scroll-margin-top: 30px;
@@ -409,10 +438,31 @@ h1 {
   scrollbar-width: 40px;
   /* scroll-padding: 20px; fungerte ikke */
   scrollbar-color: var(--main-green) transparent;
+
+  /* background-color: rgba(43, 0, 255, 0.5); */
 }
 
 #infoBoks-container {
+  /* float: right; */
+}
 
+.info-container {
+  position: relative;
+  margin-left: 1rem;
+  overflow-y: scroll;
+  pointer-events: none;
+  background-color: rgba(255, 255, 255, 0.80);
+
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+  transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
+}
+.info-container.show {
+  /* float: right; */
+  pointer-events: auto;
+  opacity: 1;
+  transition: visibility 0.5s linear 0.5s, opacity 1s 0s, transform 0.5s;
 }
 
 .lukkeKnapp-erlend {
@@ -434,11 +484,21 @@ h1 {
   border-radius: 5px;
 
   z-index: 1;
+
+  /* pointer-events: all; */
 }
 
 .lukkeKnapp-erlend:hover {
   color: #14B057;
   border-color: #14B057;
+}
+
+.submenu {
+	display: none;
+}
+
+#kartHovedMeny {
+  pointer-events: auto;
 }
 
 /*

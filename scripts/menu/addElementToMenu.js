@@ -385,6 +385,7 @@ menyDict["leggTilLag"] = {"name": "Legg til WMS/WMTS",
                           "lagGruppe": "leggTilLag"};
 
 /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
+
 // run function to initialise the menu
 addGroupToMenu(menyDict);
 

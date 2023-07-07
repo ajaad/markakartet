@@ -130,7 +130,8 @@ function addGroupToMenu(menyDict){
 
             ElementBlock += "</form>";
 
-            ElementBlock += "<div style='float:right;margin-top: 20px;'>";
+            // ElementBlock += "<div style='float:right;margin-top: 20px;'>";
+            ElementBlock += "<div>";
             ElementBlock += "<div>"
             ElementBlock += "<button id='leggTilWMSWMTSKnapp' class='markaButton' onclick='leggTilWMSWMTSKnappFunc()'>Legg til WMS/WMTS</button>";
             ElementBlock += "</div>";
@@ -345,3 +346,18 @@ let node = document.getElementById("nyttLagLayer");
 node.innerHTML += element;
 
 }
+
+/* 
+Erlend: For collapsible liste. Fra stackoverflow: 
+https://stackoverflow.com/questions/23043458/is-there-a-simpler-way-to-make-this-expandable-menu
+ */
+function toggle(n) {
+    var menus = document.getElementsByClassName("submenu");
+    for(var i=0;i<menus.length;i++){
+        if((i == (n-1)) && (menus[i].style.display != "block")){
+            menus[i].style.display = "block";
+        }else{
+            menus[i].style.display = "none";
+        }
+    } 
+};

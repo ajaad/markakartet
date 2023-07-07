@@ -102,27 +102,56 @@
     
       </div>
     
-      <!-- Hm... Ha hovedmenyen i header?
-          Høres rart ut, men da vil flex funke slik at knappene ikke kommer bak vinduet... -->
-    
       <div class="hovedVindu" id="hovedVinduVenstre">
+
+        <!-- <script src="./scripts/menu/addElementToMenu.js"></script> -->
+
+<!--         <ul id="kartHovedMeny">
+          <li><a href="#" onclick="toggle(1);" >Naturopplevelser</a>
+            <ul class="submenu">
+              <li>Group 1 Item 1</li>
+              <li>Group 1 Item 2</li>
+            </ul>
+          </li>
+          <li><a href="#" onclick="toggle(2);" >Group 2</a>
+            <ul class="submenu">
+              <li>Group 2 Item 1</li>
+              <li>Group 2 Item 2</li>
+            </ul>
+          </li>
+            <li><a href="#" onclick="toggle(3);" >Group 3</a>
+            <ul class="submenu">
+              <li>Group 3 Item 1</li>
+              <li>Group 3 Item 2</li>
+            </ul>
+          </li>
+        </ul> -->
+
         <!-- Main menu -->
         <!-- </script> -->
-    
+        
+        
         <div class="model-container-erlend menuLeft-container-erlend" id="mainMenu-container">
           <div class="modal-erlend">
             <button id="lukkHovedmeny" class="lukkeKnapp-erlend" onclick="lukkHovedmenyFunc()">
               &times;
             </button>
-            <!-- HENT HOVEDMENY! -->
             <script src="./scripts/menu/addElementToMenu.js"></script>
           </div>
         </div>
+
+        <div class="info-container" id="infoBoks-container">
+          <div id="infoBoks-tittel" class="popupTitle"></div>
     
-        <!-- Infobox  -->
-        <!-- Erlend: Vises når man trykker på en infobox (I) i hovedmenyen. -->
-        <!--- <script src="./scripts/infoDict.js"></script> -->
-        <div class="model-container-erlend menuLeft-container-erlend" id="infoBoks-container">
+          <button id="lukkInfoboks" class="lukkeKnapp-erlend" onclick="lukkBoksFunc('infoBoks-container')">
+            &times;
+          </button>
+  
+          <div id="infoBoks-innhold" class="popupContent">
+          </div>
+        </div>
+
+<!--         <div class="model-container-erlend menuLeft-container-erlend" id="infoBoks-container">
           <div class="modal-erlend">
             <div id="infoBoks-tittel" class="popupTitle"></div>
     
@@ -131,10 +160,10 @@
             </button>
     
             <div id="infoBoks-innhold" class="popupContent">
-              <!-- injiser ingformasjon her  -->
             </div>
           </div>
-        </div>
+        </div> -->
+        
     
       </div>
     
