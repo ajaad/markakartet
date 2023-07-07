@@ -333,17 +333,23 @@ h1 {
   /* max-height: 128px; */
   /* max-height: 100%; */
 
-  width: 100%;
+  /* width: 100%; */
 
-  display: flex;
+/*   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: left; */
+
+/*   display: inline-block;
+  align-items: start;
+  align-content:start; */
 
   background-color: rgb(0,0,0,0.5);
 }
 
 .model-container-erlend {
+  display: inline-block;
+  width: 400px;
 /*   position: fixed;
   float: right; */
   /* right: 5px; */
@@ -404,6 +410,9 @@ h1 {
   height: 100%;
   display: block; */
   position: relative;
+
+  display: inline-block;
+  width: 400px;
   
   background: rgba(255, 255, 255, 0.80);
   /* float: right; */
@@ -447,7 +456,13 @@ h1 {
 }
 
 .info-container {
-  position: relative;
+  display: inline-block;
+  top: 0;
+  left: 0;
+  max-width: 400px;
+/*   width: 400px; */
+
+  /* position: relative; */
   margin-left: 1rem;
   overflow-y: scroll;
   pointer-events: none;
