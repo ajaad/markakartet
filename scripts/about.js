@@ -138,6 +138,7 @@ openDuSerPa.addEventListener('click',() => {
 //////////////////////////////////
 // Del kartvisningen
 const openDelKartvisning = document.getElementById('delKartvisnig');
+// const openDelKartvisning = document.getElementById('delKartvisning');
 const menuDelKartvisning = document.getElementById("menuDelKartvisning-container");
 
 var delKartvisningOpen = 0; // starter som lukket
@@ -146,7 +147,7 @@ openDelKartvisning.addEventListener('click',() => {
 
     if (delKartvisningOpen == 0) {
         menuDelKartvisning.classList.add('show');
-        openDelKartvisning.classList.add('skjulKnapp');
+        // openDelKartvisning.classList.add('skjulKnapp');
         apneHovedmeny.classList.add('skjulKnapp');
         mainMenu_container.classList.remove('show');
         //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +169,7 @@ closeDelKartvisning.addEventListener('click',() => {
     deletePekerSirkel();
 
     // Vis DelKartvisningknappen igjen.
-    openDelKartvisning.classList.remove('skjulKnapp');
+    // openDelKartvisning.classList.remove('skjulKnapp');
     apneHovedmeny.classList.remove('skjulKnapp');
 });
 //

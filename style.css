@@ -28,6 +28,9 @@ p,a,i,ul,li {
   --main-green-transback: rgb(20, 176, 87,0.8);
   --main-fontsize: 15px;
   --usynlig: rgb(0,0,0,0);
+
+  /* Erlend: Noen er nesten helt like av de over men */
+  --markakart-logo-fargen: rgb(20,175,86, 1);
 }
 
 
@@ -121,28 +124,63 @@ p,a,i,ul,li {
   opacity: 0;
 }
 
-/* ERLEND: Tester alternativ header START */
+/* 
+----------------------------------------
+ERLEND: Tester alternativ header START
+----------------------------------------
+*/
 
-h1 {
-  color: white;
+.hovedIkon {
+  /* float: left; */
+  height: 64px;
+  margin-left: 1rem;
 }
 
-.header {
+h1 {
+  color: black;
+  margin-left: 1rem;
+}
+
+.tittelBakgrunn {
+/*   background-color: rgba(0, 0, 0, 0.75);
+  height: 64px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 4px; */
+}
+
+.content {
+/*   position: fixed;
+  z-index: 2;
+  width: 100%;
+  height: 64px;
+  margin-top: 1rem;
+  display:flex;
+  flex-direction: row; */
+  /* justify-content: space-between; */
+  /* flex-wrap: wrap; */
+  /* background-color: rgb(0,0,0,0.75); */
+
+  pointer-events: none;
+}
+
+.header-items {
   position: fixed;
   z-index: 2;
   width: 100%;
-  height: 100px;
-  display:flex;
+  height: 64px;
+  margin-top: 1rem;
+  display: flex;
   flex-direction: row;
   justify-content: space-between;
-  pointer-events: none;
-  background-color: rgb(0,0,0,0.75);
+  flex-wrap: wrap;
 }
 
 .headerVenstre {
   /* position: fixed; */
   display: flex;
   align-items: center;
+  margin-bottom: 1rem;
 /*   left: 0;
   height: 100px;
   z-index: 100;
@@ -151,16 +189,43 @@ h1 {
 
 .headerVenstre img {
   pointer-events:all;
+  border-radius: 16px;
+/*   border-color: black;
+  border-style: 32px solid black;
+  border-image: 32px solid black; */
+  border-left: 4px solid black;
+  border-top: 4px solid black;
+  border-right: 4px solid black;
+  border-bottom: 4px solid black;
+  /* box-shadow: 8px 8px rgba(0, 0, 0, 0.25); */
 }
 
 .headerVenstre h1 {
   pointer-events:all;
+  /* text-shadow: 2px 2px rgba(0, 0, 0, 0.25); */
+}
+
+.headerMidten {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.headerMidten button {
+  /* margin-right: 1rem; */
+  pointer-events:all;
+/*   margin-left: 8px;
+  margin-right: 8px; */
 }
 
 .headerHoyre {
   /* position: fixed; */
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  margin-left: 1rem;
+  /* margin-bottom: 1rem; */
 /*   right: 0;
   z-index: 100;
   height: 100px;
@@ -169,10 +234,85 @@ h1 {
 
 .headerHoyre button {
   margin-right: 1rem;
+  margin-bottom: 1rem;
   pointer-events:all;
 }
 
-/* ERLEND: Tester alternativ header END */
+.markaKnapp {
+
+  pointer-events: inherit; /* Arver pointerevent fra div over */
+
+  background-color: var(--main-green);
+  font-size: large;
+  font-style:normal;
+  font-weight: bold;
+  padding: 20px;
+
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 3px 3px;
+  border-color: black;
+
+  /* border-color:transparent; */
+
+  z-index: 1;
+}
+
+.markaKnapp:hover {
+  /* border-color: var(--main-green) !important; */ 
+  /* border-color: white; */
+  border-color: var(--markakart-logo-fargen);
+}
+
+.knappKartMeny {
+  background-color: white;
+}
+.knappKartMeny:hover {
+/*   border-color: var(--dark-green) !important; */
+}
+
+.knappDelKartvisning {
+/*   background-color: var(--dark-green);
+  color: white; */
+  background-color: white;
+  color: black;
+/*   border-color: var(--dark-green); */
+}
+.knappDelKartvisning:hover {
+/*   border-color: var(--light-green) !important; */
+}
+
+.knappOmMarkakartet {
+  background-color: white;
+}
+.knappOmMarkakartet:hover {
+/*   border-color: var(--dark-green) !important; */
+}
+
+.knappStotte {
+
+  background-color: var(--main-green);
+/*   border-color:  var(--main-green); */
+  background-color: white;
+  color: black;
+}
+.knappStotte:hover {
+/*   border-color: var(--dark-green) !important; */
+}
+
+.hovedMeny {
+
+}
+
+#hovedMenyVenstre {
+
+}
+
+/*
+---------------------------------------
+ERLEND: Tester alternativ header END
+---------------------------------------
+*/
 
 /* Bokser for hoyre og venstre */ 
 .venstre {
@@ -232,7 +372,7 @@ h1 {
   position: fixed;
   float: right;
   right: 5px;
-  top: 130px;
+  top: 96px;
   /* height: auto; */
   align-items: center;
   justify-content: center;
@@ -259,12 +399,12 @@ h1 {
 
 .menuLeft-container {
   left: 5px;
-  float:left;
+  /* float:left; */
 }
 
 .menuRight-container {
   right: 5px;
-  float:right;
+  /* float:right; */
 }
 
 
@@ -382,7 +522,7 @@ h1 {
   border-color: var(--dark-green) !important;
 }
 
-#apneStotte {
+/* #apneStotte {
   background-color: var(--main-green);
   border-color:  var(--main-green);
   color: white;
@@ -395,7 +535,7 @@ h1 {
 
 #apneOmMarkakartet {
   background-color: white;
-}
+} */
 
 
 #genererUrlKnapp {

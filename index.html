@@ -53,29 +53,91 @@
       </button>
     </div> -->
 
-    <div class="header">
-
-      <div class="headerVenstre">
-        <img src="favicon.svg" height="75" alt="Ikon" class="icoImage" />
-        <h1>Markakartet</h1>
+    <div class="content">
+    
+      <div class="header-items">
+    
+        <div class="headerVenstre">
+          <img src="favicon.svg" height="75" alt="Ikon" class="hovedIkon" />
+          <div class="tittelBakgrunn">
+            <h1>Markakartet</h1>
+          </div>
+        </div>
+    
+        <!--       <div class="headerMidten">
+              <button class="markaKnapp knappKartMeny">
+                Åpne kartmeny
+              </button>
+                
+              <button class="markaKnapp knappDelKartvisning">
+                Del kartvisning
+              </button>
+            </div> -->
+    
+        <!-- 
+              NOTE: containerAbout - se id under.
+              Se også id omMarkakartetID under.
+            -->
+    
+        <div class="headerHoyre">
+    
+          <button class="markaKnapp knappKartMeny">
+            ☰ Kartmeny
+          </button>
+    
+          <button class="markaKnapp knappDelKartvisning" id="delKartvisning">
+            Del kartvisning
+          </button>
+    
+          <button class="markaKnapp knappOmMarkakartet" id="apneOmMarkakartet"
+            onclick="infoButtonClick('omMarkakartet','omMarkakartetID','containerAbout')">
+            Om Markakartet
+          </button>
+    
+          <button class="markaKnapp knappStotte" id="apneStotte"
+            onclick="infoButtonClick('omStotte','omStotteID','containerStotte')">
+            Støtt vårt arbeid
+          </button>
+        </div>
+    
       </div>
-
-      <!-- 
-        NOTE: containerAbout - se id under.
-        Se også id omMarkakartetID under.
-      -->
-      
-      <div class="headerHoyre">
-        <button class="markaButton" id="apneOmMarkakartet"
-          onclick="infoButtonClick('omMarkakartet','omMarkakartetID','containerAbout')">
-          Om Markakartet
-        </button>
-      
-        <button class="markaButton" id="apneStotte" onclick="infoButtonClick('omStotte','omStotteID','containerStotte')">
-          Støtt vårt arbeid
-        </button>
+    
+      <!-- Hm... Ha hovedmenyen i header?
+          Høres rart ut, men da vil flex funke slik at knappene ikke kommer bak vinduet... -->
+    
+      <div class="hovedVindu" id="hovedVinduVenstre">
+        <!-- Main menu -->
+        <!-- </script> -->
+    
+        <div class="model-container menuLeft-container" id="mainMenu-container">
+          <div class="modal">
+            <button id="lukkHovedmeny" class="lukkeKnapp" onclick="lukkHovedmenyFunc()">
+              &times;
+            </button>
+            <!-- HENT HOVEDMENY! -->
+            <script src="./scripts/menu/addElementToMenu.js"></script>
+          </div>
+        </div>
+    
+        <!-- Infobox  -->
+        <!-- Erlend: Vises når man trykker på en infobox (I) i hovedmenyen. -->
+        <!--- <script src="./scripts/infoDict.js"></script> -->
+        <div class="model-container menuLeft-container" id="infoBoks-container">
+          <div class="modal">
+            <div id="infoBoks-tittel" class="popupTitle"></div>
+    
+            <button id="lukkInfoboks" class="lukkeKnapp" onclick="lukkBoksFunc('infoBoks-container')">
+              &times;
+            </button>
+    
+            <div id="infoBoks-innhold" class="popupContent">
+              <!-- injiser ingformasjon her  -->
+            </div>
+          </div>
+        </div>
+    
       </div>
-
+    
     </div>
 
     <!-- custom map title -->
@@ -309,8 +371,7 @@
       </div>
     </div> 
 
-    <!-- Main menu -->
-    </script>
+    <!-- 
 
     <div class="model-container menuLeft-container" id="mainMenu-container">
       <div class="modal">
@@ -323,18 +384,13 @@
           </button>
         </div>
 
-        <!-- HENT HOVEDMENY! -->
         <script src="./scripts/menu/addElementToMenu.js"></script>
 
       </div>
     </div>
 
-
-    <!-- Infobox  -->
-    <!--- <script src="./scripts/infoDict.js"></script> -->
     <div class="model-container menuLeft-container" style='left:425px;' id="infoBoks-container">
       <div class="modal">
-        <!-- <div> -->
 
           <div id="infoBoks-tittel" class="popupTitle"></div>
 
@@ -346,11 +402,12 @@
           </button>
 
           <div id="infoBoks-innhold" class="popupContent">
-            
-            <!-- injiser ingformasjon her  -->
+
           </div>
       </div>
     </div>
+
+  -->
 
     <!-- Add the map-->
     <div id="map" class="map">
