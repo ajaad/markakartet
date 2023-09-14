@@ -1,12 +1,70 @@
+
 window.onload = init;
 
-var moveCount = 0;
-var coordFromView = 1;
+var coordFromView = 1; // Hva er det denne betyr egentlig?
 
+// Then DelKartvisningen is openened
+// The user should be able to make a new sircle by clicking in the map.
 
+// sirkelobjekt som er gjennomsiktig når DelVisning er av
+// og som oppdaterer koordinatene når man trykker i kartet.
 
-function init(){
+// Hvor kommer viewProjection fra?
 
+function pekerSirkel(x,y,radius,farge) {
+    /* Function to create a new sircle object */ 
+
+    /* Get coordinate system from form */
+    var coordSys = "EPSG:" + document.getElementById("epsgForm").value;
+
+    var sirkelGeometri = new ol.geom.Circle(
+        proj4(coordSys,viewProjection,[x,y]),
+        parseInt(radius)
+    );
+
+    var sirkelEgenskap = new ol.Feature(sirkelGeometri);
+
+    var vektorKilde = new ol.source.Vector({
+    projection: viewProjection,
+    features: [sirkelEgenskap]
+    });
+
+        
+    var pekeSirkelStil = new ol.style.Style({
+    fill: new ol.style.Fill({
+        color: 'rgba(255, 100, 50, 0)'
+    }),
+    stroke: new ol.style.Stroke({
+        width: 5,
+        color: farge
+    }),
+    image: new ol.style.Circle({
+        fill: new ol.style.Fill({
+            color: 'rgba(55, 200, 150, 0)'
+        }),
+        stroke: new ol.style.Stroke({
+            width: 1,
+            color: 'rgba(55, 200, 150, 0)'
+        }),
+        radius: 15
+    }),
+    });
+
+    // Make a layer with a circle
+    var sirkelLag = new ol.layer.Vector({
+        name: "pekerSirkel",
+        className: "egentstil",
+        source: vektorKilde,
+        style: pekeSirkelStil
+    });
+    
+    return sirkelLag;
+}
+
+/* 
+    ON LOAD. Altså når siden åpnes.
+*/
+function init() {
 
   // Get the GET-variables from the URL
   var outputarray = getGETvariables();
@@ -15,15 +73,11 @@ function init(){
   var sirkelLag = outputarray[1]  // Circlelayer object
   var coordSys = outputarray[2]   // Used coordinate system
 
-  /* Parse the active coordinate system to the form */
-  document.getElementById("epsgForm").value = printCoordSys();
-
   ///  Popupbox - start ///
   const popupContainer = document.getElementById('popup');
   const popupContent = document.getElementById('popup-content');
-  //const popupCloser = document.getElementById('popup-closer');
 
-  const overlay = new ol.Overlay({
+  const popupOverlay = new ol.Overlay({
     element: popupContainer,
     autoPan: true,
     autoPanAnimation: {
@@ -36,164 +90,86 @@ function init(){
     popupContainer.classList.add("hidePopup"); // perfection
   };
 
-  // eventyrskogerNaturopp
+    const displayFeatureInfo = function (pixel) {
 
-  let highlight;
-  const displayFeatureInfo = function (pixel) {
-
-    lukkInfoPopupFunc(); // Lukk vindu om det er et aktivt oppe allerede.
-
-    var feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-      
-      lagnavn = layer.get("name"); // navn på kartlaget
-
-      const info = document.getElementById('popup-content');
-
-      // Sjekk om laget skal være trykkbart
-      if (klikkbareKartlag.includes(lagnavn)) {
-
+        lukkInfoPopupFunc(); // Lukk vindu om det er et aktivt oppe allerede.
+    
+        var feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+          
+          lagnavn = layer.get("name"); // navn på kartlaget
+    
+          const info = document.getElementById('popup-content');
+    
+          // Sjekk om laget skal være trykkbart
+          if (klikkbareKartlag.includes(lagnavn)) {
+    
+            
+            if (feature) {
+              
+              htmlString = "<div class='popupTitle'>" + feature.get('navn') + "</div>";
+              // Midlertidelig fjern verdiattribut fra visning
+              //htmlString += "<br> Verdi: " + feature.get('verdi');
+              
+              info.innerHTML = htmlString;
+    
+              popupContainer.classList.remove("hidePopup");
         
-        if (feature) {
-          
-          htmlString = "<div class='popupTitle'>" + feature.get('navn') + "</div>";
-          // Midlertidelig fjern verdiattribut fra visning
-          //htmlString += "<br> Verdi: " + feature.get('verdi');
-          
-          info.innerHTML = htmlString;
-
-          popupContainer.classList.remove("hidePopup");
+            } else {
+              info.innerHTML = '&nbsp;'; // Tom boks
+              lukkInfoPopupFunc();
+            } 
     
-        } else {
-          info.innerHTML = '&nbsp;'; // Tom boks
-          lukkInfoPopupFunc();
-        } 
-
-      }
-
-    });
-  
-    /*
-    const info = document.getElementById('popup-content');
+          }
     
-    if (feature) {
-      //info.innerHTML = feature.getId() + ': ' + feature.get('navn');
-      htmlString = "<div class='popupTitle'>" + feature.get('navn') + "</div>";
-      htmlString += "<br> Verdi: " + feature.get('verdi');
+        });
 
-      popupContainer.classList.remove("hidePopup");
+      };
 
-      info.innerHTML = htmlString;
-
-    } else {
-      info.innerHTML = '&nbsp;'; // Tom boks
-      lukkInfoPopupFunc();
-    }*/
-  };
-
-  ///  Popupbox - end ///
-
-
-  /// LayerGroup ///
-/*
-        // OSM
-        new ol.layer.Tile({
-          source: new ol.source.OSM(),
+    var kartlagDict = {
+        "bakgrunnskart": new ol.layer.Group({
+            opacity: 1,
+            layers: []
+        }),
+        "kartlagGruppe": new ol.layer.Group({
+            opacity: 1,
+            layers: []
+        }),
+        "verneomrader": new ol.layer.Group({
+            opacity: 1,
+            layers: []
+        }),
+        "forvaltningforslag": new ol.layer.Group({
+            opacity: 1,
+            layers: []
+        }),
+        "verneforslag": new ol.layer.Group({
+            opacity: 1,
+            layers: []
+        }),
+        "Naturopplevelser": new ol.layer.Group({
+            opacity: 1,
+            layers: []
+        }),
+        "Turer": new ol.layer.Group({
+            opacity: 1,
+            layers: []
         })
-*/
-/*
-"Turer"
-"Naturopplevelser"
-"verneforslag"
-"forvaltningforslag"
-"verneomrader"*/
+    }
 
-  kartlagDict = {
-    "bakgrunnskart" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    }),
-    "kartlagGruppe" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    }),
-    "verneomrader" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    }),
-    "forvaltningforslag" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    }),
-    "verneforslag" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    }),
-    "Naturopplevelser" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    }),
-    "Turer" : new ol.layer.Group({
-      opacity: 1,
-      layers: []
-    })
-  }
-
-  /*
-  // bakgrunnskart 
-  bakgrunnskart = new ol.layer.Group({
-    opacity: 1,
-    layers: []
-  });
-
-  // Andre kartlag .. 
-  kartlagGruppe = new ol.layer.Group({
-    opacity: 1,
-    layers: []
-  });
-  */
-
-  // Make a list of maplayers  // Tegnerekkefølgen settes her! 
-  var kartlagList = [
-    kartlagDict["bakgrunnskart"],
-    kartlagDict["kartlagGruppe"],
-    kartlagDict["verneomrader"],
-    kartlagDict["forvaltningforslag"],
-    kartlagDict["verneforslag"],
-    kartlagDict["Naturopplevelser"],
-    kartlagDict["Turer"],
-    sirkelLag
-  ];
-
-  /*
-  var bakgrunnKartlag = [
-    new ol.layer.Tile({
-      source: new ol.source.OSM(),
-    }),
-    sirkelLag
-  ]; */
-
-
-  document.getElementById("addwmslayer").onclick = function (nyttkartlag) {
-    // Function for adding a WMS layer
-
-    var newlayername = document.getElementById("newlayername").value;
-    var neswmsurl = document.getElementById("newurlwms").value;
-  
-    var nyttlag = new ol.layer.Image({
-      source: new ol.source.ImageWMS({
-        url: neswmsurl,
-        params: {'LAYERS': newlayername},
-        ratio: 2,
-        serverType: 'mapserver'
-      })
-    });
-
-    map.addLayer(nyttlag); // Add WMS-layer to map layers
-    console.log(newlayername, "was added to the map layers");
-  };
+    // Make a list of maplayers  // Tegnerekkefølgen settes her! 
+    var kartlagList = [
+        kartlagDict["bakgrunnskart"],
+        kartlagDict["kartlagGruppe"],
+        kartlagDict["verneomrader"],
+        kartlagDict["forvaltningforslag"],
+        kartlagDict["verneforslag"],
+        kartlagDict["Naturopplevelser"],
+        kartlagDict["Turer"],
+        sirkelLag
+    ];
 
   // Målestokk
-  let scaleType = 'scaleline';
+  // let scaleType = 'scaleline';
   let control;
 
   function scaleControl() {
@@ -205,7 +181,6 @@ function init(){
     return control;
   }
 
-
   function zoomControl() {
     control = new ol.control.Zoom({
       target: document.getElementById('zoomknapper')
@@ -213,8 +188,12 @@ function init(){
     return control;
   }
 
+  window.oppdaterZoom = function(){
+    // Manualy adjust zoom level with the Form.. 
+    map.getView().setZoom(document.getElementById("zoomForm").value);
+  }
 
-  // Generer kartobkelt
+  // Generer kartobjekt
   var map = new ol.Map({
     controls: ol.control.defaults({
       zoom: false // ta bort default zoom fra default..
@@ -226,13 +205,14 @@ function init(){
     renderer: 'canvas',
     layers: kartlagList,
     view: newview,
-    overlays: [overlay] // popupboksen
+    overlays: [popupOverlay] // popupboksen
   });
-
 
   /* POINTER CIRCLE FUNCTIONS */
   window.oppdaterPekeSirkel = function(x,y){
     /* oppdater med peker */
+
+    // return; // Disabling for nå.
 
     var r = document.getElementById("sirkelForm").value
 
@@ -248,7 +228,6 @@ function init(){
     map.getLayers().getArray()
       .filter(layer => layer.get('name') === 'pekerSirkel')
       .forEach(layer => map.removeLayer(layer));
-    
 
     var sirkelLag = pekerSirkel(x,y,r,f);
     map.addLayer(sirkelLag);
@@ -256,6 +235,8 @@ function init(){
 
   window.oppdaterPekeSirkelManual = function(){
     /* Manual updating by writing values */
+
+    // return; // Disabling for nå.
 
     var y = document.getElementById("yCoordForm").value
     var x = document.getElementById("xCoordForm").value
@@ -268,7 +249,6 @@ function init(){
       var f = 'rgba(255, 0, 0, 0)';
       coordFromView = 1; // Use coordinates from view
     }
-    
 
     // Sok og slett tidligere lag med "pekerSirkel"-markoeren 
     map.getLayers().getArray()
@@ -279,20 +259,6 @@ function init(){
     map.addLayer(sirkelLag);
   }
 
-  // Delete all temporary pointer circles! 
-  window.deletePekerSirkel=function(){
-    map.getLayers().getArray()
-    .filter(layer => layer.get('name') === 'pekerSirkel')
-    .forEach(layer => map.removeLayer(layer));
-
-    coordFromView = 1; // Use view coordinates when circle is whiped
-  }
-
-  window.oppdaterZoom=function(){
-    // Manualy adjust zoom level with the Form.. 
-    map.getView().setZoom(document.getElementById("zoomForm").value);
-  }
-
   // Klikk på kartet
   map.on('click',function(e){
     // Function to return coordinates to the console
@@ -301,30 +267,28 @@ function init(){
 
     /* Get coordinate system from form */
     coordSys = "EPSG:" + document.getElementById("epsgForm").value;
+    console.log(coordSys + " " + proj4(viewProjection,coordSys,e.coordinate)); 
 
-    console.log(coordSys + " " + proj4(viewProjection,coordSys,e.coordinate));
-    
-
-    closeAboutFunc(); // funksjon for å lukke "aboutvinduet" når man trykker i kartet.
-    closeStotteFunc(); // Lukk stottevinduet når man trykker i kartet.. 
-
-    //console.log(e.coordinate);
-    //console.log(proj4(viewProjection,coordSys,e.coordinate)[0]);
-
-    var y = proj4(viewProjection,coordSys,e.coordinate)[1];
     var x = proj4(viewProjection,coordSys,e.coordinate)[0];
-    
+    var y = proj4(viewProjection,coordSys,e.coordinate)[1];
 
-    document.getElementById("yCoordForm").value = y;
     document.getElementById("xCoordForm").value = x;
+    document.getElementById("yCoordForm").value = y;
 
     var currentZoom = e.frameState.viewState.zoom; // map.getZoom() didn't work
     document.getElementById("zoomForm").value = currentZoom;
 
+    // closeAboutFunc(); // funksjon for å lukke "aboutvinduet" når man trykker i kartet.
+    // closeStotteFunc(); // Lukk stottevinduet når man trykker i kartet.. 
+
+    // Debug?
+    console.log(e.coordinate);
+    console.log(proj4(viewProjection,coordSys,e.coordinate)[0]);
+
     oppdaterPekeSirkel(x,y);
 
     // Klikk på objekt for å få info //    
-    overlay.setPosition(e.coordinate);
+    popupOverlay.setPosition(e.coordinate);
 
     // vise boks med informasjon:
     const pixel = map.getEventPixel(e.originalEvent); // pixel i skjermvinduet
@@ -332,32 +296,7 @@ function init(){
 
   });
 
-  // Selve knappen
-  const tilbakeTilDuSerPaKnapp = document.getElementById("tilbakeTilDuSerPaID");
-
-  // Gå tilbake til utgangspunktvisning..
-  document.getElementById("tilbakeTilDuSerPaID").onclick = function (startpointfunc) {
-    // Function for going back to original view
-    var outputarray = getGETvariables();
-    map.setView(outputarray[0]); // Set a new view !
-
-    moveCount = 0;
-    tilbakeTilDuSerPaKnapp.classList.remove('tilbake');
-    tilbakeTilDuSerPaKnapp.classList.add('start');
-  };
-
-
-  map.on("movestart", function(e){
-    //console.log("kart flyttet!!")
-    if ( moveCount > 0 ) {
-      //tilbakeTilDuSerPaKnapp.classList.remove('start');
-      tilbakeTilDuSerPaKnapp.classList.add('tilbake');
-    };
-
-    moveCount += 1;
-  });
-
-
+  // Når skjer dette? Etter at man har navigert på kartet?
   map.on("moveend", function(e){
 
     // If coordinates is not set by user,
@@ -375,15 +314,13 @@ function init(){
       /* Get coordinate system from form */
       coordSys = "EPSG:" + document.getElementById("epsgForm").value;
 
-      var y = proj4(viewProjection,coordSys,centerCoord)[1];
       var x = proj4(viewProjection,coordSys,centerCoord)[0];
-
+      var y = proj4(viewProjection,coordSys,centerCoord)[1];
 
       document.getElementById("yCoordForm").value = y;
       document.getElementById("xCoordForm").value = x;
     }
   });
-
 
   window.getCoordSys=function(){
     /* Function for reporting change in coordinate system */ 
@@ -404,10 +341,31 @@ function init(){
     var nyttKoordinat = proj4(gammeltCoordSys,coordSys,[x,y]);
 
     // Write to form
-    document.getElementById("yCoordForm").value = nyttKoordinat[1];
     document.getElementById("xCoordForm").value = nyttKoordinat[0];
-
+    document.getElementById("yCoordForm").value = nyttKoordinat[1];
   }
+
+    // ?
+    // I html: onclick="doFunction();" <--- Skjønner ikke...
+    // Og her står det onclick = function (nyttkartlag), men "nyttkartlag" blir ikke brukt engang.
+    document.getElementById("addwmslayer").onclick = function (nyttkartlag) {
+        // Function for adding a WMS layer
+    
+        var neswmsurl = document.getElementById("newurlwms").value;
+        var newlayername = document.getElementById("newlayername").value;
+      
+        var nyttlag = new ol.layer.Image({
+          source: new ol.source.ImageWMS({
+            url: neswmsurl,
+            params: {'LAYERS': newlayername},
+            ratio: 2,
+            serverType: 'mapserver'
+          })
+        });
+    
+        map.addLayer(nyttlag); // Add WMS-layer to map layers
+        console.log(newlayername, "was added to the map layers");
+      };
 
   /////////////////////
   // Legg til testlag
@@ -442,8 +400,7 @@ function init(){
     kartlagDict[lagGruppe].getLayers().push(lagObjekt[elementTitle]); 
 
   }
-
-
+    
   function leggTilGeoJSON(inputDict,elementTitle){
     /* Global funksjon for å legge til GeoJSONlag */
   
@@ -529,11 +486,9 @@ function init(){
   lagObjekt = {}; // opprett et objekt til å lagge lagene inn i ...
   lagObjektBakgrunn = {};
 
-  
   function fjernLag(elementTitle){
     map.removeLayer(lagObjekt[elementTitle]);
   }
-
 
   function fjernLagFraLaggruppe(kartDataDict, elementTitle, lagGruppe){
 
@@ -547,9 +502,7 @@ function init(){
     console.log(kartlagDict[lagGruppe]);
     kartlagDict[lagGruppe].getLayers().remove(lagObjekt[elementTitle]);
 
-
   }
-
 
   function fjernKartlag(kartDataDict, elementTitle, lagGruppe, lagType){
     // Generell funksjon for å fjerne lag av alle typer..
@@ -566,20 +519,22 @@ function init(){
     }
   }
 
-  function oppdaterHTML(lagGruppe){
-    // Hver gang jeg tvinger inn nye elementer i HTML-koden,
-    // må jeg oppdatere alle bindingene inne i objektet som påvirkes.
+  // Hva? ... Har disabla for nå.
+
+//   function oppdaterHTML(lagGruppe){
+//     // Hver gang jeg tvinger inn nye elementer i HTML-koden,
+//     // må jeg oppdatere alle bindingene inne i objektet som påvirkes.
     
-    let kartlagPa = Object.keys(menyDict[lagGruppe]["dict"]);
-    for (let i = 0; i < kartlagPa.length; i++) {
+//     let kartlagPa = Object.keys(menyDict[lagGruppe]["dict"]);
+//     for (let i = 0; i < kartlagPa.length; i++) {
 
-      menyDict[lagGruppe]["dict"][kartlagPa[i]]["layer"] = document.getElementById(kartlagPa[i] + "OptionsFromMenu");
-      menyDict[lagGruppe]["dict"][kartlagPa[i]]["verticalLineMark"] = document.getElementById(kartlagPa[i] + "VL");
+//       menyDict[lagGruppe]["dict"][kartlagPa[i]]["layer"] = document.getElementById(kartlagPa[i] + "OptionsFromMenu");
+//       menyDict[lagGruppe]["dict"][kartlagPa[i]]["verticalLineMark"] = document.getElementById(kartlagPa[i] + "VL");
 
-    }
-  }
+//     }
+//   }
 
-  function fjernAlleKartlag(lagGruppe){
+function fjernAlleKartlag(lagGruppe){
 
     let kartlagPa = Object.keys(menyDict[lagGruppe]["dict"]);
     for (let i = 0; i < kartlagPa.length; i++) {
@@ -591,7 +546,6 @@ function init(){
       // Uncheck
       console.log(kartlagPa[i]);
       
-
       // Definer pa nytt!
       // Det ser ut til at jeg måtte definere disse på nytt etter at jeg har endret i html-filen!! 
 
@@ -601,14 +555,13 @@ function init(){
       fjernKartlag(kartDataDictForFjern, kartlagPa[i], lagGruppe, lagType);
     }
   }
-    
- 
-  
+
+  // Hva gjør denne? ...
+
   window.velgLagFunc = function(title,elementTitle){
     /* Check and uncheck element in list  */
 
     var checked = menyDict[title]["dict"][elementTitle]["checked"];
-
 
     if (checked == 1){
         menyDict[title]["dict"][elementTitle]["verticalLineMark"].classList.add("menuOptionUncheck");
@@ -631,10 +584,7 @@ function init(){
           break;
         }
 
-
     } else {
-
-
 
         elementer = Object.keys(menyDict[title]["dict"][elementTitle]);
         for (var i = 0; i < elementer.length; i++) {
@@ -688,7 +638,8 @@ function init(){
       }
   }
 
- 
+  // Hum?
+
   function oppdaterKartvisning(menyDict){
     // If som layers defaults to active when 
     // the map loads, the velgLagFunc()-function should be 
@@ -712,11 +663,14 @@ function init(){
     }
   }
 
-  oppdaterKartvisning(menyDict);
-
+  // OBS! Må kanskje bruke den under?
+  // oppdaterKartvisning(menyDict);
 
   window.leggTilWMSWMTSKnappFunc = function(){
     // Funksjon får å legge til WMS/WMTS lag ..
+
+    // Bare disabler alt for nå...
+    return;
 
     nyttLagEgetLagnavn = document.getElementById("nyttLagEgetLagnavn").value;
     nyttLagLagGruppe = document.getElementById("nyttLagLagGruppe").value;
@@ -730,6 +684,7 @@ function init(){
         opacity: 1}
     ];
 
+    // Hvis null, lager bakgrunnskart...
     if (menyDict[nyttLagLagGruppe]["dict"][nyttLagLayer] == null ){
 
       menyDict[nyttLagLagGruppe]["dict"][nyttLagLayer] = {
@@ -764,8 +719,6 @@ function init(){
       menyDict[title]["dict"][elementTitle]["layer"] = document.getElementById(elementTitle + "OptionsFromMenu");
       menyDict[title]["dict"][elementTitle]["verticalLineMark"] = document.getElementById(elementTitle + "VL");
 
-      
-      
       if (nyttLagLagGruppe == "bakgrunnskart"){
         fjernAlleKartlag("bakgrunnskart");
         oppdaterHTML(nyttLagLagGruppe); //oppdater html objektene i den aktuelle gruppen
@@ -776,12 +729,13 @@ function init(){
         velgLagFunc(title,elementTitle); // denne funksjonen må kjøres to ganger for ikke-bakgrunnskart
       }
 
-
     } else {
       let melding = menyDict[nyttLagLagGruppe]["name"] + " -> " + nyttLagEgetLagnavn;
       alert("Lag er allerede lagt til! Se: " + melding);
     }
   }
+
+  // Hva? ...
 
   window.scrapWMTSvWMSButton = function(){
     // Funksjon for å scrappe getCapabilities etter mulige kartlag! 
@@ -791,8 +745,13 @@ function init(){
     scrapWMTSvWMS(nyttLagGetCapabilities);
   }
 
+  // ?
+
   window.oppdaterNyttLagEgetLagnavn = function(){
     // les av verdi
+
+    // Disabler for nå? ...
+    return;
 
     // Må også vite at jeg faktisk valgte ett av altenativene... 
     let id = document.getElementById("nyttLagLayer").value + "_lagvalg";
@@ -809,17 +768,18 @@ function init(){
     } catch {}
   }
 
+  /* 
+    INFOBOKS
+  */
 
   window.infoButtonClick = function(title,tilBoks,tilContainer){
 
-    
     console.log("Informasjon om dette: " + title);
 
     //const infoboks = document.getElementById("infoBoks-container"); // finn element i html
     const infoboks = document.getElementById(tilContainer);
     infoboks.classList.remove("show");
     
-
     // tittel for infoboks
     const infoBoksTittel = document.getElementById("infoBoks-tittel");
 
@@ -830,13 +790,13 @@ function init(){
       nicetitle = title;
     }
       
-
     // infoboks innhold
     lesFil(title,tilBoks);
 
     infoboks.classList.add("show");
-
   }
+
+  // Hm.
 
   window.lukkBoksFunc = function(boks){
     // generell funksjon for å lukke boks...
@@ -847,6 +807,6 @@ function init(){
     vilkaarligBoks.classList.remove("show");
   }
     
-
+  // Til slutt returnerer map.
   return map;
 }

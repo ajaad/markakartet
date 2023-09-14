@@ -14,7 +14,15 @@ function titelfunc(){
   // funksjon for å finne karttitel
   var title = getUrlVars()["title"];
   if (title == null) {
-    title = "Kartdeomstrasjon";
+    title = "Kartdemonstrasjon";
+  } else {
+    // ERLEND: Legger til i "Del kartvisning" formen.
+    // Burde nok gjøres et etter sted senere.
+    var titleForm = document.getElementById("titleForm");
+    if(titleForm != null) {
+      titleForm.value = title; // input må bruke "value"... .text funket ikke.
+    }
+    // document.getElementById("titleForm").innerHTML = title;
   }
 
   return decodeURI(title);
@@ -25,6 +33,14 @@ function beskrivelseFunc(){
   var beskrivelse = getUrlVars()["beskrivelse"];
   if (beskrivelse == null) {
     beskrivelse = "<i>Ingen beskrivelse tilgjengelig</i>";
+  } else {
+      // ERLEND: Legger til i "Del kartvisning" formen.
+      // Burde nok gjøres et etter sted senere.
+      var beskrivelseForm = document.getElementById("beskrivelseForm");
+      if(beskrivelseForm != null) {
+        beskrivelseForm.value = beskrivelse; // Funket for textarea element.
+      }
+      // document.getElementById("beskrivelseForm").innerHTML = beskrivelse;
   }
 
   return decodeURI(beskrivelse);
@@ -34,13 +50,13 @@ function beskrivelseFunc(){
 
 /* Function for showing coordinates */ 
 function printCoord(){
+
   var x = getUrlVars()["x"];
   var y = getUrlVars()["y"];
 
   var epsg = getUrlVars()["EPSG"];
   var zoomLevelURL = getUrlVars()["zoom"];
   var sirkelURL = getUrlVars()["sirkel"];
-
 
   if ( epsg == null ) {
     epsg = "4326";
@@ -70,21 +86,42 @@ function printCoord(){
     string = "<div class=\"underTitel\">Koordinater (Geodetiske)</div>";
     string += "<ul class=\"duSerPa\">";
 
+    // ERLEND: Du kan finne Ion, lat, sirkel, osv. hvis du sjekker i style.css. F.eks:
+    // ul.duSerPa li.lon:before { content: "Lengde: ";  }
+    // ul.duSerPa li.lat:before { content: "Bredde: ";  }
+    // ul.duSerPa li.ZoomLevel:before { content: "ZoomLevel: ";}
+    // ul.duSerPa li.sirkel:before { content: "Sirkeldiameter: ";}
+
     string += "<li class=\"lon\">" + lon + "&deg;</li>";
     string += "<li class=\"lat\">" + lat + "&deg;</li>";
 
-
+    // OBS! Allerede riktig (oppdateres ved start).
+    // Erlend: Oppdatere verdiene i "Del kartvisning" formen.
+    // document.getElementById("xCoordForm").innerHTML = lon;
+    // document.getElementById("yCoordForm").innerHTML = lat;
   }
 
   if (sirkelURL != null) {
     string += "<li class=\"sirkel\">" + sirkelURL + "m</li>";
+
+    // Erlend: Oppdatere verdiene i "Del kartvisning" formen.
+    var sirkelForm = document.getElementById("sirkelForm");
+    if(sirkelForm != null) {
+      sirkelForm.value = sirkelURL;
+    }
+    // document.getElementById("sirkelForm").innerHTML = sirkelURL;
   };
 
   if (zoomLevelURL != null) {
     string += "<li class=\"ZoomLevel\">" + zoomLevelURL + "</li>";
-  };
 
-  
+    // OBS! Allerede riktig (oppdateres ved start).
+    // // Erlend: Oppdatere verdiene i "Del kartvisning" formen.
+    // var zoomForm = document.getElementById("zoomForm");
+    // if(zoomForm != null) {
+    //   zoomForm.text = zoomLevelURL;
+    // }
+  };
 
   string += "</ul>";
   string += "</div>";
@@ -108,7 +145,7 @@ function printCoordSys(){
 
 /////////////////
 
-// Add coordniate available systems 
+// Add coordinate available systems 
 
 proj4.defs("EPSG:25831","+proj=utm +zone=31 +ellps=GRS80 +units=m +no_defs"); 
 proj4.defs("EPSG:25832","+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs"); 
@@ -178,7 +215,7 @@ function getGETvariables(){
     var zoomLevel = getUrlVars()["zoom"];
     if (zoomLevel == null){
       zoomLevel = 9;
-      console.log("zoom er ikke vagt, default er 8");
+      console.log("zoom er ikke valgt, default er 8");
     }
 
     // Print coordnate system and startcoordinates to the console
@@ -248,7 +285,7 @@ function getGETvariables(){
 
     //return x, y, coordSys, zoom
     //return startpunktCoord, sirkelLag
-    var title = "dette er en titel";
+    var title = "dette er en tittel";
 
     var outputarray = [newview, sirkelLag,coordSys,title];
     return outputarray

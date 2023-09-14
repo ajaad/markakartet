@@ -2,12 +2,10 @@
 /// projection extent er nødvendig for enkelte wmts lag.
 let myProjectionExtent = [364800, 7884645, 1600315, 9484620];
 
-
 // Sub-menu dictionary Turer
 //turerDict = Object();
 
 //"https://openwms.statkart.no/skwms1/wms.friluftsruter2?request=GetCapabilities&service=WMS&version=1.3.0"
-
 
 // Datasettene jeg egentlig skal bruke er mangelfulle og rotete.
 // Denne delen blir utsatt til prosjektrunde nr. 2.
@@ -21,11 +19,8 @@ turerDict["eventyrSkogTur"] = {"name": "I eventyrskoger ","checked": 0, "lagGrup
 
 
 
-
-
 ////////////////////////////////////////////////////////
 // Sub-menu dictionary - Naturopplevelser
-naturoppDict = Object();
 
 eventyrskogKartdata = ["GeoJSONdata", {
     data: "data/eventyrskoger.geojson",
@@ -37,18 +32,23 @@ eventyrskogKartdata = ["GeoJSONdata", {
     strokeWidthSelect: 4,
     opacity: 1,
     clickEvent: 1
-    }];
+}];
+
+naturoppDict = Object();
 
 naturoppDict["eventyrskogerNaturopp"] = {
         "name": "Eventyrskoger",
         "checked": 1,
         "kartdata": eventyrskogKartdata,
-        "lagGruppe": "kartlagGruppe"
-    };
+        "lagGruppe": "kartlagGruppe"};
 
+console.log("naturoppDict: ");
+console.log(naturoppDict);
 
+////////////////////////////////////////////////////////
+// Sub-menu dictionary - Verneforslag
 
-farelsatteFLOdata = ["GeoJSONdata", {
+foreslatteFLOdata = ["GeoJSONdata", {
         data: "data/foreslatteFLO.geojson",
         strokeColor: [0,0,240,1],
         fillColor: [0,0,240,0.4],
@@ -84,11 +84,13 @@ reservatKandidatData = ["GeoJSONdata", {
     clickEvent: 1
 }];
 
-    
-
-////////////////////////////////////////////////////////
-// Sub-menu dictionary - Våre verneforslag
 verneforslagDict = Object();
+
+verneforslagDict["Friluftsomrader"] = {"name": "Friluftsområder",
+                                       "checked": 0,
+                                       "kartdata": foreslatteFLOdata,
+                                       "lagGruppe": "kartlagGruppe"};
+
 verneforslagDict["Landskapsvern"] = {"name": "Landskapsvern",
                                      "checked": 0,
                                      "kartdata": foreslatteVLOdata,
@@ -97,15 +99,13 @@ verneforslagDict["Landskapsvern"] = {"name": "Landskapsvern",
 verneforslagDict["Naturreservat"] = {"name": "Naturreservat",
                                      "checked": 0,
                                      "kartdata": reservatKandidatData,
-                                     "lagGruppe": "kartlagGruppe"
-                                };
-verneforslagDict["Friluftsomrader"] = {"name": "Friluftsområder",
-                                       "checked": 0,
-                                       "kartdata": farelsatteFLOdata,
-                                       "lagGruppe": "kartlagGruppe"};
+                                     "lagGruppe": "kartlagGruppe"};
+
+console.log("verneforslagDict: ");
+console.log(verneforslagDict);
 
 ////////////////////////////////////////////////////////
-// Sub-menu dictionary - Våre verneforslag
+// Sub-menu dictionary - Forvaltningsforslag
 
 RestaureringsomraderData = ["GeoJSONdata", {
     data: "data/restaureringsomrader.geojson",
@@ -119,13 +119,6 @@ RestaureringsomraderData = ["GeoJSONdata", {
     clickEvent: 1
 }];
 
-forvaltningsforslagDict = Object();
-forvaltningsforslagDict["Restaureringsomrader"] = {"name": "Restaureringsområder",
-                                                   "checked": 0,
-                                                   "kartdata": RestaureringsomraderData,
-                                                   "lagGruppe": "kartlagGruppe"};
-
-// 
 SammenhengendeVillmarkData = ["GeoJSONdata", {
     data: "data/sammenhengendeVillmark.geojson",
     strokeColor: [139,69,19,1],
@@ -138,21 +131,28 @@ SammenhengendeVillmarkData = ["GeoJSONdata", {
     clickEvent: 1
 }];
 
+forvaltningsforslagDict = Object();
+
+forvaltningsforslagDict["Restaureringsomrader"] = {"name": "Restaureringsområder",
+                                                   "checked": 0,
+                                                   "kartdata": RestaureringsomraderData,
+                                                   "lagGruppe": "kartlagGruppe"};
+
 forvaltningsforslagDict["SammenhengendeVillmark"] = {"name": "Sammenhengende villmark",
                                                    "checked": 0,
                                                    "kartdata": SammenhengendeVillmarkData,
                                                    "lagGruppe": "kartlagGruppe"};
 
-
+console.log("forvaltningsforslagDict: ");
 console.log(forvaltningsforslagDict);
+
 // Utelater sammenhengende villmark inntil videre
 //forvaltningsforslagDict["Sammenhengendevillmark"] = {"name": "Sammenhengende villmark","checked": 0, "lagGruppe": "kartlagGruppe"};
 
 
 
-
 ////////////////////////////////////////////////////////
-// Sub-menu dictionary - Våre verneforslag
+//
 
 dataNaturvernomrade = ["WMSlayer", {
     url: "https://kart.miljodirektoratet.no/arcgis/services/vern/mapserver/WMSServer",
@@ -191,7 +191,6 @@ vernEtterMarkalovenData = ["GeoJSONdata", {
     clickEvent: 1
 }];
 
-
 vernedeomraderDict = Object();
 vernedeomraderDict["Naturreservat2"] = {"name": "Naturvernområder","checked": 0, "kartdata": dataNaturvernomrade, "lagGruppe": "verneomrader"};
 vernedeomraderDict["NaturreservatKlasser"] = {"name": "Naturvernområder (etter klasser)","checked": 0, "kartdata": dataNaturvernomradeKlasser, "lagGruppe": "verneomrader"};
@@ -203,8 +202,11 @@ vernedeomraderDict["MarkalovenVern"] = {"name": "Vern etter markaloven",
                                              "kartdata": vernEtterMarkalovenData,
                                              "lagGruppe": "verneomrader"};
 
+console.log("vernedeomraderDict: "); 
+console.log(vernedeomraderDict);                                           
+
 // wmstjenestene henger en god del.
-// Det er i alle fall mulig å velge flere lag fra samme tjeneste..
+// Det er i alle fall mulig å velge flere lag fra samme tjeneste...
 
 ////////////////////////////////////////////////////////
 // Sub-menu dictionary - Våre verneforslag
@@ -240,7 +242,6 @@ dataTopo4WMTS = ["WMTSlayer",{
     opacity: 1}
 ];
 
-
 dataTopo4WMTSgra = ["WMTSlayer",{
     capabilURL: "https://opencache.statkart.no/gatekeeper/gk/gk.open_wmts?Version=1.0.0&service=wmts&request=getcapabilities",
     kartlagWMTS: "topo4graatone",
@@ -259,8 +260,6 @@ enkelBakgrunnWMTS = ["WMTSlayer",{
     opacity: 1}
 ];
 
-
-
 dataToporaster4Tiled = ["Tilelayer",{
     kartlag: new ol.layer.Tile({
         extent:  myProjectionExtent,
@@ -276,8 +275,6 @@ dataToporaster4Tiled = ["Tilelayer",{
 
 
 
-
-
 // http://localhost/markakart/wms.toporaster4
 // http://openwms.statkart.no/skwms1/wms.toporaster4?version=1.3.0&service=wms&request=getcapabilities
 
@@ -286,7 +283,7 @@ dataToporaster4Tiled = ["Tilelayer",{
 
 
 
-// Start med OSM som bakgrunnskart ! 
+// Start med OSM som bakgrunnskart! 
 bakgrunnskartDict["OSM"] = {"name": "OpenStreetMap","checked": 1, "kartdata": dataOSM, "lagGruppe": "bakgrunnskart"};
 
 // Legg til WMTS tjenester
@@ -298,6 +295,8 @@ bakgrunnskartDict["bakgrunnskartForenkletWMTS"] = {"name": "Bakgrunnskart forenk
 
 //https://opencache.statkart.no/gatekeeper/gk/gk.open_nib_web_mercator_wmts_v2?SERVICE=WMTS&REQUEST=GetCapabilities
 
+console.log("bakgrunnskartDict: "); 
+console.log(bakgrunnskartDict); 
 
 ///////////////////////////////////////////////////////
 // Annet undermeny
@@ -340,6 +339,8 @@ HistoriskData = ["WMSlayer", {
 }];
 annetDict["Historisk"] = {"name": "Historisk ferdselsrute", "checked": 0, "kartdata":HistoriskData, "lagGruppe": "kartlagGruppe"};
 
+console.log("annetDict: "); 
+console.log(annetDict); 
 
 /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
 /// Legg til elementene i hovedmenyen.. 
@@ -384,12 +385,10 @@ menyDict["leggTilLag"] = {"name": "Legg til WMS/WMTS",
                           "expanded": 0,
                           "lagGruppe": "leggTilLag"};
 
-/// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
-// run function to initialise the menu
-addGroupToMenu(menyDict);
+console.log("annetDict: ");                      
+console.log(annetDict);
 
-
-///  /// /// 
+/// /// /// 
 // Alle de klikkbare lagene skal til én array
 let klikkbareKartlag = [];
 
@@ -408,4 +407,11 @@ for (const [key, value] of Object.entries(menyDict)) {
         }
     }
 }
-//console.log(klikkbareKartlag);
+
+console.log("klikkbareKartlag: ");
+console.log(klikkbareKartlag);
+
+/// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
+
+// run function to initialise the menu
+addGroupToMenu(menyDict);

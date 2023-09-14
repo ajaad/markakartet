@@ -1,344 +1,640 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
 
+<head>
     <meta charset="UTF-8">
-    <link rel = "icon" href = "favicon.svg" type = "image/x-icon" />
-    <!-- gammel bibliotek 
-    <link rel="stylesheet" href="./libs/v6.5.0-dist/ol.css" type="text/css"> -->
-    <link rel="stylesheet" href="./libs/v6.6.1-dist/ol.css" type="text/css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- include my styling classes -->
+    <link rel="icon" href="favicon.svg" type="image/x-icon" />
+    <link rel="stylesheet" href="./libs/v6.6.1-dist/ol.css" type="text/css">
+    <!-- Testing an extension: -->
+    <!-- <link rel="stylesheet" href="./libs/ol-ext.css" type="text/css"> -->
     <link rel="stylesheet" href="./style.css" type="text/css">
+
+    <meta http-equiv="Content-Language" content="text/html;charset=utf-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+
+    <title>Markakartet - Dev</title>
+</head>
+
+<body>
+
+    <main>
+
+        <div class="hovedIkonContainer">
+            <img src="./images/favicon-ny.png" alt="Ikon" class="hovedIkon" />
+        </div>
+
+        <div class="" id="aapneHovedVinduKnapp">
+            <div>☰ Vis kartmeny</div>
+        </div>
+
+        <div class="hovedVinduKnapper" id="hovedVinduKnapper">
+            <div class="markaKnappene" id="markaKnappene">
+ 
+                <div class="" id="divMenyKart" onclick="kartMenySideKlikk('divMenyKart');">
+                    <img class="" id="divMenyKartBilde" src="./images/layer-white.png">
+                    <button class="markaKnapp" id="headerKnappKartMeny">Kart</button>
+                </div>
+                <div class="" id="divMenyDel" onclick="kartMenySideKlikk('divMenyDel');">
+                    <img class="" id="divMenyDelBilde" src="./images/share.png">
+                    <button class="markaKnapp" id="headerKnappDel">Del</button>
+                </div>
+                <div class="" id="divMenyStott" onclick="kartMenySideKlikk('divMenyStott');">
+                    <img class="" id="divMenyStottBilde" src="./images/favicon-only-inner-large-black.png">
+                    <button class="markaKnapp" id="headerKnappStott">Støtt</button>
+                </div>
+                <div class="" id="divMenyOm" onclick="kartMenySideKlikk('divMenyOm');">
+                    <img class="" id="divMenyOmBilde" src="./images/information.png">
+                    <button class="markaKnapp" id="headerKnappOm">Om</button>
+                </div>
+
+            </div>
+            <button class="markaKnapp lukkeHovedKnapper" id="lukkeHovedVinduKnapp">x</button>
+        </div>
+
+        <button id="thresholdTestButton">Test</button>
+
+        <div id="slideTextTest">Test Info</div>
+
+        <div class="hovedVinduContainer" id="kartHovedMenyContainer">
+
+<!--             <div class="hovedVinduTest" id="hovedVinduTest">
+                <ul class="kartHovedMeny" id="kartHovedMenyTest">
+                    <li class="gruppeMeny">
+                        <div>
+                            <div class="gruppeLenke" href="#">
+                                <img class="expandButtonTest" src="./images/right-chevron-256.png">
+                                <div>
+                                    <span>GeometriGruppeTest-----------------------------------------------------------------</span>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="submenuTest">
+                            <li>
+                                <div class="lagLenkeTest">
+                                    <div class="divIndikatorTest"></div>
+                                    <div>
+                                        <span>Geometri</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="lagLenkeTest">
+                                    <div class="divIndikatorTest"></div>
+                                    <div>
+                                        <span>1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div> -->
+
+            <div class="slide" id="hovedMenySlide">
+                <div id="touchbar"><img src="./images/arrows-up-and-down-filled-triangles.png"></div>
+                <!-- <div id="slideTextTest">slideTextTest</div> -->
+            </div>
+
+            <div class="hovedVindu" id="hovedVindu">
+
+                <!-- Test: Info om en feature, at Kartlag blir skjult... -->
+                <div class="featureInfo" id="featureInfo">
+
+                    <div class="featureInfoKnapper">
+                        <img src="./images/arrow-back.png" class="tilbakeKnapp" id="featureTilbakeKnapp" alt="Tilbake knapp" />
+                        <!-- <button class="finnKnapp" id="finnKnapp">Finn på kartet</button> -->
+                        <img src="./images/map-colorful.png" class="finnKnapp" id="finnKnapp" alt="Finn på kartet knapp"/>
+                    </div>
+                    <br />
+
+                    <div class="h2sentrert">
+                        <div class="h2stil" id="featureInfoTittel">Test Sognsvann</div>
+                    </div>
+                    <br />
+
+                    <!-- Bare for turene? -->
+                    <div id="featureTurKalenderGruppe">
+                        <div class="undertittel">Kalender</div>
+                        <p id="featureKalenderTekst">
+                            2021, juli. Sammenhengende tur 1 av 3. Av Isak Isakvik Isaksen.
+                        </p>
+                        <br />
+                    </div>
+
+                    <!-- For begge -->
+                    <div class="undertittel">Sted</div>
+                    <p id="featureSted">
+                        Nordmarka, Sognsvann.
+                    </p>
+                    <br />
+
+                    <!-- Bare for turene -->
+                    <div id="featureTurArstidGruppe">
+                        <div class="undertittel">Årstid</div>
+                        <p id="featureArstid">
+                            April - September.
+                        </p>
+                        <br />
+                    </div>
+
+                    <!-- Bare for turene -->
+                    <div id="featureTurVanskelighetsgradGruppe">
+                        <div class="undertittel">Vanskelighetsgrad</div>
+                        <p id="featureVanskelighetsgrad">
+                            Enkel. Flatt terreng. 60 min. 
+                        </p>
+                        <br />
+                    </div>
+
+                    <!-- Bare for turene -->
+                    <div id="featureTurTypeGruppe">
+                        <div class="undertittel">Tur type</div>
+                        <p id="featureTurType">
+                            Gå. (Sykle, padle)
+                        </p>
+                        <br />
+                    </div>
+
+                    <!-- Hm... Hvordan gjøre det for bilder? ... -->
+                    <!-- ... Hvordan ha flere bilder? -->
+                    <!-- Karusel? Swipe left/right? -->
+                    <!-- For begge? -->
+                    <div class="undertittel">Bilder</div>
+                    <div class="featureBilder" id="featureBilder">
+                        <img src="./images/test-cat.jpg"/>
+                        <img src="./images/test-sauer.jpg"/>
+                        <img src="./images/test-cabin.jpg"/>
+                        <img src="./images/test-norway.jpg"/>
+                        <img src="./images/test-ocean.jpg"/>
+                    </div>
+                    <br/>
+
+                    <!-- For begge? -->
+                    <div class="undertittel">Beskrivelse</div>
+                    <p id="featureBeskrivelse">
+                        Dette er test-beskrivelse for en tur.
+                        Området eller turen starter på Søndre Sandås og slutter på samme sted.
+                        Dette er en gåtur som egner seg best om våren til høsten.
+                    </p>
+                    <br/>
+
+                    <!-- Hm... For begge? -->
+                    <div class="undertittel">Reisevei</div>
+                    <p id="featureReisevei">
+                        T-bane til endestasjonen for 5 Sognsvann. Bil til parkeringsområdet ved Sognsvann. 
+                    </p>
+                    <br />
+
+                    <!-- For begge? -->
+                    <div class="undertittel">Tags</div>
+                    <p id="featureTags">
+                        2021, juli, sognsvann, sommer, vår, høst, vann, innsjø, t-bane, parkering, gå
+                    </p>
+                    <br />
+
+                    <!-- For begge -->
+                    <div class="undertittel">Mer informasjon</div>
+                    <p>
+                        <a id="featureLink" href="https://google.com" target=”_blank” title="Lenke til Naturvernforbundets side for Sognsvann">Sognsvann.</a>
+                    </p>
+                    <br />
+
+                    <div class="featureInfoKnapper">
+                        <img src="./images/arrow-back.png" class="tilbakeKnapp" id="featureTilbakeKnapp2" alt="Tilbake knapp nederst" />
+                        <img src="./images/map-colorful.png" class="finnKnapp" id="finnKnapp2" alt="Finn på kartet knapp nederst"/>
+                    </div>
+                    <br />
+
+                </div>
+                
+                <ul class="kartHovedMeny" id="kartHovedMeny">
+                
+                    <!-- DEBUG -->
+<!--                     <div class="debugVindu">
+                        <div id="debugVinduTekst">DEBUG</div>
+                    </div> -->
+                
+                    <!-- Lagt til elementer med JavaScript -->
+                
+                </ul>
+
+                <!-- Del Kartvisning -->
+
+                <div id="delKartvisning">
+
+                    <div class="h2sentrert">
+                        <h2>Del kartvisningen</h2>
+                    </div>     
+
+                    <form onsubmit="return false;">
+
+                        <label for="fname">Tittel:</label><br />
+                        <input value="" class="formInput" type="text" id="titleForm">
+
+                        <br /><br />
+
+                        <label for="lname">Beskrivelse:</label><br />
+                        <textarea class="formInput" id="beskrivelseForm"></textarea>
+                        <br /><br />
+
+                        <label>Zoom:</label><br />
+                        <input class="formInput" type="number" id="zoomForm">
+                        <br />
+                        <br />
+
+                        <br />
+                        <div class="undertittel">Koordinater</div>
+                        <br />
+
+                        <!-- Trenger ikke? -->
+                        <select class="formInput" value="getCoordSysToForm" id="epsgForm" type="number"
+                            onchange=getCoordSys(this) style="display: none;">
+                            <option value="4326">Geodetisk (EPSG:4326)</option>
+                            <option value="25831">ETRS89 / UTM sone 31 (EPSG: 25831)</option>
+                            <option value="25832">ETRS89 / UTM sone 32 (EPSG: 25832)</option>
+                            <option value="25833">ETRS89 / UTM sone 33 (EPSG: 25833)</option>
+                        </select>
+                        <!-- <br /><br /> -->
+
+                        <label>Lengde (x):</label><br />
+                        <input class="formInput" type="number" id="xCoordForm">
+                        <br /><br />
+
+                        <label>Bredde (y):</label><br />
+                        <input class="formInput" type="number" id="yCoordForm">
+                        <br />
+                        <br />
+
+                        <br />
+                        <div class="undertittel">Geometri</div>
+                        <br />
+
+                        <!-- Legge til figurtype-valg senere. Eks. firkant, heksagon?, polygon? ... -->
+
+                        <label>Størrelse:</label><br />
+                        <input class="formInput" value=20 type="number" id="sirkelForm">
+                        <br /><br />
+
+                        <label>Farge:</label><br />
+
+                        <div class="formColorPickerContainer">
+
+                            <button class="colorPickerButton" id="colorPickerButton" data-jscolor="{
+                                value: 'rgba(13, 12, 119, 0.75)',
+                                palette: [
+                                'rgba(255,255,255,1)', 'rgba(0,0,0,1)', 'rgba(255,0,0,1)', 'rgba(255,153,0,1)', 'rgba(255,255,0,1)',
+                                'rgba(51,255,0,1)', 'rgba(0,255,255,1)', 'rgba(0,102,255,1)', 'rgba(153,51,255,1)', 'rgba(255,153,255,1)'
+                                ],
+                                valueElement:'#figurFargeForm',
+                                borderColor: 'rgb(255,255,255,0)',
+                                borderWidth: 0,
+                                buttonColor: 'rgb(255,255,255,0)',
+                                position:'top',
+                                preset: 'light',
+                            }">
+                            <!-- onChange: 'oppdatertFarge(this, \'#figurFargeForm\')' -->
+
+                        </div>
+
+                        <div class="colorInputContainer">
+                            <input class="formInput inputFarge" id="figurFargeForm">
+                        </div>
+
+                        <br />
+
+                    </form>
+
+                    <br /><br />
+                    <div class="genererUrlContainer">
+                        <button class="markaKnapp" id="genererUrlKnapp">Generer URL</button>
+                    </div>
+                    <div class="generertURLContainer" id="generertURLContainer">
+                        <span class="generertURL" id="generertURL"></span>
+                        <img id="kopierURL" src="./images/copy-files.png">
+                    </div>
+                    <span id="callbackKopiering"></span>
+                    <br />
+                </div>
+
+                <div id="omMarkakartet">
+
+                    <div class="divTittelFull">
+                        <div class="divTittel">
+                            <img class="noaIkon" src="./images/favicon-ny.png" alt="Ikon" />
+                            <h1>Markakartet</h1>
+                        </div>
+                    </div>
+
+                    <div class="h2sentrert">
+                        <h2>Lagbeskrivelser</h2>
+                    </div>
+
+                    <p>
+                        Kartlagene er tilgjengelige under siden "Kart". Lagene er delt inn i seks grupper beskrevet
+                        nedenfor.
+                    </p>
+
+                    <br />
+
+<!--                     <div class="undertittel">Geometri</div>
+                    <p>
+                        Dette kartlaget inneholder figurer, for eksempel sirkler, lagt til av brukere.
+                    </p>
+                    <br /> -->
+
+                    <div class="undertittel">Naturopplevelser</div>
+                    <p>
+                        Disse lagene inneholder verdier som primært er knyttet til friluftsliv og opplevelser.
+                    </p>
+                    <br />
+
+                    <div class="undertittel">Våre forvaltningsforslag</div>
+
+                    <p>
+                        Disse kartlagene inneholder informasjon om NOAs forslag til forvaltingstiltak som ikke handler om vern.
+                        Områder hvor opplevelses- og naturverdier er skadet kan restaureres.
+                        Ved å restaurere områder kan verdifulle områder bli knyttet sammen.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">Våre verneforslag</div>
+
+                    <p>
+                        Disse lagene inneholder NOAs forslag til hvilke områder som bør vernes.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">Vernede områder</div>
+
+                    <p>
+                        Disse lagene inneholder oppdatert informasjon om hvilke områder som er vernet i Norge.
+                        Disse kartlagene ajourføres av Miljødirektoratet.
+                    </p>
+
+                    <ul class="tekstListe">
+                        <li>
+                            <a href="https://kartkatalog.geonorge.no/metadata/naturvernomraader-wms/fa6a495d-05a1-4c0d-ba67-45a1d47fca92"
+                                target="_blank" rel="noopener noreferrer">Info om naturvernområder</a>
+                        </li>
+                        <li>
+                            <a href="https://kartkatalog.geonorge.no/metadata/friluftslivsomraader-statlig-sikra-wms/ef63146d-c689-4079-97b5-89f04bcfd1ff"
+                                target="_blank" rel="noopener noreferrer">Info om statlig sikra friluftsområder</a>
+                        </li>
+                    </ul>
+
+                    <br />
+
+<!--                     <div class="undertittel">Naturopplevelser</div>
+                    <p>
+                        Disse lagene inneholder verdier som primært er knyttet til friluftsliv og opplevelser.
+                    </p>
+                    <br /> -->
+
+                    <div class="undertittel">Brukerformer</div>
+                    <p>
+                        Dette kartlaget inneholder figurer, for eksempel sirkler, lagt til av brukere.
+                        <!-- Dette kartlaget inneholder figurer, for eksempel sirkler, lagt til av brukere, samt GPS-relaterte former. -->
+                    </p>
+                    <br />
+
+                    <div class="undertittel">Bakgrunnskart</div>
+
+                    <p>
+                        Bakgrunnskartlagene er heldekkende kartlag som er ment å brukes for referanse.
+                    </p>
+
+                    <br />
+
+                    <p>
+                        Her er link til informasjon om de tjenestene som allerede er lagt inn:
+                    </p>
+
+                    <ul class="tekstListe">
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/OpenStreetMap" target="_blank"
+                                rel="noopener noreferrer">OpenStreetMap</a>
+                        </li>
+                        <li>
+                            <a href="https://kartkatalog.geonorge.no/metadata/toporaster-4-cache/99de348d-fdc1-4b04-a79e-31feeeba030a"
+                                target="_blank" rel="noopener noreferrer">Toporaster4</a>
+                        </li>
+                        <li>
+                            <a href="https://kartkatalog.geonorge.no/metadata/norge-i-bilder-wmts-mercator/d639038c-a75b-446a-ad0c-16301cabfd21"
+                                target="_blank" rel="noopener noreferrer">Norge i bilder</a>
+                        </li>
+                        <li>
+                            <a href="https://kartkatalog.geonorge.no/metadata/toporaster-4-cache/99de348d-fdc1-4b04-a79e-31feeeba030a"
+                                target="_blank" rel="noopener noreferrer">Toporaster4 grå</a>
+                        </li>
+                        <li>
+                            <a href="https://kartkatalog.geonorge.no/metadata/toporaster-4-cache/99de348d-fdc1-4b04-a79e-31feeeba030a"
+                                target="_blank" rel="noopener noreferrer">Bakgrunnskart forenklet</a>
+                        </li>
+                    </ul>
+
+                    <br>
+
+                    <p>
+                        Siden bakgrunnskartene er heldekkende er det kun mulig å ha ett aktivt bakgrunnskart om gangen.
+                        Dette er gjort for å hindre unødig mye bruk av tjenestene.
+                    </p>
+
+                    <br /><br />
+
+                    <div class="h2sentrert">
+                        <h2>Om Markakartet</h2>
+                    </div>
+
+                    <p>
+                        Markakartet er Naturvernforbundet i Oslo og Akershus sin nettløsning for å dele informasjon om
+                        verdifulle områder i Oslomarka.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">
+                        Personvern
+                    </div>
+                    <p>
+                        Markakartet lagrer ingen data om deg som bruker. Kildekoden er åpen for inspeksjon
+                        <a href="https://github.com/ajaad/markakartet" target="_blank" rel="noopener noreferrer">her (ny
+                            fane)</a>.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">
+                        Finansiering
+                    </div>
+                    <p>
+                        Tjenesten er utviklet med økonomisk tilskudd fra Kommunal- og moderniseringsdepartementet (KMD)
+                        gjennom <a
+                            href="https://www.regjeringen.no/no/dep/kmd/kmd-tilskudd/lokal-kompetanse-innen-plan-kart-og-geodata/id2549246/">
+                            kompetansetiltak innen plan, kart og geodata</a>.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">
+                        Takk til
+                    </div>
+                    <p>
+                        Takk til interaksjonsdesigner Trine Lise Lindahl for kartlegging av brukerbehov og flotte
+                        designdokumenter.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">
+                        Open-source
+                    </div>
+                    <p>
+                        Markakartet er skrevet i javascript og bruker følgende biblioteker:
+
+                        <br />
+
+                    <ul class="tekstListe">
+                        <li><a href="https://openlayers.org/" target="_blank" rel="noopener noreferrer">openlayers
+                                v6.6.1</a></li>
+                        <li><a href="http://proj4js.org/" target="_blank" rel="noopener noreferrer">proj4</a></li>
+                    </ul>
+                    </p>
+
+                    <br />
+
+                    <p>
+                        Markakartet er et open-sourceprosjekt
+                        (<a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank"
+                            rel="noopener noreferrer">GPL v3.0</a>)
+                        laget av Anders Johan Konnestad <span style="font-style:italic;">(Konnestad Consulting)</span>. Videreutviklet av Erlend Kyrkjerud Hårtveit.
+                    </p>
+
+                    <br />
+
+<!--                     <div style="display: flex; align-items: center; justify-content: center;">
+                        <img src=" ./images/konnestad_logo.svg" width="auto">
+                    </div> -->
+
+                </div>
+
+                <!-- Støtte -->
+
+                <div id="stotte">
+
+                    <div class="h2sentrert">
+                        <h2>Støtt arbeidet vårt!</h2>
+                    </div>
+
+                    <p>
+                        Norsk natur er under press og det er ressurskrevende å bevare de gjenværede skogene i marka.
+                        Bidrag til Naturvernforbundets arbeid blir høyt verdsatt.
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">
+                        Bli medlem
+                    </div>
+                    <p>
+                        For mer informasjon om medlemskap
+                        <a href="https://naturvernforbundet.no/bli-medlem/" target="_blank"
+                            rel="noopener noreferrer">klikk her (ny fane).</a>
+                    </p>
+
+                    <br />
+
+                    <div class="undertittel">
+                        Gi pengegave
+                    </div>
+                    <p>
+                        Gi pengegave til NOAs Vipps-nummer: #81134
+                        <!-- Gi pengegave til NOA. For mer informasjon 
+                        <a href="https://naturvernforbundet.no/stott-arbeidet/gi-gave/" target="_blank" rel="noopener noreferrer">klikk her (ny fane)</a> -->
+                        <!-- <a href="https://naturvernforbundet.no/gi-en-gave/category4448.html" target="_blank" rel="noopener noreferrer">klikk her (ny fane).</a> -->
+                    </p>
+
+                    <br />
+
+                    <div class="NoaLogoContainer">
+                        <img src="./images/Logo_Oslo_og_Akershus_Ny_Transparent.png">
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- add a custom WMS-layer (wmsmenu er satt til usynlig i css.)   -->
+        <form method="post" class="wmsmenu">
+            <br>
+            <label for="name">WMS URL: </label>
+            <input type="text" id="newurlwms" name="newurlwms">
+            <br>
+            <label for="name">WMS layer: </label>
+            <input type="text" id="newlayername" name="newlayername">
+            <input id="addwmslayer" type="button" value="Add a WMS-layer" onclick="doFunction();" />
+        </form>
+
+    </main>
+
+    <footer>
+
+    </footer>
+
+    <div class="debugGPSContainer" id="debugGPSContainer">
+        <div class="debugGPS" id="debugGPS"></div>
+    </div>
+
+<!--     <button class="gpsButtonContainer disabledHover" id="gpsButtonContainer">
+        <img id="gpsButton" alt="gps" src="./images/gps-white.png"/>
+    </button> -->
+
+    <div class ="rightButtonsContainer">
+        <button class="rightButton gpsButtonContainer disabledHover" id="gpsButtonContainer">
+            <img id="gpsButton" alt="gps" src="./images/gps-white.png"/>
+        </button>
+        <button class="rightButton zoomButtons" id="buttonZoomIn">+</button>
+        <button class="rightButton zoomButtons" id="buttonZoomOut">-</button>
+    </div>
+
+<!--     <div class="gpsButtonContainer" id="gpsButtonContainer">
+        <img id="gpsButton" alt="gps" src="./images/gps-white.png"/>
+    </div> -->
     
-    <title>Markakartet</title>
+    <!-- 
+        Hm. On OpenLayers, it says the map element must appear before the script that
+        initializes it, so...
+     -->
+    <div class="map" id="map"></div>
+    <!-- <div class="zoom-control" id="zoomknapper"></div> -->
+    <div class="scale-line" id="scale-line-id"></div>
 
-    <!-- norsk nettside-->
-    <meta http-equiv="Content-Language" content="text/html;charset=utf-8"/>
+    <div id="ol-popup" class="ol-popup">
+        <div id="popup-closer" class="ol-popup-closer"></div>
+        <div id="popup-content"></div>
+    </div>
 
-    <!-- Autorefresh etter tre sekunder
-    <meta http-equiv="refresh" content="3" >
-    -->
-
-  </head>
-  <body>
-    <!-- include static java-script libraries -->
-    <!-- <script src="./libs/v6.5.0-dist/ol.js"></script> -->
+    <!-- ColorPicker -->
+    <script src="./libs/jscolor.min.js"></script>
 
     <script src="./libs/v6.6.1-dist/ol.js"></script>
     <script src="./libs/proj4.js"></script>
+    <!-- JQuery -->
+    <script src="./libs/jquery-3.6.1.min.js"></script>
 
+    <!-- Testing a new extension: -->
+    <!-- <script src="./libs/ol-ext.min.js"></script> -->
+    <!-- <script src="./libs/ol-ext.js"></script> -->
 
-    <!-- include my functions -->
-    <script src="./scripts/getvariables.js"></script>
-    <script src="./scripts/nySirkel.js"></script>
+    <!--  -->
+    <script src="./scripts/kartData.js"></script>
+    <script src="./scripts/kartFunksjoner.js"></script>
+    <script src="./scripts/kart.js"></script>
 
-    <script src="./scripts/functions.js"></script>
+</body>
 
-
-
-    <!-- custom map title -->
-    <div class="venstreBoks">
-      <div class="innhold">
-        <img src="favicon.svg" height= "75" alt="Ikon" class="icoImage"/>
-        <p>
-        <h1>Markakartet</h1>
-        </p>
-      </div>
-    </div>
-
-    <div class="hoyreBoks">
-      <div class="innhold">
-        <div class="venstre">
-          <button class="markaButton"
-            id="apneOmMarkakartet"
-            onclick="infoButtonClick('omMarkakartet','omMarkakartetID','containerAbout')"
-            >
-            Om Markakartet
-          </button>
-        </div>
-        <div class="hoyre">
-          <button class="markaButton"
-            id="apneStotte"
-            onclick="infoButtonClick('omStotte','omStotteID','containerStotte')"
-            >
-            Støtt vårt arbeid
-          </button>
-        </div>
-      </div>
-    </div>
-
-
-
-    <!-- Om Markakartet-->
-    <div class="model-container" id="containerAbout">
-      <div>
-        <button id="lukkeOmMarkakartet" class="lukkeKnapp">&times;</button>
-      </div>
-      <div class="modal">
-
-        <div id="omMarkakartetID">
-        </div>
-
-        </div>
-      </div>
-    </div>
-
-
-    <!-- "Støtt vårt arbeid" vindu  -->
-    <div class="model-container" id="containerStotte">
-      <div>
-        <button id="lukkeStotte" class="lukkeKnapp">&times;</button>
-      </div>
-      <div class="modal">
-
-        <div id="omStotteID">
-        </div>
-
-      </div>
-    </div>
-
-    <!--- Du ser på -->
-    <div class="model-container" id="containerDuSerPa">
-
-      <div>
-        <button id="tilbakeTilDuSerPaID" class="tilbakeTilDuSerPa start"></button>
-      </div>
-
-      <div>
-        <button id="lukkDuSerPa" class="lukkeKnapp">&times;</button>
-      </div>
-      <div class="modal" id="duSerPa">
-        <div class="hovedTitel">
-          <script>
-            document.write(titelfunc());
-          </script>
-        </div>
-        <p>
-          <script>
-            document.write(beskrivelseFunc());
-          </script>
-        </p>
-
-        <p>
-          <script>
-            document.write(printCoord());
-          </script>
-        </p>
-      </div>
-    </div>
-
-
-    <div class="model-container menuLeft-container" id="menuDelKartvisning-container">
-      <div class="modal">
-        <div>
-          <button id="lukkDelKartvisning" class="lukkeKnapp">&times;</button>
-        </div>
-
-        <div class="hovedTitel">
-          Del kartvisningen
-        </div>
-
-
-        <!-- Form -->
-        <form>
-          <label for="fname">Tittel:</label><br>
-          <input value="" type="text" id="titleForm"><br>
-
-          <label for="lname">Beskrivelse:</label><br>
-          <textarea id="beskrivelseForm"></textarea>
-            
-
-          <!-- koordinater -->
-          <div class="underTitel">
-            Koordinater <!-- <script>document.write(printCoordSys());</script> -->
-          </div>
-          <label>y:</label><br>
-          <input type="number" id="yCoordForm" onchange=oppdaterPekeSirkelManual()>
-          <br>
-
-
-          <label>x:</label><br>
-          <input type="number" id="xCoordForm" onchange=oppdaterPekeSirkelManual()>
-          <br>
-
-          <label>Koordinatsystem:</label><br>
-          <select
-              value="getCoordSysToForm"
-              id="epsgForm" type="number"
-              onchange=getCoordSys(this)>
-              
-            <option value="4326">Geodetisk (EPSG:4326)</option>
-            <option value="25831">ETRS89 / UTM sone 31 (EPSG: 25831)</option>
-            <option value="25832">ETRS89 / UTM sone 32 (EPSG: 25832)</option>
-            <option value="25833">ETRS89 / UTM sone 33 (EPSG: 25833)</option>
-          </select>
-          <br>
-          
-
-          <label>Zoom:</label><br>
-          <input type="number" id="zoomForm" onchange="oppdaterZoom()">
-          <br>
-
-
-          <label>Sirkeldiameter:</label><br>
-          <input value=20 type="number" id="sirkelForm" onchange=oppdaterPekeSirkelManual()>
-          <br>
-        </form> 
-
-        <div style="float:right;margin-top: 20px;">
-          <div>
-            <button id="genererUrlKnapp" class="markaButton">Generer URL</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-
-    <!-- modal interrupt / presenter URL   -->
-    <div class="model-container interrupt-container" id="genererURLID">
-      <div class="modal" style="width: 500px; position: fixed;">
-        <div>
-          <button id="lukkURLgenerert" class="lukkeKnapp">&times;</button>
-        </div>
-        <div class="hovedTitel">
-          Del kartvisningen
-        </div>
-        <p>
-          Informasjonen du oppgav er fylt inn i nettadressen nedenfor:
-        </p>
-
-        <form>
-          <textarea id="textAreaURL" style="height: auto;min-height: 150px; min-width: 500px;"></textarea>
-        </form>
-
-        <div style="float:right;margin-top: 20px;">
-          <div>
-            <button id="kopierUrlKnapp"
-              class="markaButton"
-              onclick="copyURLutklippstavle()">
-              Kopier til utklippstavle
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- popupbox når jeg trykker på et objekt -->
-    <div id="popup" >
-      <div  class="infoPil"></div> <!-- peker-->
-      <div class="popupBox">
-
-        <div>
-          <div id="popup-content" class="popupContent"></div>
-
-          <button id="lukkInfoPopup"
-            class="lukkeKnapp popupLukk"
-            onclick="lukkInfoPopupFunc()">
-            &times;
-          </button>
-        </div>
-
-      </div>
-    </div> 
-
-    <!-- Main menu -->
-    </script>
-
-    <div class="model-container menuLeft-container" id="mainMenu-container">
-      <div class="modal">
-        <div>
-          <button
-            id="lukkHovedmeny"
-            class="lukkeKnapp"
-            onclick="lukkHovedmenyFunc()">
-              &times;
-          </button>
-        </div>
-
-        <!-- HENT HOVEDMENY! -->
-        <script src="./scripts/menu/addElementToMenu.js"></script>
-
-      </div>
-    </div>
-
-
-    <!-- Infobox  -->
-    <!--- <script src="./scripts/infoDict.js"></script> -->
-    <div class="model-container menuLeft-container" style='left:425px;' id="infoBoks-container">
-      <div class="modal">
-        <!-- <div> -->
-
-          <div id="infoBoks-tittel" class="popupTitle"></div>
-
-          <button
-            id="lukkInfoboks"
-            class="lukkeKnapp"
-            onclick="lukkBoksFunc('infoBoks-container')">
-              &times;
-          </button>
-
-          <div id="infoBoks-innhold" class="popupContent">
-            
-            <!-- injiser ingformasjon her  -->
-          </div>
-      </div>
-    </div>
-
-    <!-- Add the map-->
-    <div id="map" class="map">
-      
-      <script src="./scripts/main.js"></script>
-      <!-- <script src="./scripts/leggTilGeoJSON.js"></script> -->
-
-      <button id="apneHovedmeny"
-        class="lukkeKnapp apneHovedmenyKnapp hamburgerSym skjulKnapp"
-        onclick="apneHovedmenyFunc()">
-            <div class="hStrek"></div>
-            <div class="hStrek"></div>
-            <div class="hStrek"></div>
-      </button>
-
-
-      <div>
-        <button id="apneDuSerPa" class="lukkeKnapp kartutsnittKnapp skjulKnapp">Kartutsnitt</button>
-      </div>
-
-
-      <!-- målestokk -->
-      <div id="scale-line-id" class="scale-line"></div>
-
-      <div style="position:absolute;  z-index: 1; margin: 20px; right: 60px; bottom:160px;">
-        <div id="zoomknapper" class="zoom-control"></div>
-      </div>
-
-      <div>
-        <button class="markaButton" id="delKartvisnig">Del kartvisningen</button>
-      </div>
-    
-  </div>
-
-  <!-- <script src="./scripts/nySirkel.js"></script> -->
-  <script src="./scripts/about.js"></script>
-
-  <!-- kart slutt-->
-  <!--  END-->
-
-
-    <!--- goToStartPoint-->
-    <!-- add a custom WMS-layer (wmsmenu er satt til usynlig i css.)   -->
-    <form method="post" class="wmsmenu">
-      <br>
-      <label for="name">WMS URL: </label>
-      <input type="text" id="newurlwms" name="newurlwms">
-
-      <br>
-
-      <label for="name">WMS layer: </label>
-      <input type="text" id="newlayername" name="newlayername">
-      <input id="addwmslayer" type="button" value="Add a WMS-layer" onclick="doFunction();" />
-    </form> 
-    
-  </body>
 </html>
