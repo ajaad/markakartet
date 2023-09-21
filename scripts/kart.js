@@ -452,7 +452,7 @@ $(document).ready(function(){
     name: "Naturopplevelser",
     opacity: 1,
     visible: true,
-    layers: [vektorLagMarkagrensa, vektorLagEventyrskog, wmsLagFotrute, wmsLagHistorisk,
+    layers: [vektorLagMarkagrensa, vektorLagEventyrskog, // wmsLagFotrute, wmsLagHistorisk,
       vektorLagKalenderRuter2021
     ]
   });
