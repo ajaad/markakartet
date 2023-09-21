@@ -453,7 +453,7 @@ $(document).ready(function(){
     opacity: 1,
     visible: true,
     layers: [vektorLagMarkagrensa, vektorLagEventyrskog, // wmsLagFotrute, wmsLagHistorisk,
-      vektorLagKalenderRuter2021
+      // vektorLagKalenderRuter2021
     ]
   });
 
