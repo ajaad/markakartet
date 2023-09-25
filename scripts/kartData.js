@@ -430,9 +430,9 @@ var foreslatteFLOdata = ["GeoJSONdata", {
     clickEvent: 1,
 }];
 
-var foreslatteVLOdata = ["GeoJSONdata", {
-    name: "foreslatteVLOdata",
-    data: "data/foreslatteVLO.geojson",
+var foreslatteLVOdata = ["GeoJSONdata", {
+    name: "foreslatteLVOdata",
+    data: "data/foreslatteLVO.geojson",
     strokeColor: [240, 240, 0, 1],
     fillColor: [240, 240, 0, 0.4],
     strokeWidth: 2,
@@ -483,31 +483,31 @@ if (stilSelectForeslatteFLO == null) {
     stilSelectForeslatteFLO = defaultLayerSelectStyle;
 }
 
-// ForeslatteVLO
+// ForeslatteLVO
 
-foreslatteVLOdata = setteNyFargeForKeyGeoJSON(foreslatteVLOdata, "strokeColor", 191, 191, 0, 1);
-foreslatteVLOdata = setteNyFargeForKeyGeoJSON(foreslatteVLOdata, "fillColor", 191, 191, 0, 0.15);
-foreslatteVLOdata = setteNyFargeForKeyGeoJSON(foreslatteVLOdata, "strokeColorSelect", 159, 159, 0, 1);
-foreslatteVLOdata = setteNyFargeForKeyGeoJSON(foreslatteVLOdata, "fillColorSelect", 159, 159, 0, 0.3);
+foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "strokeColor", 191, 191, 0, 1);
+foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "fillColor", 191, 191, 0, 0.15);
+foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "strokeColorSelect", 159, 159, 0, 1);
+foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "fillColorSelect", 159, 159, 0, 0.3);
 
-foreslatteVLOdata = justerFargeAlphaForGeoJSON(foreslatteVLOdata);
+foreslatteLVOdata = justerFargeAlphaForGeoJSON(foreslatteLVOdata);
 
-var strokeColorSelectForeslatteVLO = hentOgKonverterFargeArray(foreslatteVLOdata, 'strokeColorSelect');
-if (strokeColorSelectForeslatteVLO == null) {
-    strokeColorSelectForeslatteVLO = defaultFargeStroke;
+var strokeColorSelectForeslatteLVO = hentOgKonverterFargeArray(foreslatteLVOdata, 'strokeColorSelect');
+if (strokeColorSelectForeslatteLVO == null) {
+    strokeColorSelectForeslatteLVO = defaultFargeStroke;
 }
-var fillColorSelectForeslatteVLO = hentOgKonverterFargeArray(foreslatteVLOdata, 'fillColorSelect');
-if (fillColorSelectForeslatteVLO == null) {
-    fillColorSelectForeslatteVLO = defaultFargeFill;
+var fillColorSelectForeslatteLVO = hentOgKonverterFargeArray(foreslatteLVOdata, 'fillColorSelect');
+if (fillColorSelectForeslatteLVO == null) {
+    fillColorSelectForeslatteLVO = defaultFargeFill;
 }
 
-var stilForeslatteVLO = lagStilFraGeoJSON(foreslatteVLOdata, false);
-if (stilForeslatteVLO == null) {
-    stilForeslatteVLO = defaultLayerStyle;
+var stilForeslatteLVO = lagStilFraGeoJSON(foreslatteLVOdata, false);
+if (stilForeslatteLVO == null) {
+    stilForeslatteLVO = defaultLayerStyle;
 }
-var stilSelectForeslatteVLO = lagStilFraGeoJSON(foreslatteVLOdata, true);
-if (stilSelectForeslatteVLO == null) {
-    stilSelectForeslatteVLO = defaultLayerSelectStyle;
+var stilSelectForeslatteLVO = lagStilFraGeoJSON(foreslatteLVOdata, true);
+if (stilSelectForeslatteLVO == null) {
+    stilSelectForeslatteLVO = defaultLayerSelectStyle;
 }
 
 // ReservatKandidat
@@ -556,21 +556,21 @@ var vektorLagforeslatteFLO = new ol.layer.Vector({
     visible: false
 });
 
-var vektorKildeforeslatteVLO = new ol.source.Vector({
-    url: "data/foreslatteVLO.geojson",
+var vektorKildeforeslatteLVO = new ol.source.Vector({
+    url: "data/foreslatteLVO.geojson",
     format: geoJSONFormat,
     features: new ol.Collection()
 });
 
-var vektorLagforeslatteVLO = new ol.layer.Vector({
-    source: vektorKildeforeslatteVLO,
-    style: stilForeslatteVLO,
-    name: "vektorLagforeslatteVLO",
+var vektorLagforeslatteLVO = new ol.layer.Vector({
+    source: vektorKildeforeslatteLVO,
+    style: stilForeslatteLVO,
+    name: "vektorLagforeslatteLVO",
     uiName: "Landskapsvernområder",
-    kode: "vlo",
-    stilSelect: stilSelectForeslatteVLO,
-    strokeColorSelect: strokeColorSelectForeslatteVLO,
-    fillColorSelect: fillColorSelectForeslatteVLO,
+    kode: "lvo",
+    stilSelect: stilSelectForeslatteLVO,
+    strokeColorSelect: strokeColorSelectForeslatteLVO,
+    fillColorSelect: fillColorSelectForeslatteLVO,
     clickable: true,
     visible: false
 });
@@ -603,10 +603,10 @@ var kartMenyLagDictForeslatteFLO = {
     uiLagNavn: "Friluftslivsområder",
     lagReferanse: vektorLagforeslatteFLO
 }
-var kartMenyLagDictForeslatteVLO = {
-    lagNavn: "vektorLagforeslatteVLO",
+var kartMenyLagDictForeslatteLVO = {
+    lagNavn: "vektorLagforeslatteLVO",
     uiLagNavn: "Landskapsvernområder",
-    lagReferanse: vektorLagforeslatteVLO
+    lagReferanse: vektorLagforeslatteLVO
 }
 var kartMenyLagDictReservatKandidat = {
     lagNavn: "vektorLagReservatKandidat",
@@ -618,9 +618,9 @@ var kartMenyGruppeDictVerneforslag = {
     gruppeNavn: "Verneforslag",
     uiGruppeNavn: "Våre verneforslag",
     kartMenyLag: [
-        kartMenyLagDictForeslatteVLO,
+        kartMenyLagDictForeslatteLVO,
         kartMenyLagDictForeslatteFLO,
-        // kartMenyLagDictForeslatteVLO,
+        // kartMenyLagDictForeslatteLVO,
         kartMenyLagDictReservatKandidat
     ]
 }

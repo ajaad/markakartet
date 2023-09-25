@@ -441,6 +441,9 @@ $(document).ready(function(){
     });
   }
 
+  // Hm... Legge til disse gruppene dynamisk?
+
+
   var bakgrunnskartGruppe = new ol.layer.Group({
     name: "Bakgrunnskart",
     opacity: 1,
@@ -468,8 +471,8 @@ $(document).ready(function(){
     name: "Verneforslag",
     opacity: 1,
     visible: true,
-    // layers: [vektorLagforeslatteFLO, vektorLagforeslatteVLO, vektorLagReservatKandidat]
-    layers: [vektorLagforeslatteVLO, vektorLagforeslatteFLO, vektorLagReservatKandidat]
+    // layers: [vektorLagforeslatteFLO, vektorLagforeslatteLVO, vektorLagReservatKandidat]
+    layers: [vektorLagforeslatteLVO, vektorLagforeslatteFLO, vektorLagReservatKandidat]
   });
 
   var forvaltningsforslagGruppe = new ol.layer.Group({
