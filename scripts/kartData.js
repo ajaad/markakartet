@@ -230,7 +230,7 @@ var geometriMapGruppe = new ol.layer.Group({
     visible: true,
     layers: [
         vektorLagGeometri, 
-        // vektorLagGPS
+        vektorLagGPS
     ]
   });
 
