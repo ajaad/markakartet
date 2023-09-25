@@ -68,7 +68,6 @@ var touchbar;
 var startX = 0, startY = 0, moveX = 0, moveY = 0, prevMoveX = 0, prevMoveY = 0; endX = 0, endY = 0;
 var hovedVinduContainerMarginBottomWhenScroll = "80px"; // Samme som: style > Mobile > hovedVinduContainer > marginBottom.
 var hovedVinduContainerMarginBottomWhenHidden; // Basically WhenScroll - 36px. Defineres senere.
-// var hovedVinduContainerMarginBottomWhenHidden = "44px"; // Når hovedVinduContainer er skjult. 36px mindre enn WhenScroll?
 var minHovedMarginTop = 140; // Default. 
 var maxHovedMarginTop = 512; // Touchbar.
 var thresholdWhenHighMarginBottom;
@@ -323,12 +322,8 @@ $(document).ready(function(){
   mainMenuClassGroupLink = document.getElementsByClassName("gruppeLenke");
   mainMenuClassSubmenus = document.getElementsByClassName("submenu");
   mainMenuClassExpands = document.getElementsByClassName("expandButton");
-  // console.log(mainMenuClassGroupLink);
-  // console.log(mainMenuClassSubmenus);
-  // console.log(mainMenuClassExpands);
   hovedMenyKlasseIndikator = document.getElementsByClassName("indicator");
   hovedMenyKlasseKartlagTekst = document.getElementsByClassName("kartlagTekst");
-  // console.log(hovedMenyKlasseIndikator);
 
   // Hm, setter alle bakgrunnsfargene til grått? Bortsett fra OSM...
   for(var i = 0; i < htmlKartLagListe.length; i++){
@@ -416,12 +411,6 @@ $(document).ready(function(){
     });
     return control;
   }
-  // function zoomControl() {
-  //   control = new ol.control.Zoom({
-  //     target: document.getElementById('zoomknapper')
-  //   });
-  //   return control;
-  // }
 
   // Zoom-knapper: // Oh, funker bra.
   var zoomIn = document.getElementById("buttonZoomIn");
@@ -441,71 +430,8 @@ $(document).ready(function(){
     });
   }
 
-  // Hm... Legge til disse gruppene dynamisk?
-
-
-  var bakgrunnskartGruppe = new ol.layer.Group({
-    name: "Bakgrunnskart",
-    opacity: 1,
-    visible: true,
-    layers: [bakgrunnskartOSM]
-  });
-
-  var naturopplevelserGruppe = new ol.layer.Group({
-    name: "Naturopplevelser",
-    opacity: 1,
-    visible: true,
-    layers: [vektorLagMarkagrensa, vektorLagEventyrskog, // wmsLagFotrute, wmsLagHistorisk,
-      // vektorLagKalenderRuter2021
-    ]
-  });
-
-  var verneomraderGruppe = new ol.layer.Group({
-    name: "Verneområder",
-    opacity: 1,
-    visible: true,
-    layers: [wmsLagNaturvernOmrade, wmsLagNaturvernKlasserOmrade, wmsLagForeslattNaturvernOmrade, wmsLagFriluftStatligSikra, vektorLagVernEtterMarkaloven]
-  });
-
-  var verneforslagGruppe = new ol.layer.Group({
-    name: "Verneforslag",
-    opacity: 1,
-    visible: true,
-    // layers: [vektorLagforeslatteFLO, vektorLagforeslatteLVO, vektorLagReservatKandidat]
-    layers: [vektorLagforeslatteLVO, vektorLagforeslatteFLO, vektorLagReservatKandidat]
-  });
-
-  var forvaltningsforslagGruppe = new ol.layer.Group({
-    name: "Forvaltningforslag",
-    opacity: 1,
-    visible: true,
-    layers: [vektorLagRestaureringsomrader, vektorLagSammenhengendeVillmark]
-  });
-
-  var geometriGruppe = new ol.layer.Group({
-    name: "Geometri",
-    opacity: 1,
-    visible: true,
-    layers: [vektorLagGeometri, vektorLagGPS]
-  });
-
-  // Rekkefølgen for hvilken lag som er nederst (start), og øverst (slutt).
-  var mesterGruppe = new ol.layer.Group({
-    name: "MesterGruppe",
-    opacity: 1,
-    visible: true,
-    layers: [
-      bakgrunnskartGruppe,
-      // annetGruppe,
-      naturopplevelserGruppe,
-      verneomraderGruppe,
-      verneforslagGruppe,
-      forvaltningsforslagGruppe,
-      geometriGruppe
-    ]
-  });
-
   // Kartet
+  // mesterGruppen blir laget i kartData.js.
 
     map = new ol.Map({
     target: 'map',
@@ -516,7 +442,6 @@ $(document).ready(function(){
       zoom: false
     }).extend([
       scaleControl(),
-      // zoomControl()
     ]),
     overlays: [popupOverlay]
   });

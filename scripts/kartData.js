@@ -213,7 +213,7 @@ var kartMenyLagDictGPS = {
     uiLagNavn: vektorLagGPS.get("uiName"),
     lagReferanse: vektorLagGPS
 }
-
+// OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictGeometri = {
     gruppeNavn: "Geometri",
     // uiGruppeNavn: "Geometri",
@@ -223,6 +223,16 @@ var kartMenyGruppeDictGeometri = {
         // kartMenyLagDictGPS
     ]
 }
+// OBS! Disse vises i kart-objektet!
+var geometriMapGruppe = new ol.layer.Group({
+    name: "Geometri",
+    opacity: 1,
+    visible: true,
+    layers: [
+        vektorLagGeometri, 
+        // vektorLagGPS
+    ]
+  });
 
 ////////////////////////////////////////////////////////////////////////
 // BAKGRUNNSKART
@@ -400,7 +410,7 @@ var kartMenyLagDictEnkel = {
     uiLagNavn: "Bakgrunnskart, forenklet",
     lagReferanse: bakgrunnskartEnkel
 }
-
+// OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictBakgrunnskart = {
     gruppeNavn: "Bakgrunnskart",
     uiGruppeNavn: "Bakgrunnskart",
@@ -412,6 +422,16 @@ var kartMenyGruppeDictBakgrunnskart = {
         kartMenyLagDictEnkel
     ]
 }
+// OBS! Disse vises i map-objektet!
+var bakgrunnskartMapGruppe = new ol.layer.Group({
+    name: "Bakgrunnskart",
+    opacity: 1,
+    visible: true,
+    layers: [
+        bakgrunnskartOSM
+    ]
+  });
+
 
 ////////////////////////////////////////////////////////////////////////
 // VERNEFORSLAG
@@ -613,17 +633,27 @@ var kartMenyLagDictReservatKandidat = {
     uiLagNavn: "Naturreservat",
     lagReferanse: vektorLagReservatKandidat
 }
-
+// OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictVerneforslag = {
     gruppeNavn: "Verneforslag",
     uiGruppeNavn: "Våre verneforslag",
     kartMenyLag: [
         kartMenyLagDictForeslatteLVO,
         kartMenyLagDictForeslatteFLO,
-        // kartMenyLagDictForeslatteLVO,
         kartMenyLagDictReservatKandidat
     ]
 }
+// OBS! Disse vises i map-objektet!
+var verneforslagMapGruppe = new ol.layer.Group({
+    name: "Verneforslag",
+    opacity: 1,
+    visible: true,
+    layers: [
+        vektorLagforeslatteLVO,
+        vektorLagforeslatteFLO,
+        vektorLagReservatKandidat
+    ]
+  });
 
 ////////////////////////////////////////////////////////////////////////
 // FORVALTNINGSFORSLAG
@@ -761,7 +791,7 @@ var kartMenyLagDictSammenhengendeVillmark = {
     lagReferanse: vektorLagSammenhengendeVillmark
     // stilSelect: stilSelectSammenhengendeVillmark
 }
-
+// OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictForvaltningsforslag = {
     gruppeNavn: "Forvaltningforslag",
     uiGruppeNavn: "Våre forvaltningsforslag",
@@ -770,6 +800,16 @@ var kartMenyGruppeDictForvaltningsforslag = {
         kartMenyLagDictSammenhengendeVillmark
     ]
 }
+// OBS! Disse vises i map-objektet!
+var forvaltningsforslagMapGruppe = new ol.layer.Group({
+    name: "Forvaltningforslag",
+    opacity: 1,
+    visible: true,
+    layers: [
+        vektorLagRestaureringsomrader,
+        vektorLagSammenhengendeVillmark
+    ]
+  });
 
 ////////////////////////////////////////////////////////////////////////
 // VERNEOMRÅDER
@@ -942,7 +982,7 @@ var kartMenyLagDictVernEtterMarkaloven = {
     lagReferanse: vektorLagVernEtterMarkaloven
     // stilSelect: stilSelectVernEtterMarkaloven
 }
-
+// OBS! Disse vises i kartmeny UI!
 var kartMenyGruppeDictVerneomraader = {
     gruppeNavn: "Verneområder",
     uiGruppeNavn: "Vernede områder",
@@ -954,6 +994,19 @@ var kartMenyGruppeDictVerneomraader = {
         kartMenyLagDictVernEtterMarkaloven
     ]
 }
+// OBS! Disse blir lagt til i map-objektet!
+var verneomraderMapGruppe = new ol.layer.Group({
+    name: "Verneområder",
+    opacity: 1,
+    visible: true,
+    layers: [
+        wmsLagNaturvernOmrade,
+        wmsLagNaturvernKlasserOmrade,
+        wmsLagForeslattNaturvernOmrade,
+        wmsLagFriluftStatligSikra,
+        vektorLagVernEtterMarkaloven
+    ]
+  });
 
 ////////////////////////////////////////////////////////////////////////
 // NATUROPPLEVELSER
@@ -1225,7 +1278,7 @@ var data = fetchJSON('data/kalenderRuter2021.geojson')
                         if(snarveiVerdi > 0){
                             feature.setStyle(stilDashedKalenderRuter2021);
                             var NAVN = feature.get("NAVN");
-                            console.log("Fant en snarvei! Satt dashed style. NAVN: " + NAVN);
+                            // console.log("Fant en snarvei! Satt dashed style. NAVN: " + NAVN);
                         }
                     }
                 }
@@ -1235,13 +1288,12 @@ var data = fetchJSON('data/kalenderRuter2021.geojson')
 
             kalenderRuter2021FeatureCollection.push(feature);
         });
-        console.log(kalenderRuter2021FeatureCollection.getArray());
-
-        console.log(vektorKildeKalenderRuter2021.getFeatures().length); // 14 ?!
+        // console.log(kalenderRuter2021FeatureCollection.getArray());
+        // console.log(vektorKildeKalenderRuter2021.getFeatures().length); // 14 ?!
 
         // do what you want to do with `data` here...
         data.features.forEach(function (feature) {
-            console.log(feature);
+            // console.log(feature);
 
             // var symbol = feature.properties['icon'];
             // console.log(symbol);
@@ -1274,6 +1326,7 @@ var kartMenyLagDictKalenderRuter2021 = {
 // Prøver å legge til kalenderturer fra GeoJSON, multi line string type? EMD
 // !!!
 
+// OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictNaturopplevelser = {
     gruppeNavn: "Naturopplevelser",
     uiGruppeNavn: "Naturopplevelser",
@@ -1287,21 +1340,49 @@ var kartMenyGruppeDictNaturopplevelser = {
         // kartMenyLagDictKalenderRuter2021
     ]
 }
+// OBS! Disse vises i map-objektet!
+var naturopplevelserMapGruppe = new ol.layer.Group({
+    name: "Naturopplevelser",
+    opacity: 1,
+    visible: true,
+    layers: [
+        vektorLagMarkagrensa,
+        vektorLagEventyrskog, 
+        // wmsLagFotrute, wmsLagHistorisk,
+      // vektorLagKalenderRuter2021
+    ]
+  });
 
 // *********************************************************************
 // MENYDICT (ALLE KOMBINERT)
 // *********************************************************************
 
 // SETTE UI KARTMENY-REKKEFØLGEN HER!:
+// Denne er for kartmeny UI, og her er bakgrunnskartene nederst.
 
-// kartMenyMasterListe.push(kartMenyGruppeDictGeometri);
 kartMenyMasterListe.push(kartMenyGruppeDictNaturopplevelser);
 kartMenyMasterListe.push(kartMenyGruppeDictForvaltningsforslag);
 kartMenyMasterListe.push(kartMenyGruppeDictVerneforslag);
 kartMenyMasterListe.push(kartMenyGruppeDictVerneomraader);
-// kartMenyMasterListe.push(kartMenyGruppeDictNaturopplevelser);
 kartMenyMasterListe.push(kartMenyGruppeDictGeometri);
 kartMenyMasterListe.push(kartMenyGruppeDictBakgrunnskart);
+
+// mesterGruppen har en annen rekkefølge!
+// Denne består av kartlag i en layer.Group. Her skal bakgrunnskart legges til først (nederst i kartlag-stacken).
+// Brukerskapte figurer skal legges til slutt (øverst av kartlag-stacken).
+  var mesterGruppe = new ol.layer.Group({
+    name: "MesterGruppe",
+    opacity: 1,
+    visible: true,
+    layers: [
+      bakgrunnskartMapGruppe,
+      naturopplevelserMapGruppe,
+      verneomraderMapGruppe,
+      verneforslagMapGruppe,
+      forvaltningsforslagMapGruppe,
+      geometriMapGruppe
+    ]
+  });
 
 // Hm... Kanskje burde gjøre dem til Dict? F.eks. for å gjøre kartMenyMasterListe["Geometri"]?
 // Men kanskje ikke nødvendig?
@@ -1310,9 +1391,13 @@ console.log("kartMenyMasterListe er klar! (Brukes til bygginga av HTML)");
 
 for (var e = 0; e < kartMenyMasterListe.length; e++) {
     // console.log(kartMenyMasterListe[e]);
+
+    // console.log("gruppeNavn: " + kartMenyMasterListe[e]["gruppeNavn"]);
     var kartlag = kartMenyMasterListe[e]["kartMenyLag"];
     for (var f = 0; f < kartlag.length; f++) {
         // console.log(kartlag[f]);
+
+        // console.log("lagNavn: " + kartlag[f]["lagNavn"]);
         var ref = kartlag[f]["lagReferanse"];
         if(ref != null){
             // console.log("LagReferanse: " + ref.get("name"));
