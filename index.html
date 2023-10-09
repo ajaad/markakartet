@@ -7,14 +7,11 @@
 
     <link rel="icon" href="favicon.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./libs/v6.6.1-dist/ol.css" type="text/css">
-    <!-- Testing an extension: -->
-    <!-- <link rel="stylesheet" href="./libs/ol-ext.css" type="text/css"> -->
     <link rel="stylesheet" href="./style.css" type="text/css">
 
     <meta http-equiv="Content-Language" content="text/html;charset=utf-8" />
-    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
 
-    <title>Markakartet</title>
+    <title>Markakartet - Dev</title>
 </head>
 
 <body>
@@ -515,10 +512,6 @@
 
                     <br />
 
-<!--                     <div style="display: flex; align-items: center; justify-content: center;">
-                        <img src=" ./images/konnestad_logo.svg" width="auto">
-                    </div> -->
-
                 </div>
 
                 <!-- Støtte -->
@@ -552,9 +545,8 @@
                     </div>
                     <p>
                         Gi pengegave til NOAs Vipps-nummer: <span style="font-weight:bold;">#81134</span>
-                        <!-- Gi pengegave til NOA. For mer informasjon 
+                        <!-- Gi pengegave til NOA. For mer informasjon. Lenken under er ikke brukt, fordi pengene går ikke direkte til NOA.
                         <a href="https://naturvernforbundet.no/stott-arbeidet/gi-gave/" target="_blank" rel="noopener noreferrer">klikk her (ny fane)</a> -->
-                        <!-- <a href="https://naturvernforbundet.no/gi-en-gave/category4448.html" target="_blank" rel="noopener noreferrer">klikk her (ny fane).</a> -->
                     </p>
 
                     <br />
@@ -585,13 +577,18 @@
 
     </footer>
 
+    <img id="byttBakgrunn" class="byttBakgrunn" alt="bytt bakgrunnstype" src="./images/bakgrunn-osm-350x350.jpg" />
+    <div id="containerBytteBakgrunn">
+        <img id="bytteBakgrunnOSM" alt="bytte til OSM" src="./images/bakgrunn-osm-350x350.jpg" />
+        <img id="bytteBakgrunnSatelitt" alt="bytte til Satelitt" src="./images/bakgrunn-satelitt-350x350.jpg" />
+        <img id="bytteBakgrunnTopografisk" alt="bytte til Topografisk" src="./images/bakgrunn-topografisk-350x350.jpg" />
+        <img id="bytteBakgrunnTopografiskGraa" alt="bytte til TopografiskGraa" src="./images/bakgrunn-topografisk-graa-350x350.jpg" />
+        <img id="bytteBakgrunnForenklet" alt="bytte til Forenklet" src="./images/bakgrunn-forenklet-350x350.jpg" />
+    </div>
+
     <div class="debugGPSContainer" id="debugGPSContainer">
         <div class="debugGPS" id="debugGPS"></div>
     </div>
-
-<!--     <button class="gpsButtonContainer disabledHover" id="gpsButtonContainer">
-        <img id="gpsButton" alt="gps" src="./images/gps-white.png"/>
-    </button> -->
 
     <div class ="rightButtonsContainer">
         <button class="rightButton gpsButtonContainer disabledHover" id="gpsButtonContainer">
@@ -600,17 +597,12 @@
         <button class="rightButton zoomButtons" id="buttonZoomIn">+</button>
         <button class="rightButton zoomButtons" id="buttonZoomOut">-</button>
     </div>
-
-<!--     <div class="gpsButtonContainer" id="gpsButtonContainer">
-        <img id="gpsButton" alt="gps" src="./images/gps-white.png"/>
-    </div> -->
     
     <!-- 
         Hm. On OpenLayers, it says the map element must appear before the script that
         initializes it, so...
      -->
     <div class="map" id="map"></div>
-    <!-- <div class="zoom-control" id="zoomknapper"></div> -->
     <div class="scale-line" id="scale-line-id"></div>
 
     <div id="ol-popup" class="ol-popup">
@@ -626,11 +618,9 @@
     <!-- JQuery -->
     <script src="./libs/jquery-3.6.1.min.js"></script>
 
-    <!-- Testing a new extension: -->
-    <!-- <script src="./libs/ol-ext.min.js"></script> -->
-    <!-- <script src="./libs/ol-ext.js"></script> -->
-
     <!--  -->
+    <script src="./scripts/funksjoner.js"></script>
+    <script src="./scripts/kartDataDict.js"></script>
     <script src="./scripts/kartData.js"></script>
     <script src="./scripts/kartFunksjoner.js"></script>
     <script src="./scripts/kart.js"></script>

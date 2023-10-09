@@ -6,6 +6,17 @@ var fargeTones5 = "#547C73";
 var fargeTones7 = "#717E7B";
 
 var map;
+//
+var scale;
+var scaleFremhevet = true;
+var byttBakgrunn;
+var containerBytteBakgrunn;
+var bytteBakgrunnOSM;
+var bytteBakgrunnSatelitt;
+var bytteBakgrunnTopografisk;
+var bytteBakgrunnTopografiskGraa;
+var bytteBakgrunnForenklet;
+//
 var gpsKnapp;
 var geolocation;
 var trackingIsOn = false;
@@ -186,7 +197,18 @@ function lagKartMenyHTML(){
     var uiGruppeNavn = kartMenyMasterListe[i]["uiGruppeNavn"];
     // console.log("Lager nå html for Kartmeny gruppen: " + gruppeNavn);
 
-    htmlKartMenyGruppe += "<li class='gruppeMeny'>";
+    // if(gruppeNavn != "Bakgrunnskart"){
+    //   htmlKartMenyGruppe += "<li class='gruppeMe{ny'>";
+    //   htmlKartMenyGruppe += "<div><div class='gruppeLenke' href='#'><img class='expandButton' src='./images/right-chevron-256.png' />";
+    //   htmlKartMenyGruppe += "<div>" + uiGruppeNavn + "</div></div></div>";
+    //   htmlKartMenyGruppe += "<ul class='submenu'>";
+    // }
+    if(gruppeNavn != "Bakgrunnskart"){
+      htmlKartMenyGruppe += "<li class='gruppeMeny'>";
+    } else {
+      htmlKartMenyGruppe += "<li class='gruppeMeny bakgrunnGruppeSkjult'>";
+    }
+    // htmlKartMenyGruppe += "<li class='gruppeMeny'>";
     htmlKartMenyGruppe += "<div><div class='gruppeLenke' href='#'><img class='expandButton' src='./images/right-chevron-256.png' />";
     htmlKartMenyGruppe += "<div>" + uiGruppeNavn + "</div></div></div>";
     htmlKartMenyGruppe += "<ul class='submenu'>";
@@ -202,7 +224,15 @@ function lagKartMenyHTML(){
       // Som Anders har gjort det:
       // ... Måtte ta bort mellomrommet her: "', '" ---> "','"
       var forandreSynlighetFunksjon = "forandreSynlighetKartlag('" + gruppeNavn + "','" + lagNavn + "'," + lagIndeks + ")";
+      // if(gruppeNavn != "Bakgrunnskart"){
+      //   htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
+      //   htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
+      // }
 
+      // if(lagNavn != "vektorLagGPS"){
+      //   htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
+      //   htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
+      // }
       htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
       htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
 
@@ -220,11 +250,12 @@ function lagKartMenyHTML(){
         "lagIndeks": lagIndeks
         // "lagReferanse": lagReferanse
       }
+      // console.log(htmlKartLagDict[lagNavn]);
 
       lagIndeks++;
     }
 
-    htmlKartMenyGruppe += "</ul></li>"; // Avslutning på gruppeMney og submenu.
+    htmlKartMenyGruppe += "</ul></li>"; // Avslutning på gruppeMeny og submenu.
     document.getElementById("kartHovedMeny").innerHTML += htmlKartMenyGruppe;
     htmlKartMenyGruppe = "";
 
@@ -240,8 +271,8 @@ function lagKartMenyHTML(){
 
   console.log(".. Kart meny klar!");
 
-  console.log(htmlKartLagListe);
-  console.log(htmlKartLagDict);
+  // console.log(htmlKartLagListe);
+  // console.log(htmlKartLagDict);
 }
 
 $(document).ready(function(){
@@ -250,13 +281,13 @@ $(document).ready(function(){
 
   // On mobile?
   window.isMobile = /iphone|ipod|ipad|android|blackberry|opera mini|opera mobi|skyfire|maemo|windows phone|palm|iemobile|symbian|symbianos|fennec/i.test(navigator.userAgent.toLowerCase());
-  console.log(window.isMobile);
+  // console.log(window.isMobile);
 
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
     // some code..
     console.log("On mobile?");
   } else {
-    console.log("Not on mobile?");
+    console.log("Not on mobile? window.isMobile: " + window.isMobile + ", navigator.userAgent: " + navigator.userAgent);
   }
 
   // 
@@ -269,6 +300,15 @@ $(document).ready(function(){
     hovedVinduContainerMarginBottomWhenHidden = "44px";
   }
 
+  scale = document.getElementById("scale-line-id");
+  byttBakgrunn = document.getElementById("byttBakgrunn");
+  containerBytteBakgrunn = document.getElementById("containerBytteBakgrunn");
+  bytteBakgrunnOSM = document.getElementById("bytteBakgrunnOSM");
+  bytteBakgrunnSatelitt = document.getElementById("bytteBakgrunnSatelitt");
+  bytteBakgrunnTopografisk = document.getElementById("bytteBakgrunnTopografisk");
+  bytteBakgrunnTopografiskGraa = document.getElementById("bytteBakgrunnTopografiskGraa");
+  bytteBakgrunnForenklet = document.getElementById("bytteBakgrunnForenklet");
+  //
   gpsKnapp = document.getElementById("gpsButtonContainer");
   //
   delFormTittel = document.getElementById("titleForm");
@@ -325,6 +365,7 @@ $(document).ready(function(){
   hovedMenyKlasseIndikator = document.getElementsByClassName("indicator");
   hovedMenyKlasseKartlagTekst = document.getElementsByClassName("kartlagTekst");
 
+  // SKJULE BAKGRUNNSKART FRA MENYEN
   // Hm, setter alle bakgrunnsfargene til grått? Bortsett fra OSM...
   for(var i = 0; i < htmlKartLagListe.length; i++){
     if(htmlKartLagListe[i]["gruppeNavn"] == "Bakgrunnskart"){
@@ -361,7 +402,8 @@ $(document).ready(function(){
     addGroupLinkListener(i);
   }
 
-  toggleGruppeVisning("Naturopplevelser"); // Hm... Expande den første med en gang?
+  // toggleGruppeVisning("Naturopplevelser"); // Hm... Expande den første med en gang?
+  toggleGruppeVisning("ArealPlanOslo");
 
   for(j = 0; j < hovedMenyKlasseIndikator.length; j++){
     settIndikatorFargerForKartlag(j);
@@ -397,6 +439,18 @@ $(document).ready(function(){
     },
     name: "Popup"
   });
+
+  scale.onclick = function(){
+    // console.log("scale-line-id clicked!");
+    if(scaleFremhevet){
+      scaleFremhevet = false;
+      scale.style.opacity = "0.25";
+    } else {
+      scaleFremhevet = true;
+      scale.style.opacity = "0.75";
+    }
+    // console.log("scale-line-id ~ scaleFremhevet er nå: " + scaleFremhevet);
+  }
 
   // Målestokk
   let control;
@@ -458,6 +512,7 @@ $(document).ready(function(){
 
   lagWMTSLag(); // Lager dem async.
 
+  // SKJULE BAKGRUNNSKART FRA MENYEN
   forandreSynlighetKartlagUtenIndeks("Bakgrunnskart", "bakgrunnskartOSM");
 
   // Aktivere kartlag fra URL her.
@@ -465,7 +520,7 @@ $(document).ready(function(){
     console.log("lagListeFraURL er ikke null!");
     aktiverKartlagMedKoder(); // Funker!
   } else {
-    forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa");
+    // forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa");
     forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGeometri");
     forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGPS");
   }
@@ -722,6 +777,72 @@ $(document).ready(function(){
     // delCallbackKopiering.innerHTML = "Lenken ble kopiert!";
   });
 
+  // BYTTING AV BAKGRUNN (knapp)
+
+  byttBakgrunn.style.opacity = "0.75";
+  containerBytteBakgrunn.style.display = "none";
+  //
+  byttBakgrunn.onclick = function(){
+    console.log("byttBakgrunn clicked!");
+    toggleByttBakgrunn();
+  }
+  containerBytteBakgrunn.onclick = function(){
+    console.log("containerBytteBakgrunn clicked!");
+  }
+  bytteBakgrunnOSM.onclick = function(){
+    console.log("bytteBakgrunnOSM clicked!");
+    // Hm... Skal ikke gjøre noe hvis kartlaget allerede er aktivt.
+    
+    try{
+      visBakgrunnskartlag(bakgrunnskartOSM.get("name"));
+      byttBakgrunn.src = "./images/bakgrunn-osm-350x350.jpg";
+      deaktiverByttBakgrunn();
+    }catch(exception){
+      console.log("bytteBakgrunnOSM klikk error: " + error);
+    }
+  }
+  bytteBakgrunnSatelitt.onclick = function(){
+    console.log("bytteBakgrunnSatelitt clicked!");
+    // try catch her, siden kartlaget kan være null.
+    try{
+      visBakgrunnskartlag(bakgrunnskartNorgeIBilder.get("name"));
+      byttBakgrunn.src = "./images/bakgrunn-satelitt-350x350.jpg";
+      deaktiverByttBakgrunn();
+    }catch(exception){
+      console.log("bytteBakgrunnSatelitt klikk error: " + error);
+    }
+  }
+  bytteBakgrunnTopografisk.onclick = function(){
+    console.log("bytteBakgrunnTopografisk clicked!");
+    try{
+      visBakgrunnskartlag(bakgrunnskartTopo4.get("name"));
+      byttBakgrunn.src = "./images/bakgrunn-topografisk-350x350.jpg";
+      deaktiverByttBakgrunn();
+    }catch(exception){
+      console.log("bytteBakgrunnTopografisk klikk error: " + error);
+    }
+  }
+  bytteBakgrunnTopografiskGraa.onclick = function(){
+    console.log("bytteBakgrunnTopografiskGraa clicked!");
+    try{
+      visBakgrunnskartlag(bakgrunnskartTopoGraa.get("name"));
+      byttBakgrunn.src = "./images/bakgrunn-topografisk-graa-350x350.jpg";
+      deaktiverByttBakgrunn();
+    }catch(exception){
+      console.log("bytteBakgrunnTopografiskGraa klikk error: " + error);
+    }
+  }
+  bytteBakgrunnForenklet.onclick = function(){
+    console.log("bytteBakgrunnForenklet clicked!");
+    try{
+      visBakgrunnskartlag(bakgrunnskartEnkel.get("name"));
+      byttBakgrunn.src = "./images/bakgrunn-forenklet-350x350.jpg";
+      deaktiverByttBakgrunn();
+    }catch(exception){
+      console.log("bytteBakgrunnForenklet klikk error: " + error);
+    }
+  }
+
   // GPS
 
   lagGpsStiler();
@@ -796,6 +917,7 @@ geolocation.on('change', function () {
   var altitudeAccuracy = geolocation.getAltitudeAccuracy();
   var heading = geolocation.getHeading();
   var speed = geolocation.getSpeed();
+  var position = geolocation.getPosition();
   var x = geolocation.getPosition()[0];
   var y = geolocation.getPosition()[1];
   var intX = parseInt(x);
@@ -808,7 +930,16 @@ geolocation.on('change', function () {
   var headingDegrees = radToDeg(heading);
   var intHeadingDegrees = parseInt(headingDegrees);
 
-  // document.getElementById("debugGPS").innerHTML = "acc: " + intAccuracy + ", alt: " + intAltitude + ", head: " + headingShort + ", hDegrees: " + intHeadingDegrees;
+  // // document.getElementById("debugGPS").innerHTML = "acc: " + intAccuracy + ", alt: " + intAltitude + ", head: " + headingShort + ", hDegrees: " + intHeadingDegrees;
+  // console.log("geolocation on change ~ x: " + x + ", y: " + y);
+  // // 
+  if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
+    if(position != null){
+      sentrertViewPaaGPS = true;
+      // map.getView().setCenter(coordinates); // Ser ut til å virke!
+      sentrerMapPaaKoordinater(geolocation.getPosition());
+    }
+  }
 });
 
 // Hm... getAccuracyGeometry?
@@ -1335,6 +1466,53 @@ function settSynlighetKartlag(layer, lagIndeks){
   }
 }
 
+// Spesielt for Bakgrunnskart! // Hm, egentlig samme kode som i forandreSynlighetKartlagUtenIndeks().
+// bakgrunnskartlagNavn : string (navnet på bakgrunnskartlaget)
+function visBakgrunnskartlag(bakgrunnskartlagNavn){
+  map.getLayers().getArray().forEach(group => {
+    var gruppeNavn = group.get("name");
+
+    if(gruppeNavn == "Bakgrunnskart"){
+
+      if (lagFinnesIKartObjektet(gruppeNavn, bakgrunnskartlagNavn) == false) {
+        console.log("Bakgrunnskart --- kartlaget " + bakgrunnskartlagNavn + " finnes ikke i kart-objektet, så returnerer tidlig.");
+        return; // Hvis det ikke eksisterer, returner tidlig.
+      }
+
+      group.getLayers().forEach(layer => {
+        var lagNavn = layer.get("name");
+        // Hent lagIndeks:
+        var lagIndeks = -1; // Hm. Jeg tror det er checks for hvis lagIndeks er over -1 i vis/skjulKartlag.
+
+        try {
+          lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
+          console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+        } catch (error) {
+          console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+        }
+
+        if (lagNavn === bakgrunnskartlagNavn) {
+          visKartlag(layer, lagIndeks);
+        } else {
+          skjulKartlag(layer, lagIndeks);
+        }
+
+      });
+
+    } // gruppeNavn == "Bakgrunnskart"
+
+  });
+}
+
+// Gjør: toggle kartlagNavn.
+// For bakgrunnskart, aktiverer kartlagNavn og skjuler resten.
+//
+// OBS! En stor forskjell mellom vanlige kartlag og bakgrunnskart.
+// Kanskje burde ha egne funksjoner for vanlige kartlag og bakgrunnskart?
+// For vanlige kartlag: lagIndeks = htmlKartLagDict[kartlagNavn]
+// For bakgrunnskart:   lagIndeks = htmlKartLagDict[lagNavn]
+// Dette fordi at for bakgrunnskart sjekkes alle kartlagene ved å aktivere kartlagNavn og deaktivere resten.
+// For vanlige kartlag gjøres en "toggle" på den, altså hvis synlig, gjør den usynlig, vice versa.
 function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
   map.getLayers().getArray().forEach(group => {
     var gruppeNavn = group.get("name");
@@ -1352,10 +1530,10 @@ function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
         group.getLayers().forEach(layer => {
           var lagNavn = layer.get("name");
           // Hent lagIndeks:
-          var lagIndeks = -1;
+          var lagIndeks = -1; // Hm. Jeg tror det er checks for hvis lagIndeks er over -1 i vis/skjulKartlag.
 
           try {
-            lagIndeks = htmlKartLagDict[kartlagNavn]["lagIndeks"];
+            lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
             console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
           } catch (error) {
             console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
@@ -1392,7 +1570,7 @@ function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
         });
       }
 
-    }
+    } // gruppeNavn == kartlagGruppe
 
   });
 }
@@ -1425,22 +1603,22 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
           var lagNavn = layer.get("name");
           // console.log(lagNavn);
 
-            // Hent lagIndeks:
-            var lagIndeks = -1;
+          // Hent lagIndeks:
+          var lagIndeks = -1;
 
-            try {
-              lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-              // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
-            } catch(error){
-              console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
-            }
-          
-            if (lagNavn === kartlagNavn) {
-              visKartlag(layer, lagIndeks);
-          } else {
-              skjulKartlag(layer, lagIndeks);
+          try {
+            lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
+            // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+          } catch (error) {
+            console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
           }
-  
+
+          if (lagNavn === kartlagNavn) {
+            visKartlag(layer, lagIndeks);
+          } else {
+            skjulKartlag(layer, lagIndeks);
+          }
+
         });
 
       } else {
@@ -1961,6 +2139,7 @@ function skjulAlleLag(){
 
 }
 
+// Aktiverer alle kartlag UNNTATT bakgrunnskartlag!
 function visAlleLag(){
   if(blokkerKnappAlleTrykk) return;
 
@@ -2111,8 +2290,16 @@ function toggleTracking(state){
     onChangeAccuracyFeature();
     onChangePositionFeature();
     // For debug:
-    const coordinates = geolocation.getPosition();
-    console.log(coordinates);
+    var coordinates = geolocation.getPosition();
+    // Er den null her? I så fall, må trigge den et annet sted...
+    if(coordinates != null){
+      console.log(coordinates);
+      // if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
+      //   sentrertViewPaaGPS = true;
+      //   // map.getView().setCenter(coordinates); // Ser ut til å virke!
+      //   sentrerMapPaaKoordinater(coordinates);
+      // }
+    }
   }
 }
 
@@ -2132,10 +2319,12 @@ function onChangePositionFeature(){
   if(coordinates){
     if(positionFeaturePunkt != null){
       // Sentrere view til gps posisjon her?
-      if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
-        sentrertViewPaaGPS = true;
-        map.getView().setCenter(coordinates); // Ser ut til å virke!
-      }
+      // NOTE: Satt det i geolocation.on(change) istedenfor.
+      // if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
+      //   sentrertViewPaaGPS = true;
+      //   // map.getView().setCenter(coordinates); // Ser ut til å virke!
+      //   sentrerMapPaaKoordinater(coordinates);
+      // }
 
       var start = positionFeaturePunkt.getCoordinates();
       // console.log(start);
@@ -2159,6 +2348,16 @@ function onChangePositionFeature(){
   }
 
 }
+
+  // Støtte for zoom? Hm.
+  function sentrerMapPaaKoordinater(coordinates){
+    map.getView().setCenter(coordinates);
+    // Animasjon?
+    // map.getView().animate({
+    //   center: coordinates,
+    //   duration: 1000,
+    // });
+  }
 
 function lagGpsStiler(){
   positionFeatureStil = new ol.style.Style({
@@ -2318,15 +2517,23 @@ async function lagBakgrunnskartWMTS(capabilityURL, kartlagWMTS, lagNavn, lagKode
       switch (lagNavn) {
         case "bakgrunnskartTopo4":
           bakgrunnskartTopo4 = kartLagUt;
+          bytteBakgrunnTopografisk.style.filter = "saturate(100%)";
+          bytteBakgrunnTopografisk.style.cursor = "pointer";
           break;
         case "bakgrunnskartTopoGraa":
           bakgrunnskartTopoGraa = kartLagUt;
+          bytteBakgrunnTopografiskGraa.style.filter = "saturate(100%)";
+          bytteBakgrunnTopografiskGraa.style.cursor = "pointer";
           break;
         case "bakgrunnskartNorgeIBilder":
           bakgrunnskartNorgeIBilder = kartLagUt;
+          bytteBakgrunnSatelitt.style.filter = "saturate(100%)";
+          bytteBakgrunnSatelitt.style.cursor = "pointer";
           break;
         case "bakgrunnskartEnkel":
           bakgrunnskartEnkel = kartLagUt;
+          bytteBakgrunnForenklet.style.filter = "saturate(100%)";
+          bytteBakgrunnForenklet.style.cursor = "pointer";
           break;
         default:
           break;
@@ -2344,24 +2551,31 @@ async function lagBakgrunnskartWMTS(capabilityURL, kartlagWMTS, lagNavn, lagKode
       // Temp for debug:
       settInnKartlagIMasterListe(lagNavn, kartLagUt);
       // console.log(hentKartlagIMasterListe(lagNavn));
-      // var kartlag = hentKartlagIMasterListe(lagNavn);
-      // console.log(kartlag);
 
     } else {
       console.log("kartLagUt feilet for lagNavn: " + lagNavn);
-
-      // // Sette fargen på teksten fra til grå her?
-      // try {
-      //   var lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-      //   console.log("lagBakgrunnskartWMTS ~ lagIndeks: " + lagIndeks + " for kartlag: " + lagNavn);
-      //   hovedMenyKlasseKartlagTekst[lagIndeks].style.color = "gray";
-      // } catch (exception) {
-      //   console.log("lagBakgrunnskartWMTS ~ prøvde å hente lagIndeks og forandre på fargen til kartlagTeksten. error: " + exception);
-      // }
-
     }
 
   }
+}
+
+// For bytteknappen til bakgrunnskart.
+function toggleByttBakgrunn(){
+  if(containerBytteBakgrunn.style.display == "block"){
+    deaktiverByttBakgrunn();
+  } else {
+    aktiverByttBakgrunn();
+  }
+}
+function aktiverByttBakgrunn(){
+  containerBytteBakgrunn.style.display = "block";
+  byttBakgrunn.style.opacity = "1";
+  // console.log("aktiverByttBakgrunn triggered!");
+}
+function deaktiverByttBakgrunn(){
+  containerBytteBakgrunn.style.display = "none";
+  byttBakgrunn.style.opacity = "0.75";
+  // console.log("deaktiverByttBakgrunn triggered!");
 }
 
 function init(){

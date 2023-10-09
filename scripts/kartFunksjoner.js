@@ -330,7 +330,7 @@ function prepareView() {
 
     // Hm... Ser egentlig ut som at alle bruker EPSG her? ...
     coordSysFull = defaultCoordSysType + ":" + coordSysCode;
-    console.log(coordSysFull);
+    // console.log(coordSysFull);
 
     if (x == null | y == null) {
         switch (coordSysFull) {

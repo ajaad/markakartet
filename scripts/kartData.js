@@ -32,6 +32,8 @@ const defaultFargen = "rgba(12, 119, 93, 0.75)"; // Markakart-fargen med litt al
 proj4.defs("EPSG:25831", "+proj=utm +zone=31 +ellps=GRS80 +units=m +no_defs");
 proj4.defs("EPSG:25832", "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs");
 proj4.defs("EPSG:25833", "+proj=utm +zone=33 +ellps=GRS80 +units=m +no_defs");
+// 
+proj4.defs("EPSG:32633", "+proj=utm +zone=33 +ellps=GRS80 +units=m +no_defs");
 
 ol.proj.proj4.register(proj4);
 
@@ -142,10 +144,10 @@ var geometryStyle = new ol.style.Style({
 var vektorLagGeometri = new ol.layer.Vector({
     source: vectorSourceGeometry,
     style: geometryStyle,
-    //
     name: "vektorLagGeometri",
     // uiName: "Geometri",
-    uiName: "Former ved deling",
+    // uiName: "Former ved deling",
+    uiName: "Brukerskapte former",
     kode: "geo",
     visible: false
 });
@@ -201,8 +203,6 @@ var geoJSONFormat = new ol.format.GeoJSON({
 var kartMenyMasterListe = [];
 
 var kartMenyLagDictGeometri = {
-    // lagNavn: "vektorLagGeometri",
-    // uiLagNavn: "Geometri",
     lagNavn: vektorLagGeometri.get("name"),
     uiLagNavn: vektorLagGeometri.get("uiName"),
     lagReferanse: vektorLagGeometri
@@ -216,7 +216,6 @@ var kartMenyLagDictGPS = {
 // OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictGeometri = {
     gruppeNavn: "Geometri",
-    // uiGruppeNavn: "Geometri",
     uiGruppeNavn: "Brukerformer",
     kartMenyLag: [
         kartMenyLagDictGeometri,
@@ -224,8 +223,8 @@ var kartMenyGruppeDictGeometri = {
     ]
 }
 // OBS! Disse vises i kart-objektet!
-var geometriMapGruppe = new ol.layer.Group({
-    name: "Geometri",
+var mapGruppeGeometri = new ol.layer.Group({
+    name: kartMenyGruppeDictGeometri["gruppeNavn"],
     opacity: 1,
     visible: true,
     layers: [
@@ -383,6 +382,7 @@ var bakgrunnskartOSM = new ol.layer.Tile({
 
 // EE
 
+// OBS! For WMS lag så bør lagNavn og uiLagNavn defineres her, pga. lagene er ikke klare enda.
 var kartMenyLagDictOSM = {
     lagNavn: "bakgrunnskartOSM",
     uiLagNavn: "OpenStreetMap (OSM)",
@@ -390,24 +390,22 @@ var kartMenyLagDictOSM = {
 }
 var kartMenyLagDictTopo4 = {
     lagNavn: "bakgrunnskartTopo4",
-    // uiLagNavn: "Toporaster4",
     uiLagNavn: "Topografisk",
     lagReferanse: bakgrunnskartTopo4
 }
 var kartMenyLagDictTopo4Graa = {
     lagNavn: "bakgrunnskartTopoGraa",
-    // uiLagNavn: "Toporaster4 grå",
     uiLagNavn: "Topografisk, grå",
     lagReferanse: bakgrunnskartTopoGraa
 }
 var kartMenyLagDictNorgeIBilder = {
     lagNavn: "bakgrunnskartNorgeIBilder",
-    uiLagNavn: "Norge i bilder",
+    uiLagNavn: "Satelittbilder",
     lagReferanse: bakgrunnskartNorgeIBilder
 }
 var kartMenyLagDictEnkel = {
     lagNavn: "bakgrunnskartEnkel",
-    uiLagNavn: "Bakgrunnskart, forenklet",
+    uiLagNavn: "Forenklet",
     lagReferanse: bakgrunnskartEnkel
 }
 // OBS! Disse vises i kartmeny-UI!
@@ -416,15 +414,15 @@ var kartMenyGruppeDictBakgrunnskart = {
     uiGruppeNavn: "Bakgrunnskart",
     kartMenyLag: [
         kartMenyLagDictOSM,
+        kartMenyLagDictNorgeIBilder,
         kartMenyLagDictTopo4,
         kartMenyLagDictTopo4Graa,
-        kartMenyLagDictNorgeIBilder,
         kartMenyLagDictEnkel
     ]
 }
 // OBS! Disse vises i map-objektet!
-var bakgrunnskartMapGruppe = new ol.layer.Group({
-    name: "Bakgrunnskart",
+var mapGruppeBakgrunnskart = new ol.layer.Group({
+    name: kartMenyGruppeDictBakgrunnskart["gruppeNavn"],
     opacity: 1,
     visible: true,
     layers: [
@@ -438,140 +436,58 @@ var bakgrunnskartMapGruppe = new ol.layer.Group({
 ////////////////////////////////////////////////////////////////////////
 
 var foreslatteFLOdata = ["GeoJSONdata", {
-    name: "foreslatteFLOdata",
+    dataName: "foreslatteFLOdata",
     data: "data/foreslatteFLO.geojson",
-    strokeColor: [0, 0, 240, 1],
-    fillColor: [0, 0, 240, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [0, 0, 240, 1],
-    fillColorSelect: [0, 0, 240, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [163, 121, 23, 1],
+    fillColor: [163, 121, 23, 0.25],
+    strokeWidth: 1,
+    strokeColorSelect: [143, 106, 20, 1],
+    fillColorSelect: [143, 106, 20, 0.25],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1,
 }];
 
 var foreslatteLVOdata = ["GeoJSONdata", {
-    name: "foreslatteLVOdata",
+    dataName: "foreslatteLVOdata",
     data: "data/foreslatteLVO.geojson",
-    strokeColor: [240, 240, 0, 1],
-    fillColor: [240, 240, 0, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [240, 240, 0, 1],
-    fillColorSelect: [240, 240, 0, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [211, 211, 40, 1],
+    fillColor: [211, 211, 40, 0.25],
+    strokeWidth: 1,
+    strokeColorSelect: [185, 185, 35, 1],
+    fillColorSelect: [185, 185, 35, 0.25],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1
 }];
 
 var reservatKandidatData = ["GeoJSONdata", {
-    name: "reservatKandidatData",
+    dataName: "reservatKandidatData",
     data: "data/reservatkandidater.geojson",
-    strokeColor: [0, 240, 0, 1],
-    fillColor: [0, 240, 0, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [0, 240, 0, 1],
-    fillColorSelect: [0, 240, 0, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [191, 0, 0, 1],
+    fillColor: [191, 0, 0, 0.25],
+    strokeWidth: 1,
+    strokeColorSelect: [159, 0, 0, 1],
+    fillColorSelect: [159, 0, 0, 0.25],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1
 }];
-
-// EE: Lage VectorLayers her. // ForeslatteFLO
-
-foreslatteFLOdata = setteNyFargeForKeyGeoJSON(foreslatteFLOdata, "strokeColor", 223, 88, 0, 1);
-foreslatteFLOdata = setteNyFargeForKeyGeoJSON(foreslatteFLOdata, "fillColor", 223, 88, 0, 0.15);
-foreslatteFLOdata = setteNyFargeForKeyGeoJSON(foreslatteFLOdata, "strokeColorSelect", 191, 75, 0, 1);
-foreslatteFLOdata = setteNyFargeForKeyGeoJSON(foreslatteFLOdata, "fillColorSelect", 191, 75, 0, 0.3);
-
-foreslatteFLOdata = justerFargeAlphaForGeoJSON(foreslatteFLOdata);
-
-var strokeColorSelectForeslatteFLO = hentOgKonverterFargeArray(foreslatteFLOdata, 'strokeColorSelect');
-if (strokeColorSelectForeslatteFLO == null) {
-    strokeColorSelectForeslatteFLO = defaultFargeStroke;
-}
-var fillColorSelectForeslatteFLO = hentOgKonverterFargeArray(foreslatteFLOdata, 'fillColorSelect');
-if (fillColorSelectForeslatteFLO == null) {
-    fillColorSelectForeslatteFLO = defaultFargeFill;
-}
-
-var stilForeslatteFLO = lagStilFraGeoJSON(foreslatteFLOdata, false);
-if (stilForeslatteFLO == null) {
-    stilForeslatteFLO = defaultLayerStyle;
-}
-var stilSelectForeslatteFLO = lagStilFraGeoJSON(foreslatteFLOdata, true);
-if (stilSelectForeslatteFLO == null) {
-    stilSelectForeslatteFLO = defaultLayerSelectStyle;
-}
-
-// ForeslatteLVO
-
-foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "strokeColor", 191, 191, 0, 1);
-foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "fillColor", 191, 191, 0, 0.15);
-foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "strokeColorSelect", 159, 159, 0, 1);
-foreslatteLVOdata = setteNyFargeForKeyGeoJSON(foreslatteLVOdata, "fillColorSelect", 159, 159, 0, 0.3);
-
-foreslatteLVOdata = justerFargeAlphaForGeoJSON(foreslatteLVOdata);
-
-var strokeColorSelectForeslatteLVO = hentOgKonverterFargeArray(foreslatteLVOdata, 'strokeColorSelect');
-if (strokeColorSelectForeslatteLVO == null) {
-    strokeColorSelectForeslatteLVO = defaultFargeStroke;
-}
-var fillColorSelectForeslatteLVO = hentOgKonverterFargeArray(foreslatteLVOdata, 'fillColorSelect');
-if (fillColorSelectForeslatteLVO == null) {
-    fillColorSelectForeslatteLVO = defaultFargeFill;
-}
-
-var stilForeslatteLVO = lagStilFraGeoJSON(foreslatteLVOdata, false);
-if (stilForeslatteLVO == null) {
-    stilForeslatteLVO = defaultLayerStyle;
-}
-var stilSelectForeslatteLVO = lagStilFraGeoJSON(foreslatteLVOdata, true);
-if (stilSelectForeslatteLVO == null) {
-    stilSelectForeslatteLVO = defaultLayerSelectStyle;
-}
-
-// ReservatKandidat
-
-reservatKandidatData = setteNyFargeForKeyGeoJSON(reservatKandidatData, "strokeColor", 191, 0, 0, 1);
-reservatKandidatData = setteNyFargeForKeyGeoJSON(reservatKandidatData, "fillColor", 191, 0, 0, 0.15);
-reservatKandidatData = setteNyFargeForKeyGeoJSON(reservatKandidatData, "strokeColorSelect", 159, 0, 0, 1);
-reservatKandidatData = setteNyFargeForKeyGeoJSON(reservatKandidatData, "fillColorSelect", 159, 0, 0, 0.3);
-
-reservatKandidatData = justerFargeAlphaForGeoJSON(reservatKandidatData);
-
-var strokeColorSelectReservatKandidat = hentOgKonverterFargeArray(reservatKandidatData, 'strokeColorSelect');
-if (strokeColorSelectReservatKandidat == null) {
-    strokeColorSelectReservatKandidat = defaultFargeStroke;
-}
-var fillColorSelectReservatKandidat = hentOgKonverterFargeArray(reservatKandidatData, 'fillColorSelect');
-if (fillColorSelectReservatKandidat == null) {
-    fillColorSelectReservatKandidat = defaultFargeFill;
-}
-
-var stilReservatKandidat = lagStilFraGeoJSON(reservatKandidatData, false);
-if (stilReservatKandidat == null) {
-    stilReservatKandidat = defaultLayerStyle;
-}
-var stilSelectReservatKandidat = lagStilFraGeoJSON(reservatKandidatData, true);
-if (stilSelectReservatKandidat == null) {
-    stilSelectReservatKandidat = defaultLayerSelectStyle;
-}
 
 var vektorKildeforeslatteFLO = new ol.source.Vector({
     url: "data/foreslatteFLO.geojson",
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagforeslatteFLO = new ol.layer.Vector({
     source: vektorKildeforeslatteFLO,
-    style: stilForeslatteFLO,
+    style: lagStilFraGeoJSON(foreslatteFLOdata, false),
     name: "vektorLagforeslatteFLO",
     uiName: "Friluftslivsområder",
     kode: "flo",
-    stilSelect: stilSelectForeslatteFLO,
-    strokeColorSelect: strokeColorSelectForeslatteFLO,
-    fillColorSelect: fillColorSelectForeslatteFLO,
+    stilSelect: lagStilFraGeoJSON(foreslatteFLOdata, true),
+    strokeColorSelect: hentOgKonverterFargeArray(foreslatteFLOdata, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(foreslatteFLOdata, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
@@ -581,16 +497,15 @@ var vektorKildeforeslatteLVO = new ol.source.Vector({
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagforeslatteLVO = new ol.layer.Vector({
     source: vektorKildeforeslatteLVO,
-    style: stilForeslatteLVO,
+    style: lagStilFraGeoJSON(foreslatteLVOdata, false),
     name: "vektorLagforeslatteLVO",
     uiName: "Landskapsvernområder",
     kode: "lvo",
-    stilSelect: stilSelectForeslatteLVO,
-    strokeColorSelect: strokeColorSelectForeslatteLVO,
-    fillColorSelect: fillColorSelectForeslatteLVO,
+    stilSelect: lagStilFraGeoJSON(foreslatteLVOdata, true),
+    strokeColorSelect: hentOgKonverterFargeArray(foreslatteLVOdata, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(foreslatteLVOdata, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
@@ -600,16 +515,15 @@ var vektorKildeReservatKandidat = new ol.source.Vector({
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagReservatKandidat = new ol.layer.Vector({
     source: vektorKildeReservatKandidat,
-    style: stilReservatKandidat,
+    style: lagStilFraGeoJSON(reservatKandidatData, false),
     name: "vektorLagReservatKandidat",
     uiName: "Naturreservat",
     kode: "rk",
-    stilSelect: stilSelectReservatKandidat,
-    strokeColorSelect: strokeColorSelectReservatKandidat,
-    fillColorSelect: fillColorSelectReservatKandidat,
+    stilSelect: lagStilFraGeoJSON(reservatKandidatData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(reservatKandidatData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(reservatKandidatData, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
@@ -617,20 +531,22 @@ var vektorLagReservatKandidat = new ol.layer.Vector({
 // EE
 // NOTE: uiName på både lagnivå og i kartMenyLagDict.
 // OBS! Burde bruke uiName fra vektorlag-objektene!
+// OBS 2: Kan gjøre det for vektorlag som er klare umiddelbart.
+// Hm... Beste hadde vel vært å bare definere alt i Data-objektene?
 
 var kartMenyLagDictForeslatteFLO = {
-    lagNavn: "vektorLagforeslatteFLO",
-    uiLagNavn: "Friluftslivsområder",
+    lagNavn: vektorLagforeslatteFLO.get("name"),
+    uiLagNavn: vektorLagforeslatteFLO.get("uiName"),
     lagReferanse: vektorLagforeslatteFLO
 }
 var kartMenyLagDictForeslatteLVO = {
-    lagNavn: "vektorLagforeslatteLVO",
-    uiLagNavn: "Landskapsvernområder",
+    lagNavn: vektorLagforeslatteLVO.get("name"),
+    uiLagNavn: vektorLagforeslatteLVO.get("uiName"),
     lagReferanse: vektorLagforeslatteLVO
 }
 var kartMenyLagDictReservatKandidat = {
-    lagNavn: "vektorLagReservatKandidat",
-    uiLagNavn: "Naturreservat",
+    lagNavn: vektorLagReservatKandidat.get("name"),
+    uiLagNavn: vektorLagReservatKandidat.get("uiName"),
     lagReferanse: vektorLagReservatKandidat
 }
 // OBS! Disse vises i kartmeny-UI!
@@ -644,8 +560,8 @@ var kartMenyGruppeDictVerneforslag = {
     ]
 }
 // OBS! Disse vises i map-objektet!
-var verneforslagMapGruppe = new ol.layer.Group({
-    name: "Verneforslag",
+var mapGruppeVerneforslag = new ol.layer.Group({
+    name: kartMenyGruppeDictVerneforslag["gruppeNavn"],
     opacity: 1,
     visible: true,
     layers: [
@@ -660,100 +576,45 @@ var verneforslagMapGruppe = new ol.layer.Group({
 ////////////////////////////////////////////////////////////////////////
 
 var RestaureringsomraderData = ["GeoJSONdata", {
-    name: "RestaureringsomraderData",
+    dataName: "RestaureringsomraderData",
     data: "data/restaureringsomrader.geojson",
-    strokeColor: [0, 150, 150, 1],
-    fillColor: [0, 150, 150, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [0, 150, 150, 1],
-    fillColorSelect: [0, 150, 150, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [175, 0, 255, 1],
+    fillColor: [175, 0, 255, 0.15],
+    strokeWidth: 1,
+    strokeColorSelect: [153, 0, 223, 1],
+    fillColorSelect: [153, 0, 223, 0.3],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1
 }];
 
 var SammenhengendeVillmarkData = ["GeoJSONdata", {
-    name: "SammenhengendeVillmarkData",
+    dataName: "SammenhengendeVillmarkData",
     data: "data/sammenhengendeVillmark.geojson",
-    strokeColor: [139, 69, 19, 1],
-    fillColor: [139, 69, 19, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [139, 69, 19, 1],
-    fillColorSelect: [139, 69, 19, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [66, 75, 160, 1],
+    fillColor: [66, 75, 160, 0.15],
+    strokeWidth: 1,
+    strokeColorSelect: [41, 47, 100, 1],
+    fillColorSelect: [41, 47, 100, 0.3],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1
 }];
-
-// EE: Lage VectorLayers her. // Restaureringsomrader
-
-RestaureringsomraderData = setteNyFargeForKeyGeoJSON(RestaureringsomraderData, "strokeColor", 175, 0, 255, 1);
-RestaureringsomraderData = setteNyFargeForKeyGeoJSON(RestaureringsomraderData, "fillColor", 175, 0, 255, 0.15);
-RestaureringsomraderData = setteNyFargeForKeyGeoJSON(RestaureringsomraderData, "strokeColorSelect", 153, 0, 223, 1);
-RestaureringsomraderData = setteNyFargeForKeyGeoJSON(RestaureringsomraderData, "fillColorSelect", 153, 0, 223, 0.3);
-
-RestaureringsomraderData = justerFargeAlphaForGeoJSON(RestaureringsomraderData);
-
-var strokeColorSelectRestaureringsomrader = hentOgKonverterFargeArray(RestaureringsomraderData, 'strokeColorSelect');
-if (strokeColorSelectRestaureringsomrader == null) {
-    strokeColorSelectRestaureringsomrader = defaultFargeStroke;
-}
-var fillColorSelectRestaureringsomrader = hentOgKonverterFargeArray(RestaureringsomraderData, 'fillColorSelect');
-if (fillColorSelectRestaureringsomrader == null) {
-    fillColorSelectRestaureringsomrader = defaultFargeFill;
-}
-
-var stilRestaureringsomrader = lagStilFraGeoJSON(RestaureringsomraderData, false);
-if (stilRestaureringsomrader == null) {
-    stilRestaureringsomrader = defaultLayerStyle;
-}
-var stilSelectRestaureringsomrader = lagStilFraGeoJSON(RestaureringsomraderData, true);
-if (stilSelectRestaureringsomrader == null) {
-    stilSelectRestaureringsomrader = defaultLayerSelectStyle;
-}
-
-// SammenhengendeVillmark
-
-SammenhengendeVillmarkData = setteNyFargeForKeyGeoJSON(SammenhengendeVillmarkData, "strokeColor", 255, 32, 248, 1);
-SammenhengendeVillmarkData = setteNyFargeForKeyGeoJSON(SammenhengendeVillmarkData, "fillColor", 255, 32, 248, 0.15);
-SammenhengendeVillmarkData = setteNyFargeForKeyGeoJSON(SammenhengendeVillmarkData, "strokeColorSelect", 255, 0, 247, 1);
-SammenhengendeVillmarkData = setteNyFargeForKeyGeoJSON(SammenhengendeVillmarkData, "fillColorSelect", 255, 0, 247, 0.3);
-
-SammenhengendeVillmarkData = justerFargeAlphaForGeoJSON(SammenhengendeVillmarkData);
-
-var strokeColorSelectSammenhengendeVillmark = hentOgKonverterFargeArray(SammenhengendeVillmarkData, 'strokeColorSelect');
-if (strokeColorSelectSammenhengendeVillmark == null) {
-    strokeColorSelectSammenhengendeVillmark = defaultFargeStroke;
-}
-var fillColorSelectSammenhengendeVillmark = hentOgKonverterFargeArray(SammenhengendeVillmarkData, 'fillColorSelect');
-if (fillColorSelectSammenhengendeVillmark == null) {
-    fillColorSelectSammenhengendeVillmark = defaultFargeFill;
-}
-
-var stilSammenhengendeVillmark = lagStilFraGeoJSON(SammenhengendeVillmarkData, false);
-if (stilSammenhengendeVillmark == null) {
-    stilSammenhengendeVillmark = defaultLayerStyle;
-}
-var stilSelectSammenhengendeVillmark = lagStilFraGeoJSON(SammenhengendeVillmarkData, true);
-if (stilSelectSammenhengendeVillmark == null) {
-    stilSelectSammenhengendeVillmark = defaultLayerSelectStyle;
-}
 
 var vektorKildeRestaureringsomrader = new ol.source.Vector({
     url: "data/restaureringsomrader.geojson",
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagRestaureringsomrader = new ol.layer.Vector({
     source: vektorKildeRestaureringsomrader,
-    style: stilRestaureringsomrader,
+    style: lagStilFraGeoJSON(RestaureringsomraderData, false),
     name: "vektorLagRestaureringsomrader",
     uiName: "Restaureringsområder",
     kode: "ro",
-    stilSelect: stilSelectRestaureringsomrader,
-    strokeColorSelect: strokeColorSelectRestaureringsomrader,
-    fillColorSelect: fillColorSelectRestaureringsomrader,
+    stilSelect: lagStilFraGeoJSON(RestaureringsomraderData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(RestaureringsomraderData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(RestaureringsomraderData, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
@@ -763,16 +624,15 @@ var vektorKildeSammenhengendeVillmark = new ol.source.Vector({
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagSammenhengendeVillmark = new ol.layer.Vector({
     source: vektorKildeSammenhengendeVillmark,
-    style: stilSammenhengendeVillmark,
+    style: lagStilFraGeoJSON(SammenhengendeVillmarkData, false),
     name: "vektorLagSammenhengendeVillmark",
     uiName: "Sammenhengende villmark",
     kode: "sam",
-    stilSelect: stilSelectSammenhengendeVillmark,
-    strokeColorSelect: strokeColorSelectSammenhengendeVillmark,
-    fillColorSelect: fillColorSelectSammenhengendeVillmark,
+    stilSelect: lagStilFraGeoJSON(SammenhengendeVillmarkData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(SammenhengendeVillmarkData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(SammenhengendeVillmarkData, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
@@ -780,16 +640,14 @@ var vektorLagSammenhengendeVillmark = new ol.layer.Vector({
 // EE
 
 var kartMenyLagDictRestaureringsomraader = {
-    lagNavn: "vektorLagRestaureringsomrader",
-    uiLagNavn: "Restaureringsområder",
+    lagNavn: vektorLagRestaureringsomrader.get("name"),
+    uiLagNavn: vektorLagRestaureringsomrader.get("uiName"),
     lagReferanse: vektorLagRestaureringsomrader
-    // stilSelect: stilSelectRestaureringsomrader
 }
 var kartMenyLagDictSammenhengendeVillmark = {
-    lagNavn: "vektorLagSammenhengendeVillmark",
-    uiLagNavn: "Sammenhengende villmark",
+    lagNavn: vektorLagSammenhengendeVillmark.get("name"),
+    uiLagNavn: vektorLagSammenhengendeVillmark.get("uiName"),
     lagReferanse: vektorLagSammenhengendeVillmark
-    // stilSelect: stilSelectSammenhengendeVillmark
 }
 // OBS! Disse vises i kartmeny-UI!
 var kartMenyGruppeDictForvaltningsforslag = {
@@ -801,8 +659,8 @@ var kartMenyGruppeDictForvaltningsforslag = {
     ]
 }
 // OBS! Disse vises i map-objektet!
-var forvaltningsforslagMapGruppe = new ol.layer.Group({
-    name: "Forvaltningforslag",
+var mapGruppeForvaltningsforslag = new ol.layer.Group({
+    name: kartMenyGruppeDictForvaltningsforslag["gruppeNavn"],
     opacity: 1,
     visible: true,
     layers: [
@@ -837,22 +695,27 @@ var dataForeslattNaturvernOmradeMiljodir = ["WMSlayer", {
     opacity: 1
 }]; // ?service=wms&request=getcapabilities
 
-
 var dataFriluftStatligSikra = ["WMSlayer", {
     url: "https://kart.miljodirektoratet.no/arcgis/services/friluftsliv_statlig_sikra/mapserver/WMSServer",
     name: "friluftsliv_statlig_sikra",
     opacity: 1
 }];
 
+var dataNaturtyper13Skog = ["WMSlayer", {
+    url: "https://kart.miljodirektoratet.no/arcgis/services/naturtyper_hb13/MapServer/WMSServer",
+    name: "hovednaturtype_hb13_skog",
+    opacity: 1
+}];
+
 var vernEtterMarkalovenData = ["GeoJSONdata", {
-    name: "vernEtterMarkalovenData",
+    dataName: "vernEtterMarkalovenData",
     data: "data/markaloven.geojson",
-    strokeColor: [0, 240, 0, 1],
-    fillColor: [0, 240, 0, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [0, 240, 0, 1],
-    fillColorSelect: [0, 240, 0, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [200, 73, 82, 1],
+    fillColor: [200, 73, 82, 0.15],
+    strokeWidth: 1,
+    strokeColorSelect: [150, 55, 62, 1],
+    fillColorSelect: [150, 55, 62, 0.3],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1
 }];
@@ -909,53 +772,28 @@ var wmsLagFriluftStatligSikra = new ol.layer.Image({
     kode: "fss"
 });
 
-vernEtterMarkalovenData = setteNyFargeForKeyGeoJSON(vernEtterMarkalovenData, "strokeColor", 0, 0, 191, 1);
-vernEtterMarkalovenData = setteNyFargeForKeyGeoJSON(vernEtterMarkalovenData, "fillColor", 0, 0, 191, 0.15);
-vernEtterMarkalovenData = setteNyFargeForKeyGeoJSON(vernEtterMarkalovenData, "strokeColorSelect", 0, 0, 159, 1);
-vernEtterMarkalovenData = setteNyFargeForKeyGeoJSON(vernEtterMarkalovenData, "fillColorSelect", 0, 0, 159, 0.3);
-
-vernEtterMarkalovenData = justerFargeAlphaForGeoJSON(vernEtterMarkalovenData);
-
-var strokeColorSelectVernEtterMarkaloven = hentOgKonverterFargeArray(vernEtterMarkalovenData, 'strokeColorSelect');
-if (strokeColorSelectVernEtterMarkaloven == null) {
-    strokeColorSelectVernEtterMarkaloven = defaultFargeStroke;
-}
-var fillColorSelectVernEtterMarkaloven = hentOgKonverterFargeArray(vernEtterMarkalovenData, 'fillColorSelect');
-if (fillColorSelectVernEtterMarkaloven == null) {
-    fillColorSelectVernEtterMarkaloven = defaultFargeFill;
-}
-
-var stilVernEtterMarkaloven = lagStilFraGeoJSON(vernEtterMarkalovenData, false);
-if (stilVernEtterMarkaloven == null) {
-    stilVernEtterMarkaloven = defaultLayerStyle;
-}
-var stilSelectVernEtterMarkaloven = lagStilFraGeoJSON(vernEtterMarkalovenData, true);
-if (stilSelectVernEtterMarkaloven == null) {
-    stilSelectVernEtterMarkaloven = defaultLayerSelectStyle;
-}
-
+// NOTE: Hm... Kunne kanskje bare lagd alt for alle vektorlag, inkludert dashed? ...
 var vektorKildeVernEtterMarkaloven = new ol.source.Vector({
     url: "data/markaloven.geojson",
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagVernEtterMarkaloven = new ol.layer.Vector({
     source: vektorKildeVernEtterMarkaloven,
-    style: stilVernEtterMarkaloven,
+    style: lagStilFraGeoJSON(vernEtterMarkalovenData, false),
     name: "vektorLagvernEtterMarkaloven",
     uiName: "Vern etter markaloven § 11",
     kode: "vem",
-    stilSelect: stilSelectVernEtterMarkaloven,
-    strokeColorSelect: strokeColorSelectVernEtterMarkaloven,
-    fillColorSelect: fillColorSelectVernEtterMarkaloven,
+    stilSelect: lagStilFraGeoJSON(vernEtterMarkalovenData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(vernEtterMarkalovenData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(vernEtterMarkalovenData, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
 
 // EE
 // NOTE: uiName på lagnivå skal bli brukt til klikk-highlight selection (på lag-features).
-
+// NOTE: De som er WMS-lag kan ikke hente lagNavn og uiLagNavn fra et kartlag, siden det ikke er klart enda.
 var kartMenyLagDictNaturvernOmraader = {
     lagNavn: "wmsLagNaturvernOmrade",
     uiLagNavn: "Naturvernområder",
@@ -995,8 +833,8 @@ var kartMenyGruppeDictVerneomraader = {
     ]
 }
 // OBS! Disse blir lagt til i map-objektet!
-var verneomraderMapGruppe = new ol.layer.Group({
-    name: "Verneområder",
+var mapGruppeVerneomrader = new ol.layer.Group({
+    name: kartMenyGruppeDictVerneomraader["gruppeNavn"],
     opacity: 1,
     visible: true,
     layers: [
@@ -1015,27 +853,29 @@ var verneomraderMapGruppe = new ol.layer.Group({
 // Markagrensa
 
 var markagrensaKartdata = ["GeoJSONdata", {
-    name: "markagrensaKartdata",
+    dataName: "markagrensaKartdata",
     data: "data/markagrensa.geojson",
-    strokeColor: [240, 0, 0, 1],
-    fillColor: [0, 240, 0, 0],
-    strokeWidth: 2,
-    strokeColorSelect: [240, 0, 0, 1],
-    fillColorSelect: [0, 240, 250, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [12, 119, 93, 1],
+    fillColor: [12, 119, 93, 0],
+    strokeWidth: 1,
+    strokeColorSelect: [12, 119, 93, 1],
+    fillColorSelect: [12, 119, 93, 0],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 0
 }];
-
+// OK, så med farger... Samme strokefarge for vanlig og select, og samme fillfarge for vanlig og select.
+// strokefargen er mørkere enn fillcolor? ...
+// Hm... Eller bare bruke en farge?
 var eventyrskogData = ["GeoJSONdata", {
-    name: "eventyrskogData",
+    dataName: "eventyrskogData",
     data: "data/eventyrskoger.geojson",
-    strokeColor: [240, 0, 0, 1],
-    fillColor: [0, 240, 0, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [240, 0, 0, 0.9],
-    fillColorSelect: [0, 240, 0, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [53, 124, 34, 1],
+    fillColor: [53, 124, 34, 0.15],
+    strokeWidth: 1,
+    strokeColorSelect: [53, 124, 34, 1],
+    fillColorSelect: [53, 124, 34, 0.3],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1,
 }];
@@ -1080,25 +920,14 @@ var wmsLagHistorisk = new ol.layer.Image({
     kode: "his"
 });
 
-// Hm... Forandre på fargene til markagrensaKartdata?
-// markagrensaKartdata = setteNyFargeForKeyGeoJSON(markagrensaKartdata, "strokeColor", 13, 109, 54, 1);
-markagrensaKartdata = setteNyFargeForKeyGeoJSON(markagrensaKartdata, "strokeColor", 0, 96, 0, 1);
-
 var stilMarkagrensa = lagStilFraGeoJSON(markagrensaKartdata, false);
-if (stilMarkagrensa == null) {
-    stilMarkagrensa = defaultLayerStyle;
-}
 var stilSelectMarkagrensa = lagStilFraGeoJSON(markagrensaKartdata, false);
-if (stilSelectMarkagrensa == null) {
-    stilSelectMarkagrensa = defaultLayerSelectStyle;
-}
 
 var vektorKildeMarkagrensa = new ol.source.Vector({
     url: "data/markagrensa.geojson",
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 // Hm... Sette stilSelect direkte på kartlaget?
 var vektorLagMarkagrensa = new ol.layer.Vector({
     source: vektorKildeMarkagrensa,
@@ -1113,48 +942,20 @@ var vektorLagMarkagrensa = new ol.layer.Vector({
 
 // WMS kartMenyLag?
 
-// EE: Lage VectorLayers her. // Eventyrskog
-
-eventyrskogData = setteNyFargeForKeyGeoJSON(eventyrskogData, "strokeColor", 0, 191, 0, 1);
-eventyrskogData = setteNyFargeForKeyGeoJSON(eventyrskogData, "fillColor", 0, 191, 0, 0.15);
-eventyrskogData = setteNyFargeForKeyGeoJSON(eventyrskogData, "strokeColorSelect", 0, 159, 0, 1);
-eventyrskogData = setteNyFargeForKeyGeoJSON(eventyrskogData, "fillColorSelect", 0, 159, 0, 0.3);
-
-// eventyrskogData = justerFargeAlphaForGeoJSON(eventyrskogData);
-
-var strokeColorSelectEventyrskog = hentOgKonverterFargeArray(eventyrskogData, 'strokeColorSelect');
-if (strokeColorSelectEventyrskog == null) {
-    strokeColorSelectEventyrskog = defaultFargeStroke;
-}
-var fillColorSelectEventyrskog = hentOgKonverterFargeArray(eventyrskogData, 'fillColorSelect');
-if (fillColorSelectEventyrskog == null) {
-    fillColorSelectEventyrskog = defaultFargeFill;
-}
-
-var stilEventyrskog = lagStilFraGeoJSON(eventyrskogData, false);
-if (stilEventyrskog == null) {
-    stilEventyrskog = defaultLayerStyle;
-}
-var stilSelectEventyrskog = lagStilFraGeoJSON(eventyrskogData, true);
-if (stilSelectEventyrskog == null) {
-    stilSelectEventyrskog = defaultLayerSelectStyle;
-}
-
 var vektorKildeEventyrskog = new ol.source.Vector({
     url: "data/eventyrskoger.geojson",
     format: geoJSONFormat,
     features: new ol.Collection()
 });
-
 var vektorLagEventyrskog = new ol.layer.Vector({
     source: vektorKildeEventyrskog,
-    style: stilEventyrskog,
+    style: lagStilFraGeoJSON(eventyrskogData, false),
     name: "vektorlagEventyrskog",
     uiName: "Eventyrskog",
     kode: "eve",
-    stilSelect: stilSelectEventyrskog,
-    strokeColorSelect: strokeColorSelectEventyrskog,
-    fillColorSelect: fillColorSelectEventyrskog,
+    stilSelect: lagStilFraGeoJSON(eventyrskogData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(eventyrskogData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(eventyrskogData, 'fillColorSelect'),
     clickable: true,
     visible: false
 });
@@ -1162,16 +963,14 @@ var vektorLagEventyrskog = new ol.layer.Vector({
 // Referanse til vektorlaget? // Hm... Er null for WMS-lag som loader async.
 
 var kartMenyLagDictMarkagrensa = {
-    lagNavn: "vektorLagMarkagrensa",
-    uiLagNavn: "Markagrensa",
+    lagNavn: vektorLagMarkagrensa.get("name"),
+    uiLagNavn: vektorLagMarkagrensa.get("uiName"),
     lagReferanse: vektorLagMarkagrensa
-    // stilSelect: stilSelectMarkagrensa
 }
 var kartMenyLagDictEventyrskog = {
-    lagNavn: "vektorlagEventyrskog",
-    uiLagNavn: "Eventyrskoger",
+    lagNavn: vektorLagEventyrskog.get("name"),
+    uiLagNavn: vektorLagEventyrskog.get("uiName"),
     lagReferanse: vektorLagEventyrskog
-    // stilSelect: stilSelectEventyrskog
 }
 var kartMenyLagDictFotrute = {
     lagNavn: "wmsLagFotrute",
@@ -1195,14 +994,14 @@ var kartMenyLagDictHistorisk = {
 // Sienna: 160, 82, 45
 // SaddleBrown: 139, 69, 19
 var kalenderRuter2021Data = ["GeoJSONdata", {
-    name: "kalenderRuter2021Data",
+    dataName: "kalenderRuter2021Data",
     data: "data/kalenderRuter2021.geojson",
-    strokeColor: [160, 82, 45, 1],
-    fillColor: [160, 82, 45, 0.4],
-    strokeWidth: 2,
-    strokeColorSelect: [139, 69, 19, 0.9],
-    fillColorSelect: [139, 69, 19, 0.7],
-    strokeWidthSelect: 4,
+    strokeColor: [139, 69, 19, 1],
+    fillColor: [139, 69, 19, 0.15],
+    strokeWidth: 1,
+    strokeColorSelect: [139, 69, 19, 1],
+    fillColorSelect: [139, 69, 19, 0.3],
+    strokeWidthSelect: 2,
     opacity: 1,
     clickEvent: 1,
 }];
@@ -1210,47 +1009,10 @@ var kalenderRuter2021Data = ["GeoJSONdata", {
 // Debug:
 // console.log(kalenderRuter2021Data[1]["data"])
 
-var strokeColorSelectKalenderRuter2021 = hentOgKonverterFargeArray(kalenderRuter2021Data, 'strokeColorSelect');
-if (strokeColorSelectKalenderRuter2021 == null) {
-    strokeColorSelectKalenderRuter2021= defaultFargeStroke;
-}
-var fillColorSelectKalenderRuter2021 = hentOgKonverterFargeArray(kalenderRuter2021Data, 'fillColorSelect');
-if (fillColorSelectKalenderRuter2021 == null) {
-    fillColorSelectKalenderRuter2021 = defaultFargeFill;
-}
-
-var stilKalenderRuter2021 = lagStilFraGeoJSON(kalenderRuter2021Data, false);
-if (stilKalenderRuter2021 == null) {
-    stilKalenderRuter2021 = defaultLayerStyle;
-}
-var stilSelectKalenderRuter2021 = lagStilFraGeoJSON(kalenderRuter2021Data, true);
-if (stilSelectKalenderRuter2021 == null) {
-    stilSelectKalenderRuter2021 = defaultLayerSelectStyle;
-}
-// Dashed --- bare for turer:
-var stilDashedKalenderRuter2021 = lagDashedStilFraGeoJSON(kalenderRuter2021Data, false);
-if (stilDashedKalenderRuter2021 == null) {
-    stilDashedKalenderRuter2021 = defaultDashedLayerStyle;
-}
-var stilDashedSelectKalenderRuter2021 = lagDashedStilFraGeoJSON(kalenderRuter2021Data, true);
-if (stilDashedSelectKalenderRuter2021 == null) {
-    stilDashedSelectKalenderRuter2021 = defaultDashedLayerSelectStyle;
-}
-
-// Lage GeoJSON objekt fra GeoJSON url? ...
-// const geojson = new GeoJSON
-
 var kalenderRuter2021FeatureCollection = new ol.Collection();
 
 var vektorKildeKalenderRuter2021 = new ol.source.Vector({
-    // Hm. Bare en av featurene nå! Funket dette?!
-
-    // url: "data/kalenderRuter2021.geojson",
-
     format: geoJSONFormat,
-
-    // features: new ol.Collection()
-
     features: kalenderRuter2021FeatureCollection
 });
 
@@ -1294,7 +1056,6 @@ var data = fetchJSON('data/kalenderRuter2021.geojson')
         // do what you want to do with `data` here...
         data.features.forEach(function (feature) {
             // console.log(feature);
-
             // var symbol = feature.properties['icon'];
             // console.log(symbol);
         });
@@ -1302,24 +1063,23 @@ var data = fetchJSON('data/kalenderRuter2021.geojson')
 
 var vektorLagKalenderRuter2021 = new ol.layer.Vector({
     source: vektorKildeKalenderRuter2021,
-    style: stilKalenderRuter2021,
+    style: lagStilFraGeoJSON(kalenderRuter2021Data, false),
     name: "vektorlagKalenderRuter2021",
     uiName: "Kalender turer 2021",
     kode: "t21",
-    stilSelect: stilSelectKalenderRuter2021,
-    strokeColorSelect: strokeColorSelectKalenderRuter2021,
-    fillColorSelect: fillColorSelectKalenderRuter2021,
-    stilDashed: stilDashedKalenderRuter2021,
-    stilDashedSelect: stilDashedSelectKalenderRuter2021,
+    stilSelect: lagStilFraGeoJSON(kalenderRuter2021Data, true),
+    strokeColorSelect: hentOgKonverterFargeArray(kalenderRuter2021Data, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(kalenderRuter2021Data, 'fillColorSelect'),
+    stilDashed: lagDashedStilFraGeoJSON(kalenderRuter2021Data, false),
+    stilDashedSelect: lagDashedStilFraGeoJSON(kalenderRuter2021Data, true),
     clickable: true,
     visible: false
 });
 
 var kartMenyLagDictKalenderRuter2021 = {
-    lagNavn: "vektorlagKalenderRuter2021",
-    uiLagNavn: "Kalender turer 2021",
+    lagNavn: vektorLagKalenderRuter2021.get("name"),
+    uiLagNavn: vektorLagKalenderRuter2021.get("uiName"),
     lagReferanse: vektorLagKalenderRuter2021
-    // stilSelect: stilSelectMarkagrensa
 }
 
 // !!!
@@ -1341,15 +1101,376 @@ var kartMenyGruppeDictNaturopplevelser = {
     ]
 }
 // OBS! Disse vises i map-objektet!
-var naturopplevelserMapGruppe = new ol.layer.Group({
-    name: "Naturopplevelser",
+var mapGruppeNaturopplevelser = new ol.layer.Group({
+    name: kartMenyGruppeDictNaturopplevelser["gruppeNavn"],
     opacity: 1,
     visible: true,
     layers: [
         vektorLagMarkagrensa,
         vektorLagEventyrskog, 
         // wmsLagFotrute, wmsLagHistorisk,
-      // vektorLagKalenderRuter2021
+        // vektorLagKalenderRuter2021
+    ]
+  });
+
+////////////////////////////////////////////////////////////////////////
+// AREALPLAN OSLO
+////////////////////////////////////////////////////////////////////////
+
+// BEVARINGSSKOGER, OSLO KOMMUNE
+
+// Definere vektorlagnavnet og ui-navnet her? ...
+var oksBevaringsskogerData = ["GeoJSONdata", {
+    dataName: "oksBevaringsskogerData",
+    data: "data/oksBevaringsskoger.geojson",
+    name: "vektorlagOksBevaringsskoger",
+    uiName: "Bevaringsskoger, Oslo kommuneskog",
+    strokeColor: [102, 138, 138, 1],
+    fillColor: [102, 138, 138, 0.15],
+    strokeWidth: 1,
+    strokeColorSelect: [102, 138, 138, 1],
+    fillColorSelect: [102, 138, 138, 0.3],
+    strokeWidthSelect: 2,
+    opacity: 1,
+    clickEvent: 0,
+}];
+
+var vektorKildeOksBevaringsskoger = new ol.source.Vector({
+    url: "data/oksBevaringsskoger.geojson",
+    format: geoJSONFormat,
+    features: new ol.Collection()
+});
+var vektorLagOksBevaringsskoger = new ol.layer.Vector({
+    source: vektorKildeOksBevaringsskoger,
+    style: new ol.style.Style({
+        fill: new ol.style.Fill({color: makeStripedPattern(2, 5, 1, "rgba(26, 36, 100, 1)")}),
+        stroke: new ol.style.Stroke({
+          color: 'rgba(26, 36, 100, 1)',
+          width: 1,
+        }),
+      }),
+    name: "vektorlagOksBevaringsskoger",
+    uiName: "Bevaringsskoger, Oslo kommuneskog",
+    kode: "bso",
+    stilSelect: lagStilFraGeoJSON(oksBevaringsskogerData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(oksBevaringsskogerData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(oksBevaringsskogerData, 'fillColorSelect'),
+    clickable: false,
+    visible: false
+});
+var kartMenyLagDictOksBevaringsskoger = {
+    lagNavn: vektorLagOksBevaringsskoger.get("name"),
+    uiLagNavn: vektorLagOksBevaringsskoger.get("uiName"),
+    lagReferanse: vektorLagOksBevaringsskoger
+}
+
+// EIENDOM, OSLO KOMMUNE
+
+var oksEiendomsgrenserData = ["GeoJSONdata", {
+    dataName: "oksEiendomsgrenserData",
+    data: "data/oksEiendom.geojson",
+    name: "vektorlagOksEiendomsgrenser",
+    uiName: "Eiendomsgrenser, Oslo kommuneskog",
+    strokeColor: [35, 77, 133, 0.5],
+    fillColor: [35, 77, 133, 0.33],
+    strokeWidth: 1,
+    strokeColorSelect: [102, 138, 138, 0.5],
+    fillColorSelect: [102, 138, 138, 0.33],
+    strokeWidthSelect: 2,
+    opacity: 1,
+    clickEvent: 0,
+}];
+
+var vektorKildeOksEiendomsgrenser = new ol.source.Vector({
+    url: "data/oksEiendom.geojson",
+    format: geoJSONFormat,
+    features: new ol.Collection()
+});
+var vektorLagOksEiendomsgrenser = new ol.layer.Vector({
+    source: vektorKildeOksEiendomsgrenser,
+    style: lagStilFraGeoJSON(oksEiendomsgrenserData, false),
+    name: "vektorlagOksEiendomsgrenser",
+    uiName: "Eiendomsgrenser, Oslo kommuneskog",
+    kode: "ego",
+    stilSelect: lagStilFraGeoJSON(oksEiendomsgrenserData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(oksEiendomsgrenserData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(oksEiendomsgrenserData, 'fillColorSelect'),
+    clickable: false,
+    visible: false
+});
+var kartMenyLagDictOksEiendomsgrenser= {
+    lagNavn: vektorLagOksEiendomsgrenser.get("name"),
+    uiLagNavn: vektorLagOksEiendomsgrenser.get("uiName"),
+    lagReferanse: vektorLagOksEiendomsgrenser
+}
+
+// BEVARINGSSKOGER, LØVENSKIOLD
+
+var lovenskioldBevaringsskogerData = ["GeoJSONdata", {
+    dataName: "lovenskioldBevaringsskogerData",
+    data: "data/lovenskiold_eget_vern.geojson",
+    name: "vektorlagLovenskieldBevaringsskoger",
+    uiName: "Bevaringsskoger, Løvenskiold",
+    strokeColor: [138, 102, 102, 1],
+    fillColor: [138, 102, 102, 0.33],
+    strokeWidth: 1,
+    strokeColorSelect: [138, 102, 102, 1],
+    fillColorSelect: [138, 102, 102, 0.33],
+    strokeWidthSelect: 2,
+    opacity: 1,
+    clickEvent: 0,
+}];
+
+var vektorKildeLovenskioldBevaringsskoger = new ol.source.Vector({
+    url: "data/lovenskiold_eget_vern.geojson",
+    format: geoJSONFormat,
+    features: new ol.Collection()
+});
+var vektorLagLovenskioldBevaringsskoger = new ol.layer.Vector({
+    source: vektorKildeLovenskioldBevaringsskoger,
+    style: new ol.style.Style({
+        fill: new ol.style.Fill({color: makeStripedPattern(2, 5, 1, "rgba(133, 35, 35, 1)")}),
+        stroke: new ol.style.Stroke({
+          color: 'rgba(133, 35, 35, 1)',
+          width: 1,
+        }),
+      }),
+    name: "vektorlagLovenskioldBevaringsskoger",
+    uiName: "Bevaringsskoger, Løvenskiold",
+    kode: "bsl",
+    stilSelect: lagStilFraGeoJSON(lovenskioldBevaringsskogerData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(lovenskioldBevaringsskogerData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(lovenskioldBevaringsskogerData, 'fillColorSelect'),
+    clickable: false,
+    visible: false
+});
+var kartMenyLagDictLovenskioldBevaringsskoger = {
+    lagNavn: vektorLagLovenskioldBevaringsskoger.get("name"),
+    uiLagNavn: vektorLagLovenskioldBevaringsskoger.get("uiName"),
+    lagReferanse: vektorLagLovenskioldBevaringsskoger
+}
+
+// EIENDOM, LØVENSKIOLD
+
+var lovenskioldEiendomsgrenserData = ["GeoJSONdata", {
+    dataName: "lovenskioldEiendomsgrenserData",
+    data: "data/lovenskiold_eiendom.geojson",
+    name: "vektorlagLovenskieldEiendomsgrenser",
+    uiName: "Eiendomsgrenser, Løvenskiold",
+    strokeColor: [138, 102, 102, 0.5],
+    fillColor: [138, 102, 102, 0.33],
+    strokeWidth: 1,
+    strokeColorSelect: [138, 102, 102, 0.5],
+    fillColorSelect: [138, 102, 102, 0.33],
+    strokeWidthSelect: 2,
+    opacity: 1,
+    clickEvent: 0,
+}];
+//
+var strokeColorSelectLovenskioldEiendomsgrenser = hentOgKonverterFargeArray(lovenskioldEiendomsgrenserData, 'strokeColorSelect');
+var fillColorSelectLovenskioldEiendomsgrenser = hentOgKonverterFargeArray(lovenskioldEiendomsgrenserData, 'fillColorSelect');
+var stilLovenskioldEiendomsgrenser = lagStilFraGeoJSON(lovenskioldEiendomsgrenserData, false);
+var stilSelectLovenskioldEiendomsgrenser = lagStilFraGeoJSON(lovenskioldEiendomsgrenserData, true);
+//
+var vektorKildeLovenskioldEiendomsgrenser = new ol.source.Vector({
+    url: "data/lovenskiold_eiendom.geojson",
+    format: geoJSONFormat,
+    features: new ol.Collection()
+});
+var vektorLagLovenskioldEiendomsgrenser = new ol.layer.Vector({
+    source: vektorKildeLovenskioldEiendomsgrenser,
+    style: stilLovenskioldEiendomsgrenser,
+    name: "vektorlagLovenskioldEiendomsgrenser",
+    uiName: "Eiendomsgrenser, Løvenskiold",
+    kode: "bsl",
+    stilSelect: stilSelectLovenskioldEiendomsgrenser,
+    strokeColorSelect: strokeColorSelectLovenskioldEiendomsgrenser,
+    fillColorSelect: fillColorSelectLovenskioldEiendomsgrenser,
+    clickable: false,
+    visible: false
+});
+var kartMenyLagDictLovenskioldEiendomsgrenser = {
+    lagNavn: vektorLagLovenskioldEiendomsgrenser.get("name"),
+    uiLagNavn: vektorLagLovenskioldEiendomsgrenser.get("uiName"),
+    lagReferanse: vektorLagLovenskioldEiendomsgrenser
+}
+
+// H560 NATURMILJØ FORSLAG - KPA
+
+var h560HensynssonerForslagData = ["GeoJSONdata", {
+    dataName: "h560HensynssonerForslagData",
+    data: "data/h560_naturmiljo_forslag_kpa.geojson",
+    name: "vektorlagH560HensynssonerForslag",
+    uiName: "Eiendomsgrenser, Løvenskiold",
+    strokeColor: [0, 108, 71, 1],
+    fillColor: [0, 161, 106, 0.4],
+    strokeWidth: 2,
+    strokeColorSelect: [0, 108, 71, 0.9],
+    fillColorSelect: [0, 161, 106, 0.7],
+    strokeWidthSelect: 4,
+    opacity: 1,
+    clickEvent: 0,
+}];
+//
+var strokeColorSelectH560HensynssonerForslag = hentOgKonverterFargeArray(h560HensynssonerForslagData, 'strokeColorSelect');
+var fillColorSelectH560HensynssonerForslag = hentOgKonverterFargeArray(h560HensynssonerForslagData, 'fillColorSelect');
+var stilH560HensynssonerForslag= lagStilFraGeoJSON(h560HensynssonerForslagData, false);
+var stilSelectH560HensynssonerForslag = lagStilFraGeoJSON(h560HensynssonerForslagData, true);
+
+var vektorKildeH560HensynssonerForslag = new ol.source.Vector({
+    url: "data/h560_naturmiljo_forslag_kpa.geojson",
+    format: geoJSONFormat,
+    features: new ol.Collection()
+});
+var vektorLagH560HensynssonerForslag = new ol.layer.Vector({
+    source: vektorKildeH560HensynssonerForslag,
+    style: new ol.style.Style({
+        fill: new ol.style.Fill({color: makeStripedPattern(2, 5, 1, "rgba(26, 100, 36, 1)")}),
+        stroke: new ol.style.Stroke({
+          color: 'rgba(26, 100, 36, 1)',
+          width: 1,
+        }),
+      }),
+    name: "vektorlagH560HensynssonerForslag",
+    uiName: "Foreslåtte henssynsoner - H560",
+    kode: "fhs",
+    stilSelect: lagStilFraGeoJSON(h560HensynssonerForslagData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(h560HensynssonerForslagData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(h560HensynssonerForslagData, 'fillColorSelect'),
+    clickable: false,
+    visible: false
+});
+var kartMenyLagDictH560HensynssonerForslag = {
+    lagNavn: vektorLagH560HensynssonerForslag.get("name"),
+    uiLagNavn: vektorLagH560HensynssonerForslag.get("uiName"),
+    lagReferanse: vektorLagH560HensynssonerForslag
+}
+
+// SKYGGELAG RUNDT OSLO KOMMUNE
+
+var skyggeLagRundtOsloKommuneData = ["GeoJSONdata", {
+    dataName: "skyggeLagRundtOsloKommuneData",
+    data: "data/Norge_25833_Kommuner_Uten_Oslo.geojson",
+    name: "vektorlagSkyggeLagRundtOsloKommune",
+    uiName: "Skyggelag rundt Oslo kommune",
+    strokeColor: [0, 0, 0, 0.5],
+    fillColor: [0, 0, 0, 0.5],
+    strokeWidth: 2,
+    strokeColorSelect: [0, 0, 0, 0.5],
+    fillColorSelect: [0, 0, 0, 0.05],
+    strokeWidthSelect: 4,
+    opacity: 1,
+    clickEvent: 0,
+}];
+
+var vektorKildeSkyggeLagRundtOsloKommune = new ol.source.Vector({
+    url: "data/Norge_25833_Kommuner_Uten_Oslo.geojson",
+    format: geoJSONFormat,
+    features: new ol.Collection()
+});
+var vektorLagSkyggeLagRundtOsloKommune = new ol.layer.Vector({
+    source: vektorKildeSkyggeLagRundtOsloKommune,
+    style: lagStilFraGeoJSON(skyggeLagRundtOsloKommuneData, false),
+    name: "vektorlagSkyggeLagRundtOsloKommune",
+    uiName: "Skyggelag rundt Oslo kommune",
+    kode: "sok",
+    stilSelect: lagStilFraGeoJSON(skyggeLagRundtOsloKommuneData, true),
+    strokeColorSelect: hentOgKonverterFargeArray(skyggeLagRundtOsloKommuneData, 'strokeColorSelect'),
+    fillColorSelect: hentOgKonverterFargeArray(skyggeLagRundtOsloKommuneData, 'fillColorSelect'),
+    clickable: false,
+    visible: false
+});
+var kartMenyLagDictSkyggeLagRundtOsloKommune = {
+    lagNavn: vektorLagSkyggeLagRundtOsloKommune.get("name"),
+    uiLagNavn: vektorLagSkyggeLagRundtOsloKommune.get("uiName"),
+    lagReferanse: vektorLagSkyggeLagRundtOsloKommune
+}
+
+// Hovednaturtyper og elvenett - WMS?
+var wmsLagHovednaturtyper = new ol.layer.Image({
+    source: new ol.source.ImageWMS({
+        url: "https://kart.miljodirektoratet.no/arcgis/services/naturtyper_hb13/mapserver/WMSServer",
+        params: { 'LAYERS': "hovednaturtype_hb13_skog" },
+        ratio: 2,
+        serverType: 'mapserver'
+    }),
+    visible: false,
+    name: "wmsLagHovednaturtyper",
+    kode: "hnt"
+});
+var wmsLagHovedelv = new ol.layer.Image({
+    source: new ol.source.ImageWMS({
+        url: "https://nve.geodataonline.no/arcgis/services/Elvenett1/MapServer/WMSServer",
+        params: { 'LAYERS': "hovedelv" },
+        ratio: 2,
+        serverType: 'mapserver'
+    }),
+    visible: false,
+    name: "wmsLagHovedelv",
+    kode: "hel"
+});
+var wmsLagInnsjoer = new ol.layer.Image({
+    source: new ol.source.ImageWMS({
+        url: "https://nve.geodataonline.no/arcgis/services/Innsjodatabase2/MapServer/WMSServer",
+        params: { 'LAYERS': "Innsjodatabase" },
+        ratio: 2,
+        serverType: 'mapserver'
+    }),
+    visible: false,
+    name: "wmsLagInnsjoer",
+    kode: "inn"
+});
+var kartMenyLagDictHovednaturtyper = {
+    lagNavn: "wmsLagHovednaturtyper",
+    uiLagNavn: "Hovedskogstyper (DN-håndbok 13)",
+    lagReferanse: wmsLagHovednaturtyper
+}
+var kartMenyLagDictHovedelv = {
+    lagNavn: "wmsLagHovedelv",
+    uiLagNavn: "Hovedelver",
+    lagReferanse: wmsLagHovedelv
+}
+var kartMenyLagDictInnsjoer = {
+    lagNavn: "wmsLagInnsjoer",
+    uiLagNavn: "Innsjøer",
+    lagReferanse: wmsLagInnsjoer
+}
+
+// OBS! Disse vises i kartmeny-UI!
+var kartMenyGruppeDictArealPlanOslo = {
+    gruppeNavn: "ArealPlanOslo",
+    uiGruppeNavn: "Arealplan Oslo",
+    kartMenyLag: [
+        kartMenyLagDictHovednaturtyper,
+        kartMenyLagDictLovenskioldEiendomsgrenser,
+        kartMenyLagDictLovenskioldBevaringsskoger,
+        kartMenyLagDictOksEiendomsgrenser,
+        kartMenyLagDictOksBevaringsskoger,
+        kartMenyLagDictH560HensynssonerForslag,
+        //
+        kartMenyLagDictHovedelv,
+        kartMenyLagDictInnsjoer,
+        //
+        kartMenyLagDictSkyggeLagRundtOsloKommune,
+    ]
+}
+// OBS! Disse vises i map-objektet!
+var mapGruppeArealPlanOslo = new ol.layer.Group({
+    name: kartMenyGruppeDictArealPlanOslo["gruppeNavn"],
+    opacity: 1,
+    visible: true,
+    layers: [
+        wmsLagHovednaturtyper,
+        vektorLagLovenskioldEiendomsgrenser,
+        vektorLagLovenskioldBevaringsskoger,
+        vektorLagOksEiendomsgrenser,
+        vektorLagOksBevaringsskoger,
+        vektorLagH560HensynssonerForslag,
+        //
+        wmsLagHovedelv,
+        wmsLagInnsjoer,
+        // Skyggelaget til slutt
+        vektorLagSkyggeLagRundtOsloKommune,
     ]
   });
 
@@ -1361,6 +1482,7 @@ var naturopplevelserMapGruppe = new ol.layer.Group({
 // Denne er for kartmeny UI, og her er bakgrunnskartene nederst.
 
 kartMenyMasterListe.push(kartMenyGruppeDictNaturopplevelser);
+kartMenyMasterListe.push(kartMenyGruppeDictArealPlanOslo);
 kartMenyMasterListe.push(kartMenyGruppeDictForvaltningsforslag);
 kartMenyMasterListe.push(kartMenyGruppeDictVerneforslag);
 kartMenyMasterListe.push(kartMenyGruppeDictVerneomraader);
@@ -1375,12 +1497,13 @@ kartMenyMasterListe.push(kartMenyGruppeDictBakgrunnskart);
     opacity: 1,
     visible: true,
     layers: [
-      bakgrunnskartMapGruppe,
-      naturopplevelserMapGruppe,
-      verneomraderMapGruppe,
-      verneforslagMapGruppe,
-      forvaltningsforslagMapGruppe,
-      geometriMapGruppe
+      mapGruppeBakgrunnskart,
+      mapGruppeNaturopplevelser,
+      mapGruppeArealPlanOslo,
+      mapGruppeVerneomrader,
+      mapGruppeVerneforslag,
+      mapGruppeForvaltningsforslag,
+      mapGruppeGeometri
     ]
   });
 
@@ -1515,7 +1638,9 @@ function lagStilFraGeoJSON(geojson, erSelectStil) {
             return style;
 
         } catch (error) {
-            return null;
+            // Returnere default istedenfor null.
+            return defaultLayerStyle;
+            // return null;
         }
 
     } else {
@@ -1534,12 +1659,19 @@ function lagStilFraGeoJSON(geojson, erSelectStil) {
 
             return style;
         } catch (error) {
-            return null;
+            // Returnere default istedenfor null.
+            return defaultLayerSelectStyle;
+            // return null;
         }
 
     }
-
-    return null; // Unreachable?
+    // I tilfelle koden kommer hit, siden det har skjedd før med en annen funksjon...
+    if(!erSelectStil){
+        return defaultLayerStyle
+    } else {
+        return defaultLayerSelectStyle;
+    }
+    // return null; // Unreachable?
 }
 
 // Egentlig nesten identisk med lagStilFraGeoJSON, bortsett fra lineDash i funksjonen under.
@@ -1564,7 +1696,9 @@ function lagDashedStilFraGeoJSON(geojson, erSelectStil){
             return style;
 
         } catch (error) {
-            return null;
+            // returner default istedenfor null her.
+            return defaultLayerDashedStyle;
+            // return null;
         }
 
     } else {
@@ -1584,12 +1718,19 @@ function lagDashedStilFraGeoJSON(geojson, erSelectStil){
 
             return style;
         } catch (error) {
-            return null;
+            // Returnere default istedenfor null her.
+            return defaultLayerDashedSelectStyle;
+            // return null;
         }
 
     }
-
-    return null; // Unreachable?
+    // I tilfelle koden kommer hit, siden det har skjedd før med en annen funksjon...
+    if(!erSelectStil){
+        return defaultLayerDashedStyle;
+    } else {
+        return defaultLayerDashedSelectStyle;
+    }
+    // return null; // Unreachable?
 }
 
 function hentOgKonverterFargeArray(geojson, dictKey) {
@@ -1599,9 +1740,72 @@ function hentOgKonverterFargeArray(geojson, dictKey) {
         if (fargeArray != null) {
             return "rgba(" + fargeArray[0] + ", " + fargeArray[1] + ", " + fargeArray[2] + ", " + fargeArray[3] + ")";
         } else {
+            // Returnere defaults.
+            if(dictKey == "strokeColorSelect"){
+                return defaultFargeStroke;
+            } else {
+                return defaultFargeFill;
+            }
             return null;
         }
     } else {
         return null;
     }
 }
+
+// STRIPETE MØNSTER: START
+
+function createStripedPattern(lineWidth, spacing, slope, color) {
+    const can = document.createElement('canvas');
+    const len = Math.hypot(1, slope);
+    
+    const w = can.width = 1 / len + spacing + 0.5 | 0; // round to nearest pixel              
+    const h = can.height = slope / len + spacing * slope + 0.5 | 0; 
+
+    const ctx = can.getContext('2d'); 
+    ctx.strokeStyle = color; 
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+
+    // Line through top left and bottom right corners
+    ctx.moveTo(0, 0);
+    ctx.lineTo(w, h);
+    // Line through top right corner to add missing pixels
+    ctx.moveTo(0, -h);
+    ctx.lineTo(w * 2, h);
+    // Line through bottom left corner to add missing pixels
+    ctx.moveTo(-w, 0);
+    ctx.lineTo(w, h * 2);
+    
+    ctx.stroke();
+    return ctx.createPattern(can, 'repeat');
+    // Skjønner ikke hvorfor denne trenger å bruke return.
+    // Hvis return blir tatt bort blir det feil...
+  };
+
+  // Tror jeg kan ta bort return canvas, men ha den i tilfelle...
+  function fillWithPattern(canvas, pattern, inset = 0) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(inset, inset, canvas.width - inset * 2, canvas.height - inset * 2);
+    ctx.fillStyle = pattern;
+    ctx.fillRect(inset, inset, canvas.width - inset * 2, canvas.height - inset * 2);
+    return canvas;
+  }
+
+// Bare bruk denne funksjonen. Den bruker både createStripedPattern og fillWithPattern.
+// Eks: makeStripedPattern(2, 5, 1, "rgba(85, 187, 107, 1)")
+// Denne skal returnere "pattern".
+function makeStripedPattern(lineWidth, spacing, slope, color){
+    // Canvas for det stripete mønsteret.
+    const patternCanvas = document.createElement("canvas");
+    fillWithPattern(patternCanvas, createStripedPattern(lineWidth, spacing, slope, color));
+    // Canvas som holder mønsteret.
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const pattern = ctx.createPattern(patternCanvas, "repeat")
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    return pattern;
+}
+
+// STRIPETE MØNSTER: END

@@ -257,6 +257,7 @@ h2 {
   align-self: center;
 }
 
+/* Må ha høyere z-indeks en hovedVinduet! */
 .hovedVinduKnapper {
   width: 448px;
   margin-left: 1rem;
@@ -265,7 +266,7 @@ h2 {
   border-top-right-radius: 16px;
   border: 3px solid var(--markakart-logo-fargen-shades4);
   position: fixed;
-  z-index: 3;
+  z-index: 7;
   display: flex;
   justify-content: space-between; 
   background-color: var(--markakart-logo-fargen-tones5);
@@ -371,13 +372,14 @@ h2 {
 
   display:flex;
   flex-direction: column;
-  z-index: 2;
+  z-index: 5;
   border: 3px solid var(--markakart-logo-fargen-shades4);
 
   /* border-radius: 4px; */
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 1);
+  /* background-color: rgba(255, 255, 255, 0.9); */
   /* transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s; */
   pointer-events:all;
 }
@@ -1324,18 +1326,6 @@ h1 {
 }
 
 .gpsButtonContainer {
-/*   width: 42px;
-  height: 42px;
-  position: fixed;
-  z-index: 1;
-  right: 0rem;
-  bottom: 10.5rem;
-  bottom: 12rem;
-  border: 3px solid var(--markakart-logo-fargen-tones7);
-  border-radius: 4px;
-  opacity: 0.8;
-  cursor: pointer;
-  */
   margin-bottom: 1rem;
   border-color: var(--markakart-logo-fargen-tones7);
   background-color: var(--markakart-logo-fargen-tones7);
@@ -1343,10 +1333,6 @@ h1 {
   align-items: center;
   justify-content: center;
 }
-/* .gpsButtonContainer:hover {
-  background-color: var(--markakart-logo-fargen-shades3);
-  background-color: var(--markakart-logo-fargen-tones5);
-} */
 
 .gpsButtonContainer img {
   width: 32px;
@@ -1384,26 +1370,96 @@ h1 {
   color: white;
 }
 
-#zoomknapper {
-  width: 32px;
-  height: 64px;
+.bakgrunnGruppeSkjult {
+  display: none;
+}
+
+#byttBakgrunn {
+  width: 76px;
+  height: 76px;
+  z-index: 3;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 5rem;
+  /* border: rgba(0, 0, 0, 0.8) 3px solid; */
+  /* border: rgba(0, 0, 0, 1) 3px solid; */
+  border: rgba(0, 0, 0, 1) 3px solid;
+  /* border-color: black;
+  border-style: solid;
+  border-width: 3px; */
+  border-radius: 4px;
+  opacity: 0.75;
+  cursor: pointer;
+  padding: 1px;
+  background-color: white;
+}
+
+#containerBytteBakgrunn {
+  position: fixed;
+  display: none;
+  z-index: 2;
+  right: 5rem;
+  bottom: 1.5rem;
+}
+
+#containerBytteBakgrunn img {
   position: fixed;
   z-index: 1;
-  right: 0rem;
-  bottom: 7.5rem;
-  margin-right: 40px;
-  stroke-width: 3px;
+  right: 5rem;
+  /* bottom: 1.5rem; */
+  width: 78px;
+  height: 78px;
+  border: rgba(255, 255, 255, 0.75) 3px solid;
+  border-radius: 4px;
+  /* opacity: 0.9; */
+}
+
+#bytteBakgrunnOSM {
+  bottom: 14rem;
+  cursor: pointer;
+  /* filter: saturate(100%); */
+  filter: none;
+  transition: all 300ms ease;
+}
+#bytteBakgrunnSatelitt {
+  bottom: 11.5rem;
+  filter: saturate(0%);
+  cursor: auto;
+  /* pointer-events: none; */
+  transition: all 300ms ease;
+}
+#bytteBakgrunnTopografisk {
+  bottom: 9rem;
+  filter: saturate(0%);
+  cursor: auto;
+  /* pointer-events: none; */
+  transition: all 300ms ease;
+}
+#bytteBakgrunnTopografiskGraa {
+  bottom: 6.5rem;
+  filter: saturate(0%);
+  cursor: auto;
+  /* pointer-events: none; */
+  transition: all 300ms ease;
+}
+#bytteBakgrunnForenklet {
+  bottom: 4rem;
+  cursor: auto;
+  /* pointer-events: none; */
+  transition: all 300ms ease;
 }
 
 #scale-line-id {
   position: fixed;
   z-index: 1;
   display: block;
-  right: 0.75rem;
-  right: 1.5rem;
-  bottom: 1.25rem;
-  bottom: 1.75rem;
+  /* right: 1.5rem; */
+  bottom: 0.75rem;
+  /* bottom: 1.25rem; */
+  margin-left: 50%;
   stroke-width: 3px;
+  opacity: 0.75;
+  cursor: pointer;
 }
 
 .map {
@@ -1541,7 +1597,8 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
   .rightButtonsContainer {
     margin-right: 0.5rem;
     /* bottom: 12rem; */
-    bottom: 11rem;
+    bottom: 10rem;
+    bottom: 9.5rem;
   }
 /*   .gpsButtonContainer {
     margin-right: 0.5rem;
@@ -1551,6 +1608,41 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     margin-right: 0.5rem;
     bottom: 23rem;
   }
+}
+#byttBakgrunn {
+  right: unset;
+  left: 0.5rem;
+  bottom: 9.5rem;
+}
+#containerBytteBakgrunn {
+  right: unset;
+  left: 0.5rem;
+  bottom: 9.5rem;
+}
+#bytteBakgrunnOSM {
+  right: unset;
+  left: 0.5rem;
+  bottom: 22.5rem;
+}
+#bytteBakgrunnSatelitt {
+  right: unset;
+  left: 0.5rem;
+  bottom: 20rem;
+}
+#bytteBakgrunnTopografisk {
+  right: unset;
+  left: 0.5rem;
+  bottom: 17.5rem;
+}
+#bytteBakgrunnTopografiskGraa {
+  right: unset;
+  left: 0.5rem;
+  bottom: 15rem;
+}
+#bytteBakgrunnForenklet {
+  right: unset;
+  left: 0.5rem;
+  bottom: 12.5rem;
 }
 
 /* 
@@ -1598,6 +1690,7 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     margin-top: 140px;
     margin-left: 0rem;
     margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     padding-top: 1rem;
     padding-bottom: 1rem;
     border: 3px solid var(--markakart-logo-fargen-shades4);
@@ -1611,8 +1704,8 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
   }
   .rightButtonsContainer {
     margin-right: 1rem;
-    /* bottom: 12rem; */
     bottom: 5rem;
+    bottom: 1.5rem;
   }
 /*   .gpsButtonContainer {
     margin-right: 1rem;
@@ -1622,6 +1715,47 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     margin-right: 1rem;
     bottom: 16rem;
   }
+
+  #scale-line-id {
+    display: none;
+  }
+
+  #byttBakgrunn {
+    left: unset;
+    right: 5rem;
+    bottom: 1.5rem;
+  }
+  #containerBytteBakgrunn {
+    left: unset;
+    right: 5rem;
+    bottom: 1.5rem;
+  }
+  #bytteBakgrunnOSM {
+    left: unset;
+    right: 5rem;
+    bottom: 14rem;
+  }
+  #bytteBakgrunnSatelitt {
+    left: unset;
+    right: 5rem;
+    bottom: 11.5rem;
+  }
+  #bytteBakgrunnTopografisk {
+    left: unset;
+    right: 5rem;
+    bottom: 9rem;
+  }
+  #bytteBakgrunnTopografiskGraa {
+    left: unset;
+    right: 5rem;
+    bottom: 6.5rem;
+  }
+  #bytteBakgrunnForenklet {
+    left: unset;
+    right: 5rem;
+    bottom: 4rem;
+  }
+
 }
 /* DESKTOP+ */
 @media only screen and (min-width : 800px){
@@ -1633,4 +1767,8 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     width: 448px;
     margin-left: 1rem;
   }
+  #scale-line-id {
+    display: block;
+  }
+
 }
