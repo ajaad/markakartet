@@ -37,6 +37,19 @@
   --markakart-logo-fargen-tones5: rgb(84, 124, 115, 1);
   --markakart-logo-fargen-tones6: rgb(99, 125, 119, 1);
   --markakart-logo-fargen-tones7: rgb(113, 126, 123, 1);
+  /* For kontrast */
+  --markakart-logo-fargen-complementary: rgb(119, 12, 38, 1);
+  --markakart-logo-fargen-triadic1: rgb(93, 12, 119, 1);
+  --markakart-logo-fargen-triadic2: rgb(119, 93, 12, 1);
+  --markakart-logo-fargen-tetradic1: rgb(39, 12, 119, 1);
+  --markakart-logo-fargen-tetradic2: rgb(119, 12, 38, 1);
+  --markakart-logo-fargen-tetradic3: rgb(91, 119, 12, 1);
+  --markakart-logo-fargen-analogue1: rgb(12, 91, 119, 1);
+  --markakart-logo-fargen-analogue2: rgb(12, 38, 119, 1);
+  --markakart-logo-fargen-analogue3: rgb(39, 12, 119, 1);
+  --markakart-logo-fargen-analogue4: rgb(93, 12, 119, 1);
+  --markakart-logo-fargen-analogue5: rgb(119, 12, 92, 1);
+
   /* GAMLE */
 /*   
   --markakart-logo-fargen: rgb(20, 175, 86, 1);
@@ -85,6 +98,8 @@ html,body {
 /*   overflow: hidden;
   overscroll-behavior: none; */
   overscroll-behavior-y: contain; /* Eneste som har funket! */
+  overflow: hidden;
+  height: 100%;
 }
 
 /* Default text size within paragraph tags */
@@ -354,6 +369,60 @@ h2 {
 }
 
 /* =======================================================
+== HOVEDTABS: To tabs for "Kart"
+======================================================= */
+
+
+#hovedMenyTabsContainer {
+  width: 100%;
+  display: flex;
+  /* margin-bottom: 0.75rem; */
+  justify-content: space-evenly;
+  justify-items: center;
+  gap: 1rem;
+  /* background-color: rgba(0,0,0,0.25); */
+  margin-bottom: 2rem;
+}
+.hovedMenyTabsContainer div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  pointer-events: inherit;
+}
+.hovedMenyTabsContainer button {
+  width: 100%;
+  padding: 1rem;
+  /* padding: 0.5rem; */
+  /* margin: 0; */
+  cursor: pointer;
+  border: 0;
+}
+
+.hovedMenyTabAktiv {
+  color: white;
+  background-color: var(--markakart-logo-fargen-neutral2);
+}
+.hovedMenyTabAktiv:hover {
+  /* background-color: var(--markakart-logo-fargen-neutral1); */
+  background-color: var(--markakart-logo-fargen-neutral2);
+  filter: saturate(80%);
+}
+
+.hovedMenyTabInaktiv {
+  color: black;
+  /* background-color:gainsboro; */
+  /* background-color: var(--markakart-logo-fargen-neutral2); */
+  background-color: var(--markakart-logo-fargen-tints4);
+  filter: saturate(0);
+}
+.hovedMenyTabInaktiv:hover {
+  /* background-color:#cccccc; */
+  /* background-color: var(--markakart-logo-fargen-neutral1); */
+  background-color: var(--markakart-logo-fargen-tints3);
+  filter: saturate(0);
+}
+
+/* =======================================================
 == HOVEDVINDU
 ======================================================= */
 
@@ -364,7 +433,7 @@ h2 {
   margin-left: 0rem;
   margin-right: 1rem;
   margin-bottom: 1rem;
-  padding-top: 1rem;
+  /* padding-top: 1rem; */
   padding-bottom: 1rem;
   top: 0;
   bottom: 0;
@@ -435,20 +504,40 @@ h2 {
 }
 
 .hovedVindu {
+  
   height: 100%;
+
+  /* margin-top: 1rem; */
+  
   padding-top: 1rem;
   padding-left: 2rem;
   padding-right: 2rem;
   padding-bottom: 1rem;
+  
   overflow-y: scroll;
   overflow-x: hidden;
+ 
 
   opacity: 1;
   /* transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s; */
 }
 
+.hovedVinduScroll {
+  /* height: 100%; */
+  /*
+  padding-top: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 1rem;
+  */
+/* 
+  overflow-y: scroll;
+  overflow-x: hidden;
+   */
+}
+
 #kartHovedMeny {
-  
+
 }
 
 #kartHovedMeny li {
@@ -582,14 +671,26 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
 }
 
 #skjulAlleLagKnapp {
-  max-width: 128px;
+  /* max-width: 128px; */
+  max-width: 156px;
   border-radius: 4px;
-  background-color: var(--markakart-logo-fargen-neutral4);
+  padding: 1rem;
+  /* background-color: var(--markakart-logo-fargen-neutral4); */
+  /* background-color: var(--markakart-logo-fargen-complementary); */
+  /* background-color: var(--markakart-logo-fargen-tetradic3); */
+  background-color: var(--markakart-logo-fargen-analogue1);
+  filter: saturate(100%);
+  /* filter:brightness(1); */
 }
 #skjulAlleLagKnapp:hover {
-  background-color: var(--markakart-logo-fargen-neutral2);
+  /* background-color: var(--markakart-logo-fargen-neutral3); */
+  /* background-color: var(--markakart-logo-fargen-complementary); */
+  /* background-color: var(--markakart-logo-fargen-tetradic3); */
+  background-color: var(--markakart-logo-fargen-analogue1);
+  filter: saturate(75%);
+  /* filter:brightness(1.25); */
 }
-
+/* Hm... Ikke ha? */
 #visAlleLagKnapp {
   max-width: 128px;
   border-radius: 4px;
@@ -597,6 +698,318 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
 }
 #visAlleLagKnapp:hover {
   background-color: var(--markakart-logo-fargen-shades1);
+}
+
+/* Hovedmeny - Aktive kartlag */
+
+#kartSideAktiveLag {
+  display: none;
+  /* background-color: rgba(84, 231, 84, 0.75); */
+}
+#kartSideAktiveLag li {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.5rem;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  /*
+  background-color: rgba(80,145,145, 0.2);
+  background-color: rgba(204, 204, 204, 0.2);
+  */
+
+  /* Mens debugging */
+  /*background-color: rgba(0,0,0,0.25);*/
+}
+
+.aktivtLagHeader {
+  width: 100%;
+  height: 2rem;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  /* justify-content: start; */
+  justify-content: space-between;
+  /* background-color: rgba(216, 50, 50, 0.1); */
+}
+.aktivtLagHeaderVenstre {
+  width: 76%;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* background-color: rgba(0,0,0,0.1); */
+}
+.aktivtLagHeaderHoyre {
+  width: 24%;
+  height: 2rem;
+  display: flex;
+  justify-content:end;
+  gap: 4px;
+  /* background-color: rgba(255, 0, 0, 0.25); */
+}
+
+.aktivtLagFargeContainer {
+  height: 12px;
+  width: 12px;
+  border: 1px solid black;
+}
+
+.aktivtLagFarge {
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+  min-width: 12px;
+  max-width: 12px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: black;
+  opacity: 1.0; /* Lag under Aktive Lag skal vise fargen. */
+  background-color: var(--markakart-logo-fargen-tints3);
+  transition: visibility 0.5s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
+}
+.aktivtLagNavn {
+  font-size:large;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aktivtLagRedigerPanel {
+  display: none;
+  width: 100%;
+  /* height: 200px; */
+  margin-top: 1rem;
+  border-top: 1px solid gray;
+  /* padding-top: 1rem; */
+  /* background-color: rgba(255, 103, 103, 0.25); */
+}
+.aktivtLagRedigerIkonKollaps {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  /* padding: 4px; */
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  justify-self: center;
+  text-align: center;
+  /* background-color: rgba(255, 0, 0, 0.15); */
+  cursor: pointer;
+  border-radius: 2px;
+  /* padding-top: 0.25rem; */
+  margin-top: 0.5rem;
+  /* margin-bottom: 0.5rem; */
+}
+.aktivtLagRedigerIkonKollaps:hover {
+  /* background-color: rgba(255, 0, 0, 0.3); */
+}
+.aktivtLagRedigerIkonKollaps img {
+  width: 75%;
+  height: 75%;
+}
+.aktivtLagEndreFargeContainer {
+  display: none;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+.aktivtLagEndreFargeTekst {
+  font-size: 14px;
+  font-style: italic;
+  align-self: center;
+}
+.aktivtLagEndreFargeVelgerContainer {
+  width: 100%;
+  max-width: 128px;
+}
+
+.aktivtLagMiniKnapp {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: black;
+}
+/* Rediger */
+.aktivtLagRediger {
+  background-color: rgba(55, 149, 192, 0.15);
+  border-radius: 2px;
+}
+.aktivtLagRediger:hover {
+  background-color: rgba(55, 149, 192, 0.3);
+}
+.aktivtLagRediger img {
+  width: 66%;
+}
+/* Info */
+.aktivtLagInfo {
+  background-color: rgba(55, 149, 192, 0.15);
+  border-radius: 2px;
+}
+.aktivtLagInfo:hover {
+  background-color: rgba(55, 149, 192, 0.3);
+}
+.aktivtLagInfo img {
+  width: 66%;
+}
+/* Slett */
+.aktivtLagSlett {
+  background-color: rgba(255, 0, 0, 0.15);
+  border-radius: 2px;
+  /* background-color: green; */
+}
+.aktivtLagSlett:hover {
+  background-color: rgba(255, 0, 0, 0.25);
+}
+.aktivtLagSlett div {
+  font-size:smaller;
+}
+
+.aktivtLagEkstraInfo {
+  display: none;
+  width: 100%;
+  margin-top: 1rem;
+  border-top: 1px solid gray;
+/* 
+  border: 1px solid lightslategray;
+  border-radius: 2px;
+   */
+  /* background-color: rgba(0,0,0,0.25); */
+}
+.aktivtLagInfoIkonKollaps {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  justify-self: center;
+  text-align: center;
+  /* background-color: rgba(255, 0, 0, 0.15); */
+  cursor: pointer;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  /* margin-bottom: 0.5rem; */
+}
+.aktivtLagInfoIkonKollaps:hover {
+
+}
+.aktivtLagInfoIkonKollaps img {
+  width: 75%;
+  height: 75%;
+}
+.aktivtLagTegnforklaring {
+  display: none;
+  width: 100%;
+  /* padding-top: 1rem; */
+  padding-top: 0.5rem;
+
+/*   margin: 0 auto;
+  justify-self: center; */
+  /* padding: 4px; */
+  /* margin-top: 1rem; */
+  /* background-color: rgba(0,0,0,0.25); */
+}
+.aktivtLagTegnforklaringsBilde {
+  display: none;
+/*   justify-self: center;
+  margin: 0 auto; */
+  border: 1px solid gainsboro;
+}
+
+.toKolonnerContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  /* gap: 8px; */
+  margin-top: 0.5rem;
+  justify-content: space-between;
+  /* background-color: rgba(50, 100, 150, 0.25); */
+}
+.venstreKolonne {
+  width: 50%;
+  font-size: 14px;
+  font-style:italic;
+  align-self:flex-start;
+}
+.hoyreKolonne {
+  width: 50%;
+  font-size: 14px;
+  align-self: center;
+  justify-self:start;
+  text-align:start;
+  word-wrap:break-word;
+  white-space: normal;
+  /* background-color: rgba(0,0,0,0.25); */
+}
+
+/* =======================================================
+== SLIDER
+======================================================= */
+
+.slidecontainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Width of the outside container */
+}
+
+/* The slider itself */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderVerdierContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.sliderVerdier {
+  /* position: absolute; */
+  width: 100%;
+  /* left: 2rem; */
+  text-align:left;
+  /* background-color: rgba(0,0,0,0.25); */
 }
 
 /* =======================================================
@@ -949,20 +1362,22 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
   display: flex;
   flex-direction: row;
   align-items:end;
-  margin-bottom: 4rem;
+  padding: 0.5rem;
+  margin-bottom: 2.5rem;
+  /* margin-bottom: 4rem; */
   /* background-color: rgb(0,0,0,0.25); */
 }
 
 .noaIkon {
-  height: 64px;
-  width: 64px;
+  height: 54px;
+  width: 54px;
   margin-right: 1rem;
 }
 
 h1 {
-  font-size: 48px;
+  font-size: 44px;
   margin: 0; padding: 0;
-  border-bottom: 6px solid var(--markakart-logo-fargen);
+  /*border-bottom: 6px solid var(--markakart-logo-fargen);*/
 }
 
 /* =======================================================
@@ -1125,6 +1540,8 @@ h1 {
   pointer-events: none;
   opacity: 0;
 }
+
+
 
 /* =======================================================
 == MENY-GREIER
@@ -1573,6 +1990,7 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
   .lukkeHovedKnapper {
     display: none;
   }
+
   .hovedVinduContainer {
     width: 100%;
     margin-top: 140px;
@@ -1581,7 +1999,7 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     /* margin-bottom: 108px; */
     margin-bottom: 96px;
     margin-bottom: 80px;
-    padding-top: 0rem;
+    /* padding-top: 0rem; */
     padding-bottom: 1rem;
     border-width: 0;
     /* border-top: 3px solid var(--markakart-logo-fargen-shades4); */
@@ -1645,6 +2063,11 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
   bottom: 12.5rem;
 }
 
+/*
+.hovedMenyTabsContainer button {
+  padding: 0.5rem;
+} */
+
 /* 
   DESKTOP
 */
@@ -1691,13 +2114,16 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     margin-left: 0rem;
     margin-bottom: 1rem;
     margin-bottom: 1.5rem;
-    padding-top: 1rem;
+    /* padding-top: 1rem; */
     padding-bottom: 1rem;
     border: 3px solid var(--markakart-logo-fargen-shades4);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+  }
+  .hovedVindu {
+    /* margin-top: 1rem; */
   }
   .slide {
     display: none;
@@ -1754,6 +2180,10 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
     left: unset;
     right: 5rem;
     bottom: 4rem;
+  }
+
+  .hovedMenyTabsContainer button {
+    padding: 1rem;
   }
 
 }

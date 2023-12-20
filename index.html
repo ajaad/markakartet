@@ -8,6 +8,11 @@
     <link rel="icon" href="favicon.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./libs/v6.6.1-dist/ol.css" type="text/css">
     <link rel="stylesheet" href="./style.css" type="text/css">
+    <link rel="stylesheet" href="./libs/coloris.css" type="text/css">
+
+    <!-- ColorPicker -->
+    <!-- <script src="./libs/jscolor.min.js"></script> -->
+    <script src="./libs/coloris.js"></script>
 
     <meta http-equiv="Content-Language" content="text/html;charset=utf-8" />
 
@@ -33,10 +38,12 @@
                     <img class="" id="divMenyKartBilde" src="./images/layer-white.png">
                     <button class="markaKnapp" id="headerKnappKartMeny">Kart</button>
                 </div>
+                <!--
                 <div class="" id="divMenyDel" onclick="kartMenySideKlikk('divMenyDel');">
                     <img class="" id="divMenyDelBilde" src="./images/share.png">
                     <button class="markaKnapp" id="headerKnappDel">Del</button>
                 </div>
+                -->
                 <div class="" id="divMenyStott" onclick="kartMenySideKlikk('divMenyStott');">
                     <img class="" id="divMenyStottBilde" src="./images/favicon-only-inner-large-black.png">
                     <button class="markaKnapp" id="headerKnappStott">Støtt</button>
@@ -95,6 +102,15 @@
             </div>
 
             <div class="hovedVindu" id="hovedVindu">
+
+                <div class="hovedMenyTabsContainer" id="hovedMenyTabsContainer">
+                    <div class="hovedMenyTab">
+                        <button class="" id="tabMenyKnapp">Alle lag</button>
+                    </div>
+                    <div class="hovedMenyTab">
+                        <button class="" id="tabAktivKnapp">Aktive lag</button>
+                    </div>
+                </div>
 
                 <!-- Test: Info om en feature, at Kartlag blir skjult... -->
                 <div class="featureInfo" id="featureInfo">
@@ -205,16 +221,290 @@
                     <br />
 
                 </div>
+
+                <!-- ENTEN ALLE LAG ELLER AKTIVE LAG! -->
+
+                <!-- Alle lag -->
                 
                 <ul class="kartHovedMeny" id="kartHovedMeny">
                 
-                    <!-- DEBUG -->
-<!--                     <div class="debugVindu">
-                        <div id="debugVinduTekst">DEBUG</div>
-                    </div> -->
-                
-                    <!-- Lagt til elementer med JavaScript -->
-                
+                        <!-- DEBUG
+                        <div>
+                            <div class="debugVindu">
+                            <div id="debugVinduTekst">DEBUG</div>
+                        </div> -->
+                    
+                        <!-- Lagt til elementer med JavaScript -->
+
+                </ul>
+
+                <!-- Aktive lag -->
+
+                <ul class="kartSideAktiveLag" id="kartSideAktiveLag">
+                    <!-- Test -->
+
+                    <!--
+                    <li>
+                        <div class="aktivtLagFarge"></div>
+
+                        <div class="" style="display: flex; flex-direction: column;">
+
+                            <div class="aktivtLagGruppe">
+                                <span title="Gruppe">Gruppe Navn</span>
+                            </div>
+                            <div style="display: flex; flex-direction: row;">
+                                <div class="aktivtLagNavn">
+                                    Lag 1 Navn
+                                </div>
+                                <div class="aktivtLagInfo">
+                                    <img src="./images/information.png" alt="Informasjon" title="Info" />
+                                </div>
+                                <div class="aktivtLagRediger">
+                                    <img src="./images/editing.png" alt="Rediger" title="Edit" />
+                                </div>
+        
+                                <div class="aktivtLagGjennomsiktighet">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </li>
+                    <li>
+                        Lag 2
+                    </li>
+                    -->
+
+                    <li>
+                        <!--
+                        <div class="aktivtLagHeader">
+                            <div class="aktivtLagFarge" id="testFarge"></div>
+                            <div class="aktivtLagNavn">Testlag med et veeeeeeeeeeeeeeeeeeeeeeeeeeeeeldig langt navn.</div>
+                        </div>                            
+                        -->
+                        <div class="aktivtLagHeader">
+                            <div class="aktivtLagHeaderVenstre">
+                                <div class="aktivtLagFarge" id="testFarge"></div>
+                                <div class="aktivtLagNavn">Testlag med et veeeeeeeeeeeeeeeeeeeeeeeeeeeeeldig langt navn.</div>
+                            </div>
+                            <div class="aktivtLagHeaderHoyre">
+                                <div class="aktivtLagMiniKnapp aktivtLagRediger" id="testLagRediger" onclick="testRediger();" title="Rediger">
+                                    <img src="./images/edit.png" alt="Edit" />
+                                </div>
+                                <div class="aktivtLagMiniKnapp aktivtLagInfo" id="testLagInfo" onclick="testInfo();" title="Informasjon">
+                                    <img src="./images/information.png" alt="Info"/>
+                                </div>
+                                <div class="aktivtLagMiniKnapp aktivtLagSlett" id="testLagSlett" onclick="testSlett();" title="Deaktiver">
+                                    <div>x</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <input type="range" min="0" max="100" value="50" class="slider" id="testSlider" oninput="updateSliderValue();">
+                            <!--
+                            <div class="sliderVerdierContainer">
+                                <div style="display:flex; gap: 4;">
+                                    <span class="sliderVerdier">Synlighet: </span>
+                                    <div class="aktivtLagFarge" id="testFarge"></div>                                    
+                                </div>
+                                <span id="sliderVerdi"></span>
+                            </div>
+                            -->
+                            <span class="sliderVerdier">Synlighet: <span id="sliderVerdi"></span></span>
+                        </div>
+                        <!-- <span class="sliderVerdier">Gjennomsiktighet: <span id="sliderVerdi"></span></span> -->
+
+                        <!-- <script src="./libs/jscolor.min.js"></script> -->
+
+                        <div id="aktivtLagRedigerPanelId" class="aktivtLagRedigerPanel">
+
+                            <div class="aktivtLagRedigerIkonKollaps">
+                                <img src="./images/edit.png" alt="Edit Collapse" />
+                            </div>
+
+                            <!-- <input value="3399FF" data-jscolor="{position: 'right', width: 181, height: 121}"> -->
+
+                            <!-- <div class="clr-field">
+                                <button type="button">::after</button>
+                                <input type="text" class="aktiv1test" data-coloris>
+                            </div> -->
+
+                            <!-- <input class="aktiv1test" type="text" value="rgb(70,140,70)" data-coloris> -->
+                            <div class="aktivtLagEndreFargeContainer">
+                                <div class="aktivtLagEndreFargeTekst">
+                                    Endre farge:
+                                </div>
+                                <div class="aktivtLagEndreFargeVelgerContainer">
+                                    <input class="aktiv1test" type="text" value="rgb(70,140,70)" data-coloris>
+                                </div>
+                            </div>
+
+                            <!-- TEST MED TO INPUT FIELDS -->
+                            <!-- <input style="display: block;" class="aktiv2test" type="text" value="rgb(140,70,140)" data-coloris> -->
+                        </div>
+
+                        <div id="aktivtLagViserInfo" style="display: none;">false</div>
+
+                        <div class="aktivtLagEkstraInfo" id="aktivtLagEkstraInfoTest">
+
+                            <div class="aktivtLagInfoIkonKollaps">
+                                <img src="./images/information.png" alt="Info Collapse" />
+                            </div>
+
+                            <div class="aktivtLagTegnforklaring" id="aktivtLagTegnforklaringTest" style="display: block;">
+                                <div class="toKolonnerContainer">
+                                    <div class="venstreKolonne">
+                                        Tegnforklaring:
+                                    </div>
+                                    <div class="hoyreKolonne">
+                                        <img class="aktivtLagTegnforklaringsBilde" src="" alt="Tegnforklaring" />
+                                    </div>
+                                </div>
+                                <div class="toKolonnerContainer">
+                                    <div class="venstreKolonne">
+                                        Organisasjon:
+                                    </div>
+                                    <div class="hoyreKolonne">
+                                        TEST for rådgivning av skilpadder i det tropiske Galapagos
+                                    </div>
+                                </div>
+                                <div class="toKolonnerContainer">
+                                    <div class="venstreKolonne">
+                                        E-post:
+                                    </div>
+                                    <div class="hoyreKolonne">
+                                        test_veldig_lang_epost@hotmail.com
+                                    </div>
+                                </div>
+                            </div>
+
+<!--                             <div class="aktivtLagTegnforklaring" id="aktivtLagTegnforklaringTest">
+                                <img class="" src="" alt="Tegnforklaring" />
+                            </div> -->
+                            
+                        </div>
+                        
+<!--                         <div class="aktivtLagTegnforklaring" id="aktivtLagTegnforklaringTest">
+                            <img class="" src="" alt="Tegnforklaring" />
+                        </div> -->
+
+                        <!--<p>Value: <span id="sliderValue"></span></p> -->
+                        <script>
+                            // var testSlider = document.getElementById("testSlider");
+                            // var output = document.getElementById("sliderValue");
+                            // output.innerHTML = slider.value;
+
+                            function testInfo(){
+                                console.log("testInfo clicked!");
+                                var element = document.getElementById("aktivtLagEkstraInfoTest");
+                                var style = window.getComputedStyle(element);
+                                var display = style.getPropertyValue("display");
+                                console.log("display: " + display);
+                                if(display == "block"){
+                                    element.style.display = "none";
+                                } else {
+                                    element.style.display = "block";
+                                }
+                            }
+
+                            Coloris.setInstance('.aktiv1test', {
+                                // inline: true,
+                                // wrap: false,
+                                // el: '.aktiv1test',
+                                theme: 'polaroid', // default, large, polaroid, pill
+                                themeMode: 'light',
+                                alpha: false,
+                                // forceAlpha: true,
+                                format: 'rgb',
+                                // clearButton: true,
+                                // clearLabel: "Angre",
+                                // closeButton: true,
+                                // closeLabel: "Lukk",
+                                // margin: 0,
+                                swatches: [
+                                    // 'rgb(70,140,70)',
+                                    'rgb(255,255,255)'
+                                ],
+                                onChange: (color) => {
+                                    console.log("aktiv1test ~ onChange triggered! color: " + color);
+                                },
+                                onClear: (color) => {
+                                    console.log("aktiv1test ~ onClear triggered! color: " + color);
+                                },
+                                onClose: (color) => {
+                                    console.log("aktiv1test ~ onClose triggered! color: " + color);
+                                },
+                                onOpen: (color) => {
+                                    console.log("aktiv1test ~ onOpen triggered! color: " + color);
+                                }
+                            });
+
+                            Coloris.setInstance('.aktiv2test', {
+                                theme: 'polaroid',
+                                themeMode: 'light',
+                                alpha: false,
+                                format: 'rgb',
+                                swatches: [
+                                    // 'rgb(70,140,70)',
+                                    'rgb(0,0,0)'
+                                ],
+                                onChange: (color) => {
+                                    console.log("aktiv2test ~ onChange triggered! color: " + color);
+                                },
+                                onClear: (color) => {
+                                    console.log("aktiv2test ~ onClear triggered! color: " + color);
+                                },
+                                onClose: (color) => {
+                                    console.log("aktiv2test ~ onClose triggered! color: " + color);
+                                },
+                                onOpen: (color) => {
+                                    console.log("aktiv2test ~ onOpen triggered! color: " + color);
+                                }
+                            });
+
+                            function testRediger(){
+                                console.log("testRediger clicked!");
+                                var redigerPanel = document.getElementById("aktivtLagRedigerPanelId");
+                                var style = window.getComputedStyle(redigerPanel);
+                                var display = style.getPropertyValue("display");
+                                console.log("display: " + display);
+                                if(display == "block"){
+                                    redigerPanel.style.display = "none";
+                                } else {
+                                    redigerPanel.style.display = "block";
+                                }
+                            }
+
+                            // document.getElementById("clr-clear").addEventListener("click", function(){
+                            //     console.log("clear clicked!");
+                            // });
+
+                            function TESTintegerToPercent(intNumber){
+                                return intNumber / 100;
+                            }
+
+                            function updateSliderValue(){
+                                // console.log("updateSliderValue triggered!");
+                                var val = document.getElementById("testSlider").value;
+                                // document.getElementById("sliderValue").innerHTML = val;
+                                var f = TESTintegerToPercent(val);
+                                // console.log("v: " + val + ", f: " + f); // Seems to work fine.
+
+                                document.getElementById("sliderVerdi").innerHTML = val;
+
+                                //
+                                document.getElementById("testFarge").style.opacity = f;
+                            }
+
+                            function testSlett(){
+
+                            }
+                            
+                        </script>
+                    </li>
+
                 </ul>
 
                 <!-- Del Kartvisning -->
@@ -278,6 +568,7 @@
 
                         <div class="formColorPickerContainer">
 
+                            <!--
                             <button class="colorPickerButton" id="colorPickerButton" data-jscolor="{
                                 value: 'rgba(13, 12, 119, 0.75)',
                                 palette: [
@@ -291,6 +582,8 @@
                                 position:'top',
                                 preset: 'light',
                             }">
+                            -->
+
                             <!-- onChange: 'oppdatertFarge(this, \'#figurFargeForm\')' -->
 
                         </div>
@@ -347,31 +640,33 @@
                     </p>
                     <br />
 
-                    <div class="undertittel">Våre forvaltningsforslag</div>
+                    <div class="undertittel">Arealplan Oslo</div>
+                    <p>
+                        Kartlag som er relatert til Oslo kommunes arealplan.
+                        Det sentrale kartlaget er de foreslåtte hensynssonene (H560) for skogsbevaring.
+                        Hensynssonene tar blant annet skogstyper, nøkkelbiotoper og livsmiljø i betraktning.
+                    </p>
+                    <br />
 
+                    <div class="undertittel">Våre forvaltningsforslag</div>
                     <p>
                         Disse kartlagene inneholder informasjon om NOAs forslag til forvaltingstiltak som ikke handler om vern.
                         Områder hvor opplevelses- og naturverdier er skadet kan restaureres.
                         Ved å restaurere områder kan verdifulle områder bli knyttet sammen.
                     </p>
-
                     <br />
 
                     <div class="undertittel">Våre verneforslag</div>
-
                     <p>
                         Disse lagene inneholder NOAs forslag til hvilke områder som bør vernes.
                     </p>
-
                     <br />
 
                     <div class="undertittel">Vernede områder</div>
-
                     <p>
                         Disse lagene inneholder oppdatert informasjon om hvilke områder som er vernet i Norge.
                         Disse kartlagene ajourføres av Miljødirektoratet.
                     </p>
-
                     <ul class="tekstListe">
                         <li>
                             <a href="https://kartkatalog.geonorge.no/metadata/naturvernomraader-wms/fa6a495d-05a1-4c0d-ba67-45a1d47fca92"
@@ -382,7 +677,6 @@
                                 target="_blank" rel="noopener noreferrer">Info om statlig sikra friluftsområder</a>
                         </li>
                     </ul>
-
                     <br />
 
 <!--                     <div class="undertittel">Naturopplevelser</div>
@@ -399,17 +693,14 @@
                     <br />
 
                     <div class="undertittel">Bakgrunnskart</div>
-
                     <p>
                         Bakgrunnskartlagene er heldekkende kartlag som er ment å brukes for referanse.
                     </p>
-
                     <br />
 
                     <p>
                         Her er link til informasjon om de tjenestene som allerede er lagt inn:
                     </p>
-
                     <ul class="tekstListe">
                         <li>
                             <a href="https://en.wikipedia.org/wiki/OpenStreetMap" target="_blank"
@@ -432,7 +723,6 @@
                                 target="_blank" rel="noopener noreferrer">Bakgrunnskart forenklet</a>
                         </li>
                     </ul>
-
                     <br>
 
                     <p>
@@ -561,6 +851,7 @@
         </div>
 
         <!-- add a custom WMS-layer (wmsmenu er satt til usynlig i css.)   -->
+        <!--
         <form method="post" class="wmsmenu">
             <br>
             <label for="name">WMS URL: </label>
@@ -570,6 +861,7 @@
             <input type="text" id="newlayername" name="newlayername">
             <input id="addwmslayer" type="button" value="Add a WMS-layer" onclick="doFunction();" />
         </form>
+        -->
 
     </main>
 
@@ -611,7 +903,8 @@
     </div>
 
     <!-- ColorPicker -->
-    <script src="./libs/jscolor.min.js"></script>
+    <!-- <script src="./libs/jscolor.min.js"></script> -->
+    <!-- <script src="./libs/coloris.js"></script> -->
 
     <script src="./libs/v6.6.1-dist/ol.js"></script>
     <script src="./libs/proj4.js"></script>

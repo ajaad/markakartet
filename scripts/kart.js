@@ -101,6 +101,13 @@ var sideFeatureInfo;
 var featureInfoAktiv = false;
 var featureTilbakeKnapp;
 var finnKnapp;
+// Kartmeny-siden
+var sideAktiveLag;
+var hovedMenyTabsContainer;
+var tabAlleKnapp;
+var tabAktivKnapp;
+var aktiveLagVises = false;
+
 
 var mainMenuClassGroupLink;
 var mainMenuClassSubmenus;
@@ -112,6 +119,8 @@ var hovedMenyKlasseKartlagTekst;
 var htmlKartLagListe;
 // Prøve med dict:
 var htmlKartLagDict;
+
+var testBilde = new Image();
 
 function addGroupLinkListener(classIndex){
 
@@ -176,6 +185,16 @@ function settIndikatorFargerForKartlag(lagIndeks){
     // console.log("lagIndeks: " + lagIndeks + ", lagNavn: " + lagNavn + ", lagReferansen er null.");
   }
 }
+// Hm... Funksjon(er) for å hente farger? ...
+function hentLagReferanseFraKartlagListen(lagNavn){
+  for(var i = 0; i < htmlKartLagListe.length; i++){
+    // console.log(htmlKartLagListe[i]["lagNavn"]);
+    if(htmlKartLagListe[i]["lagNavn"] == lagNavn){
+      return htmlKartLagListe[i]["lagReferanse"];
+    }
+  }
+  return null;
+}
 
 function lagKartMenyHTML(){
 
@@ -186,23 +205,12 @@ function lagKartMenyHTML(){
 
   console.log("Lager kart meny...");
 
-  //
-  var h2Kartlag = "<div class='h2sentrert'><h2>Kartlag</h2></div><br/>";
-  document.getElementById("kartHovedMeny").innerHTML += h2Kartlag;
-  // document.getElementById("kartHovedMeny").textContent += h2Kartlag;
-
   for(var i = 0; i < kartMenyMasterListe.length; i++){
 
     var gruppeNavn = kartMenyMasterListe[i]["gruppeNavn"];
     var uiGruppeNavn = kartMenyMasterListe[i]["uiGruppeNavn"];
     // console.log("Lager nå html for Kartmeny gruppen: " + gruppeNavn);
 
-    // if(gruppeNavn != "Bakgrunnskart"){
-    //   htmlKartMenyGruppe += "<li class='gruppeMe{ny'>";
-    //   htmlKartMenyGruppe += "<div><div class='gruppeLenke' href='#'><img class='expandButton' src='./images/right-chevron-256.png' />";
-    //   htmlKartMenyGruppe += "<div>" + uiGruppeNavn + "</div></div></div>";
-    //   htmlKartMenyGruppe += "<ul class='submenu'>";
-    // }
     if(gruppeNavn != "Bakgrunnskart"){
       htmlKartMenyGruppe += "<li class='gruppeMeny'>";
     } else {
@@ -224,15 +232,7 @@ function lagKartMenyHTML(){
       // Som Anders har gjort det:
       // ... Måtte ta bort mellomrommet her: "', '" ---> "','"
       var forandreSynlighetFunksjon = "forandreSynlighetKartlag('" + gruppeNavn + "','" + lagNavn + "'," + lagIndeks + ")";
-      // if(gruppeNavn != "Bakgrunnskart"){
-      //   htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
-      //   htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
-      // }
 
-      // if(lagNavn != "vektorLagGPS"){
-      //   htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
-      //   htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
-      // }
       htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
       htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
 
@@ -261,18 +261,22 @@ function lagKartMenyHTML(){
 
   }
 
-  // Teste noe... Alle-lag knapper.
+  // Alle-lag knapper.
   var alleKnapperHTML = "<div id='alleKnapperContainer'>";
   alleKnapperHTML += "<button class='markaKnapp' id='skjulAlleLagKnapp' onclick='skjulAlleLag()'>Skjul alle</button>";
-  alleKnapperHTML += "<button class='markaKnapp' id='visAlleLagKnapp' onclick='visAlleLag()'>Vis alle</button>";
+  // Ikke ha med "Vis alle" knappen?
+  // alleKnapperHTML += "<button class='markaKnapp' id='visAlleLagKnapp' onclick='visAlleLag()'>Vis alle</button>";
   alleKnapperHTML += "</div>";
 
   document.getElementById("kartHovedMeny").innerHTML += alleKnapperHTML;
 
-  console.log(".. Kart meny klar!");
+  console.log("... Kart meny klar!");
 
   // console.log(htmlKartLagListe);
   // console.log(htmlKartLagDict);
+
+  // TEST: Funker.
+  // console.log(hentLagReferanseFraKartlagListen("vektorlagSkyggeLagRundtOsloKommune"));
 }
 
 $(document).ready(function(){
@@ -358,6 +362,11 @@ $(document).ready(function(){
   //
   featureTilbakeKnapp = document.getElementById("featureTilbakeKnapp");
   finnKnapp = document.getElementById("finnKnapp");
+  // Kartmeny-siden
+  sideAktiveLag = document.getElementById("kartSideAktiveLag");
+  hovedMenyTabsContainer = document.getElementById("hovedMenyTabsContainer");
+  tabAlleKnapp = document.getElementById("tabMenyKnapp");
+  tabAktivKnapp = document.getElementById("tabAktivKnapp");
 
   mainMenuClassGroupLink = document.getElementsByClassName("gruppeLenke");
   mainMenuClassSubmenus = document.getElementsByClassName("submenu");
@@ -375,11 +384,11 @@ $(document).ready(function(){
     }
   }
 
-  jscolor.ready(function(){
-    console.log("jscolor er klar!");
-    // Vet ikke hvilken farge jeg skal sette til bakgrunnen. Hm.
-    settIndikatorFargeManuelt("vektorLagGeometri", delFigurFarge.value, "rgba(0,0,0,0)");
-  });
+  // jscolor.ready(function(){
+  //   console.log("jscolor er klar!");
+  //   // Vet ikke hvilken farge jeg skal sette til bakgrunnen. Hm.
+  //   settIndikatorFargeManuelt("vektorLagGeometri", delFigurFarge.value, "rgba(0,0,0,0)");
+  // });
 
   sideDelKartvisning.style.display = "none";
   sideOmMarkakartet.style.display = "none";
@@ -388,7 +397,9 @@ $(document).ready(function(){
   aapneHovedMenyKnapp.style.opacity = "0";
   hovedVinduKnapper.style.opacity = "1";
   headerKnappKartMeny.style.opacity = "1";
-  headerKnappDel.style.opacity = "1";
+  if(headerKnappDel != null){
+    headerKnappDel.style.opacity = "1";
+  }
   headerKnappOm.style.opacity = "1";
   headerKnappStott.style.opacity = "1";
   hovedVinduContainer.style.opacity = "1";
@@ -518,10 +529,11 @@ $(document).ready(function(){
   // Aktivere kartlag fra URL her.
   if(lagListeFraURL != null){
     console.log("lagListeFraURL er ikke null!");
-    aktiverKartlagMedKoder(); // Funker!
+    // aktiverKartlagMedKoder(); // Funker!
+    aktiverKartlagMedNavn();
   } else {
-    // forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa");
-    forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGeometri");
+    forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa");
+    // forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGeometri");
     forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGPS");
   }
 
@@ -1038,7 +1050,26 @@ geolocation.on('error', function (error) {
     featureFinnKnappFunksjon();
   });
 
-}); // 
+  // Kartmeny-knapper for "Alle lag" og "Aktive lag"
+
+  // Sette stil for knappene.
+  settRiktigStilForTabKnapperUtenEndreBoolean();
+
+  tabAlleKnapp.addEventListener("click", function () {
+    console.log("tabAlleKnapp klikket!");
+    if(aktiveLagVises){
+      byttTilAlleLagSiden();
+    }
+  });
+
+  tabAktivKnapp.addEventListener("click", function () {
+    console.log("tabAktivKnapp klikket!");
+    if(!aktiveLagVises){
+      byttTilAktiveLagSiden();
+    }
+  });
+
+}); // onready END
 
 function featureTilbakeKnappFunksjon(){
   console.log("featureTilbakeKnapp klikket!");
@@ -1083,6 +1114,13 @@ let touchHandler = function (e) {
 
   switch (e.type) {
     case "touchstart":
+      // Prevent map interaction while dragging the menuslider?
+      // map.getInteractions().forEach(x => x.setActive(false));
+
+      // Gjøre kartmenyen uttrykkbar foreløpig.
+      hovedMenyTabsContainer.style.pointerEvents = "none";
+      sideKartMeny.style.pointerEvents = "none";
+
       type = "touchstart";
       startX = x;
       startY = y;
@@ -1161,11 +1199,24 @@ let touchHandler = function (e) {
         }
       }
 
+      // Re-enable map interactions
+      // map.getInteractions().forEach(x => x.setActive(true));
+
+      // Gjøre kartmenyen trykkbar igjen.
+      // hovedMenyTabsContainer.style.pointerEvents = "auto";
+      // sideKartMeny.style.pointerEvents = "auto";
       break;
     case "touchcancel":
       type = "touchcancel";
       endX = x;
       endY = y;
+
+      // Re-enable map interactions
+      // map.getInteractions().forEach(x => x.setActive(true));
+
+      // Gjøre kartmenyen trykkbar igjen.
+      // hovedMenyTabsContainer.style.pointerEvents = "auto";
+      // sideKartMeny.style.pointerEvents = "auto";
       break;
   }
 
@@ -1269,7 +1320,8 @@ let touchHandler = function (e) {
   // var containerHeight = hovedContainerStyle.height;
   // var containerHeightPixels = parseInt(containerHeight);
   // document.getElementById("slideTextTest").innerHTML = "v: 15" + ", hv h: " + pixelHeightEnd + ", c h: " + containerHeightPixels + ", c mtop: " + hovedVinduContainer.style.marginTop + ", c mb: " + hovedVinduContainer.style.marginBottom + ", mtT: " + marginTopShowThreshold + ", isUT: " + underMarginTopShowThreshold + ", tmb: " + thresholdWhenHighMarginBottom;
-}
+
+} // touchhandler END
 
 function kartMenySideKlikk(divTrykketPaa){
 
@@ -1293,6 +1345,9 @@ function kartMenySideKlikk(divTrykketPaa){
         headerKnappKartMeny.style.borderBottomColor = fargeTones5;
         //
         skjulSide(sideFeatureInfo); // Skjuler alltid begge.
+        // Skjul alle/aktive-knappene for de andre sidene:
+        skjulHovedMenyTabsKnapper();
+        skjulBeggeLagSiderUtenEndreBoolean(); // Skjuler både "alle" og "aktive".
         break;
       case "divMenyDel":
         skjulSide(sideDelKartvisning);
@@ -1334,7 +1389,13 @@ function kartMenySideKlikk(divTrykketPaa){
         visSide(sideFeatureInfo);
       } else {
         visSide(sideKartMeny);
+        // Vis alle/aktive-lag knapper.
+        // Ikke med sideFeatureInfo, men lurer på om jeg skal gjøre det annerledes?
+        visHovedMenyTabsKnapper();
+        // Unikt for hovedmenyen. Vise riktig mellom "alle" og "aktive".
+        visRiktigLagSideForMenyUtenEndreBoolean();
       }
+
       break;
     case "divMenyDel":
       divMenyDelBilde.src = "./images/share-white.png";
@@ -1364,6 +1425,687 @@ function kartMenySideKlikk(divTrykketPaa){
 }
 
 // Kartlag-funksjoner
+
+// For "aktive" kartlag-siden
+function hentSynligeKartlagForAktiveLagSiden(){
+
+  console.log("hentAktiveKartlagUtenomBakgrunn ~ triggered!");
+
+  // RESET TIDLIG. Kommenter ut mens du debugger/legger til ny funksjonalitet.
+  sideAktiveLag.innerHTML = "";
+
+  var aktiveLagListe = [];
+  // NOTE: For nå, lage for hver gang "aktive" knappen kjører koden?
+  var htmlAktiveKartlag = [];
+
+  map.getLayers().getArray().forEach(group => {
+
+    var gruppeNavn = group.get("name");
+
+    // Ikke inkludere bakgrunnskart.
+    if(gruppeNavn != "Bakgrunnskart"){
+
+      group.getLayers().forEach(layer => {
+
+        // Hm... Ikke inkludere GPS-laget her? Siden det ikke er meningen å kunne skru av.
+        var lagNavn = layer.get("name");
+
+        if(lagNavn != "vektorLagGPS"){
+          // console.log(layer.get("name"));
+
+          if(layer.get("visible") == true){
+            // Kartlag som er synlige/aktivert under "Alle lag"!
+            console.log(lagNavn);
+
+            // Hm... Hente kartlaget her?
+            var kartlag = hentKartlagMedLagNavn(lagNavn);
+            
+            var lagFargeNavn = "aktivtLagFarge" + lagNavn;
+            var lagFargeFunksjon = "settOpacityTilNullForKartlagMedLagNavn('" + lagNavn + "');";
+            var lagRedigerNavn = "aktivtLagRediger" + lagNavn;
+            var lagRedigerFunksjon = "redigerAktivtKartlagMedLagNavn('" + lagNavn + "');";
+            var lagInfoNavn = "aktivtLagInfo" + lagNavn;
+            var lagVisInfoFunksjon = "visInfoForAktivtKartlagMedLagNavn('" + lagNavn + "');";
+            var lagSlettNavn = "aktivtLagSlett" + lagNavn;
+            var lagDeaktiverFunksjon = "deaktiverAktivtKartlagMedLagNavn('" + lagNavn + "');";
+            //
+            var sliderNavn = "slider" + lagNavn;
+            var updateSliderNavn = "updateSlider('" + lagNavn + "');"; // SKAL BRUKE STRING SOM PARAMETER HER!
+            var sliderVerdiNavn = "sliderVerdi" + lagNavn;
+            // Rediger
+            var lagViserRedigerId = "aktivtLagViserRediger" + lagNavn;
+            var lagRedigerContainerId = "aktivtLagRedigerPanelId" + lagNavn;
+            // var lagRedigerIkonKollaps = "" + lagNavn;
+            var redigerKollapsFunksjon = "toggleVisRediger('" + lagNavn + "');";
+            var redigerEndreFargeContainer = "redigerEndreFargeContainer" + lagNavn;
+            var lagRedigerFargeInput = "aktivtLagRedigerFargeInput" + lagNavn;
+            console.log("lagRedigerFargeInput: " + lagRedigerFargeInput);
+            // var lagRedigerFargeVerdi = hentOgKonverterFargeArrayRGB()
+            // Ekstra info
+            var lagViserInfoId = "aktivtLagViserInfo" + lagNavn;
+            var lagEkstraInfo = "aktivtLagEkstraInfo" + lagNavn;
+            // var lagInfoIkonKollaps = "" + lagNavn;
+            var infoKollapsFunksjon = "toggleVisInfo('" + lagNavn + "');";
+            var redigerEndreFargeContainer = "redigerEndreFargeContainer" + lagNavn;
+            var lagTegnforklaringId = "aktivtLagTegnforklaring" + lagNavn;
+            var lagTegnforklaringBildeId = "aktivtLagTegnforklaringBilde" + lagNavn;
+            var tegnforklaringOrganisasjon = "tegnforklaringOrganisasjon" + lagNavn;
+            var tegnforklaringEpost = "tegnforklaringEpost" + lagNavn;
+            console.log("hentSynligeKartlagForAktiveLagSiden ~ sliderNavn: " + sliderNavn + ", updateSliderNavn: " + updateSliderNavn);
+
+            htmlAktiveKartlag += "<li>";
+
+            htmlAktiveKartlag += "<div class='aktivtLagHeader'><div class='aktivtLagHeaderVenstre'>";
+            htmlAktiveKartlag += "<div class='aktivtLagFarge' id='" + lagFargeNavn + "' onclick=" + lagFargeFunksjon + "></div>";
+            htmlAktiveKartlag += "<div class='aktivtLagNavn' title ='" + layer.get("uiName") + "'>" + layer.get("uiName") + "</div></div>";
+            htmlAktiveKartlag += "<div class='aktivtLagHeaderHoyre'>";
+            // Obs! Under testing...
+            htmlAktiveKartlag += "<div class='aktivtLagMiniKnapp aktivtLagRediger' id='" + lagRedigerNavn + "' onclick=" + lagRedigerFunksjon + " title='Rediger'><img src='./images/edit.png' alt='Edit' /></div>";
+            htmlAktiveKartlag += "<div class='aktivtLagMiniKnapp aktivtLagInfo' id='" + lagInfoNavn + "' onclick=" + lagVisInfoFunksjon + " title='Se mer informasjon'><img src='./images/information.png' alt='Info' /></div>";
+            htmlAktiveKartlag += "<div class='aktivtLagMiniKnapp aktivtLagSlett' id='" + lagSlettNavn + "' onclick=" + lagDeaktiverFunksjon + " title='Deaktiver'><div>x</div></div>";
+            htmlAktiveKartlag += "</div></div>";
+            // Synlighet
+            htmlAktiveKartlag += "<div class='slidecontainer'>";
+            htmlAktiveKartlag += "<input type='range' min='0' max='100' value='50' class='slider' id='" + sliderNavn + "' oninput=" + updateSliderNavn + ">";
+            htmlAktiveKartlag += "<span class='sliderVerdier'>Synlighet: <span id='" + sliderVerdiNavn + "'></span></span></div>";
+            // Rediger
+            htmlAktiveKartlag += "<div id='" + lagViserRedigerId + "' style='display: none;'>false</div>";
+            htmlAktiveKartlag += "<div class='aktivtLagRedigerPanel' id='" + lagRedigerContainerId + "'>";
+            htmlAktiveKartlag += "<div class='aktivtLagRedigerIkonKollaps' onclick=" + redigerKollapsFunksjon + "><img src='./images/edit.png' alt='Edit Collapse' /></div>";
+            htmlAktiveKartlag +=    "<div class='aktivtLagEndreFargeContainer' id='" + redigerEndreFargeContainer + "'>";
+            htmlAktiveKartlag +=        "<div class='aktivtLagEndreFargeTekst'>Endre farge:</div>";
+            htmlAktiveKartlag +=        "<div class='aktivtLagEndreFargeVelgerContainer'>";
+            htmlAktiveKartlag +=            "<div class='clr-field'>";
+            htmlAktiveKartlag +=                "<button></button>";
+            htmlAktiveKartlag +=                "<input class='" + lagRedigerFargeInput + "' type='text' data-coloris>"; 
+            htmlAktiveKartlag +=            "</div>";
+            htmlAktiveKartlag +=        "</div>";
+            htmlAktiveKartlag +=    "</div>";
+            htmlAktiveKartlag += "</div>"; // Rediger slutt
+            // Ekstra Info
+            htmlAktiveKartlag += "<div id='" + lagViserInfoId + "' style='display: none;'>false</div>";
+            htmlAktiveKartlag += "<div class='aktivtLagEkstraInfo' id='" + lagEkstraInfo + "'>"
+            htmlAktiveKartlag += "<div class='aktivtLagInfoIkonKollaps' onclick=" + infoKollapsFunksjon + "><img src='./images/information.png' alt='Info Collapse' /></div>";
+            // Tegnforklaring
+            // htmlAktiveKartlag += "<div class='aktivtLagTegnforklaring' id='" + lagTegnforklaringId + "'><img class='aktivtLagTegnforklaringsBilde' id='" + lagTegnforklaringBildeId + "' src='' alt='Tegnforklaring' /></div>"
+            htmlAktiveKartlag += "<div class='aktivtLagTegnforklaring' id='" + lagTegnforklaringId + "'>";
+            htmlAktiveKartlag += "<div class='toKolonnerContainer'><div class='venstreKolonne'>Tegnforklaring:</div><div class='hoyreKolonne'><img class='aktivtLagTegnforklaringsBilde' id='" + lagTegnforklaringBildeId + "' src='' alt='Tegnforklaring' /></div></div>";
+            htmlAktiveKartlag += "<div class='toKolonnerContainer'><div class='venstreKolonne'>Organisasjon:</div><div class='hoyreKolonne' id='" + tegnforklaringOrganisasjon + "'></div></div>";
+            htmlAktiveKartlag += "<div class='toKolonnerContainer'><div class='venstreKolonne'>E-post:</div><div class='hoyreKolonne' id='" + tegnforklaringEpost + "'></div></div>";
+            htmlAktiveKartlag += "</div>"; // Tegnforklaring slutt
+
+            htmlAktiveKartlag += "</div>"; // Ekstra Info slutt
+
+            htmlAktiveKartlag += "</li>";
+
+            // Hm... Trenger ikke bruke <script></script>. Bare sette det som det er?: Hm...
+            // settStartVerdierForAktivtLag(lagNavn);
+            aktiveLagListe.push([lagNavn, kartlag]);
+          }
+
+        }
+
+        // console.log(layer.get("name"));
+      })
+
+    }
+
+  })
+
+  // console.log(htmlAktiveKartlag);
+
+  // sideAktiveLag.innerHTML = "";
+  sideAktiveLag.innerHTML += htmlAktiveKartlag;
+  // sideAktiveLag.innerHTML = htmlAktiveKartlag;
+
+  //
+  for(var i = 0; i < aktiveLagListe.length; i++){
+    settStartVerdierForAktivtLag(aktiveLagListe[i][0], aktiveLagListe[i][1]);
+  }
+}
+
+function settStartVerdierForAktivtLag(lagNavn, kartlag) {
+  console.log("settStartVerdierForAktivtLag triggered! lagNavn: " + lagNavn);
+  var aktivtLagFarge = document.getElementById("aktivtLagFarge" + lagNavn);
+  var slider = document.getElementById("slider" + lagNavn);
+  var sliderVerdi = document.getElementById("sliderVerdi" + lagNavn);
+  // var kartlag = hentKartlagMedLagNavn(lagNavn);
+  if (kartlag != null) {
+    // GetOpacity først.
+    slider.value = kartlag.getOpacity() * 100;
+    sliderVerdi.innerHTML = slider.value;
+    aktivtLagFarge.style.opacity = slider.value;
+    // Sette farge fra kartlaget på aktivtLagFarge.
+    var strokeColorSelect = kartlag.get("strokeColorSelect");
+    var fillColorSelect = kartlag.get("fillColorSelect");
+    if (strokeColorSelect != null) {
+      aktivtLagFarge.style.borderColor = strokeColorSelect;
+    }
+    if (fillColorSelect != null) {
+      aktivtLagFarge.style.backgroundColor = fillColorSelect;
+    }
+
+    // // Bare hente tegnforklaring for WMS-lag, ikke vanlige vektorlag.
+    try {
+      var wmsSourceParams = kartlag.getSource().getParams(); // Vil bare funke for WMS-lag. WMTS bruker ikke params, bare capabilities.
+      // console.log(wmsSourceParams);
+      console.log("Følgende kartlag er et WMS-lag: " + lagNavn);
+      hentTegnforklaring(lagNavn, kartlag);
+      hentWMSCapabilitiesMetaData(lagNavn, kartlag);
+    } catch (e) {
+      console.log("Følgende kartlag er ikke et WMS-lag: " + lagNavn);
+    }
+
+    // Gjøres til slutt? Pga. "return" tidlig under spesielleInstrukser.
+
+    // Sette rediger-greier...
+    // Hente og sette redigerInput fargen:
+    try{
+      const style = kartlag.getStyle(); //
+      if (style != null) {
+        var type = kartlag.get("type");
+        console.log("vektorlag ~ type: " + type);
+        if(type == null){
+          setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, null);
+        } else {
+          if(type == "vektor_skygge"){
+            // Ikke la brukeren endre farge på vektorlaget.
+          } else {
+            // For f.eks. markagrensa.
+            setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type);
+          }
+        }
+      }
+    } catch(e){
+
+    }
+    // const style = kartlag.getStyle(); //
+    // if (style != null) {
+    //   var type = kartlag.get("type");
+    //   console.log("vektorlag ~ type: " + type);
+    //   if(type == null){
+    //     setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, null);
+    //   } else {
+    //     if(type == "vektor_skygge"){
+    //       // Ikke la brukeren endre farge på vektorlaget.
+    //     } else {
+    //       // For f.eks. markagrensa.
+    //       setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type);
+    //     }
+    //   }
+    // }
+
+  }
+}
+
+//
+function setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type){
+  // Gjøre slik at den vises (endre css):
+  document.getElementById("redigerEndreFargeContainer" + lagNavn).style.display = "flex";
+  const kartlagIndeks = finnIndeksForKartlag(lagNavn);
+
+  const fillFargen = style.getFill().getColor();
+  const strokeFargen = style.getStroke().getColor();
+  // console.log(fillFargen);
+  // Test...
+  var inputKlassen = ".aktivtLagRedigerFargeInput" + lagNavn;
+  // console.log("inputKlassen: " + inputKlassen);
+  var fargeArray = null;
+
+  // if(type == null){
+  //   fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
+  // } else {
+  //   if(type == "vektor_grense"){
+  //     fargeArray = hentOgKonverterFargeArrayRGB(strokeFargen);
+  //   } else {
+  //     fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
+  //   }
+  // }
+
+  // Håndterer også hvis type == null?
+  if(type == "vektor_grense"){
+    fargeArray = hentOgKonverterFargeArrayRGB(strokeFargen);
+  } else {
+    fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
+  }
+
+  // var fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
+  // var strokeFargeArray = hentOgKonverterFargeArrayRGB(strokeFargen);
+  // console.log("fargeArray: " + fargeArray);
+
+  var klasseElement = document.getElementsByClassName("aktivtLagRedigerFargeInput" + lagNavn)[0];
+  console.log(klasseElement);
+  klasseElement.setAttribute('value', fargeArray);
+  klasseElement.style.backgroundColor = fargeArray;
+  // Lagre en backup for default farge-arrayet under kartlaget
+  // kartlag.set("opprinneligFillFargeArray", fillFargen); // Hm, disse brukes egentlig ikke nå?
+  // kartlag.set("opprinneligFillFargeRGB", fargeArray);
+  // console.log("opprinneligFillFargeArray: " + kartlag.get("opprinneligFillFargeArray"));
+  // console.log("opprinneligFillFargeRGB: " + kartlag.get("opprinneligFillFargeRGB"));
+  // console.log(fillFargen[0]);
+
+  Coloris.setInstance(inputKlassen, {
+    theme: 'polaroid',
+    themeMode: 'light',
+    alpha: false,
+    format: 'rgb',
+    // startColor: fargeArray,
+    swatches: [
+      // 'rgb(255,255,255)'
+      // hentOgKonverterFargeArrayRGB(fillFargen)
+      fargeArray
+    ],
+    onChange: (color) => {
+      console.log(inputKlassen + " ~ onChange triggered! color: " + color);
+      klasseElement.style.backgroundColor = color;
+      // Neste -> Bytte farge på kartlaget!
+      // 1. Konvertere color-output til array... F.eks: rgb(83, 193, 166) til [83, 193, 166, 1]
+      // 2. Sette fill og stroke color for style.
+      // 3. Sette fill og stroke color for stilSelect.
+      // 4. Sette strokeColorSelect (STRING!).
+      // 5. Sette fillColorSelect (STRING!).
+      var rgbArray = konverterRGBStrengTilArrayRGBA(color);
+      var strokeColor = getDarkerColorIntegerListRGBA(rgbArray, SHADE_STROKE);
+      // console.log("rgbArray: " + rgbArray);
+      // console.log("strokeColor: " + strokeColor);
+      //
+      var fillColorSelect = getDarkerColorIntegerListRGBA(rgbArray, SHADE_SELECT);
+      var strokeColorSelect = getDarkerColorIntegerListRGBA(strokeColor, SHADE_SELECT);
+      var strengFillColorSelect = konverterArrayRGBAtilStreng(fillColorSelect);
+      var strengStrokeColorSelect = konverterArrayRGBAtilStreng(strokeColorSelect);
+      // console.log("strengFillColorSelect: " + strengFillColorSelect);
+      // console.log("strengStrokeColorSelect: " + strengStrokeColorSelect);
+      // console.log("fillColorSelect: " + fillColorSelect);
+      // console.log("strokeColorSelect: " + strokeColorSelect);
+      // console.log("stilSelect fill color: " + kartlag.get("stilSelect").getFill().getColor());
+      // console.log("stilSelect stroke color: " + kartlag.get("stilSelect").getStroke().getColor());
+      
+      // Spesiell instruks for markagrensa (og andre grenser)
+      if(type == "vektor_grense"){
+        style.getStroke().setColor(strokeColor);
+        kartlag.set("strokeColorSelect", strengStrokeColorSelect);
+        kartlag.changed();
+        // Bare bytte stroke fargen
+        aktivtLagFarge.style.borderColor = strengStrokeColorSelect;
+        // Bytte farge på indikatoren i hovedmenyen
+        hovedMenyKlasseIndikator[kartlagIndeks].style.borderColor = strengStrokeColorSelect;
+        // hovedMenyKlasseIndikator[finnIndeksForKartlag(lagNavn)].style.backgroundColor = fillFarge;
+      } else {
+        style.getFill().setColor(rgbArray);
+        style.getStroke().setColor(strokeColor);
+        var stilSelect = kartlag.get("stilSelect");
+        stilSelect.getFill().setColor(fillColorSelect);
+        stilSelect.getStroke().setColor(strokeColorSelect);
+        kartlag.set("fillColorSelect", strengFillColorSelect);
+        kartlag.set("strokeColorSelect", strengStrokeColorSelect);
+        kartlag.changed();
+        //
+        aktivtLagFarge.style.borderColor = strengStrokeColorSelect;
+        aktivtLagFarge.style.backgroundColor = strengFillColorSelect;
+        // Bytte farge på indikatoren i hovedmenyen
+        hovedMenyKlasseIndikator[kartlagIndeks].style.borderColor = strengStrokeColorSelect;
+        hovedMenyKlasseIndikator[kartlagIndeks].style.backgroundColor = strengFillColorSelect;
+      }
+      
+    },
+    onClear: (color) => {
+      // console.log(inputKlassen + " ~ onClear triggered! color: " + color);
+    },
+    onClose: (color) => {
+      // console.log(inputKlassen + " ~ onClose triggered! color: " + color);
+    },
+    onOpen: (color) => {
+      // console.log(inputKlassen + " ~ onOpen triggered! color: " + color);
+    }
+  });
+
+}
+
+function toggleVisRediger(lagNavn){
+  console.log("toggleVisRediger ~ lagNavn: " + lagNavn);
+  var elementViserRediger = document.getElementById("aktivtLagViserRediger" + lagNavn);
+  var elementRedigerPanel = document.getElementById("aktivtLagRedigerPanelId" + lagNavn);
+  var viserRediger = elementViserRediger.innerHTML;
+  if(viserRediger == "false"){
+    elementViserRediger.innerHTML = "true";
+    elementRedigerPanel.style.display = "block";
+  } else {
+    elementViserRediger.innerHTML = "false";
+    elementRedigerPanel.style.display = "none";
+  }
+}
+
+// 
+function redigerAktivtKartlagMedLagNavn(lagNavn){
+  console.log("redigerAktivtKartlagMedLagNavn ~ lagNavn: " + lagNavn);
+  toggleVisRediger(lagNavn);
+}
+// 
+function toggleVisInfo(lagNavn){
+  var elementViserInfo = document.getElementById("aktivtLagViserInfo" + lagNavn);
+  var elementEkstraInfo = document.getElementById("aktivtLagEkstraInfo" + lagNavn);
+  var viserInfo = elementViserInfo.innerHTML;
+  if(viserInfo == "false"){
+    elementViserInfo.innerHTML = "true";
+    elementEkstraInfo.style.display = "block";
+  } else {
+    elementViserInfo.innerHTML = "false";
+    elementEkstraInfo.style.display = "none";
+  }
+}
+// Kjøres i settStartVerdierForAktivtLag().
+function hentTegnforklaring(lagNavn, kartlag){
+  console.log("hentTegnforklaring ~ lagNavn: " + lagNavn);
+  try{
+    if(kartlag == null){
+      kartlag = hentKartlagMedLagNavn(lagNavn);
+    }
+    // var kartlag = hentKartlagMedLagNavn(lagNavn);
+ 
+    var url = kartlag.getSource().getUrl(); // Hoved url
+    var attributions = kartlag.getSource().getAttributions();
+    var legendUrl = kartlag.getSource().getLegendUrl(); // Legend url. Ikke alle har en som fungerer, f.eks. nibio.
+
+    // console.log("visInfoForAktivtKartlagMedLagNavn ~ url: " + url); 
+    // console.log("visInfoForAktivtKartlagMedLagNavn ~ attributions: " + attributions);
+    // console.log("visInfoForAktivtKartlagMedLagNavn ~ legendUrl: " + legendUrl); 
+
+    // var params = kartlag.getSource().getParams();
+    // console.log(params);
+
+    var tegnforklaringsContainer = document.getElementById("aktivtLagTegnforklaring" + lagNavn);
+    var tegnforklaringsBilde = document.getElementById("aktivtLagTegnforklaringBilde" + lagNavn);
+    // document.getElementById("aktivtLagTegnforklaringBilde" + lagNavn).src = legendUrl;
+    tegnforklaringsBilde.src = legendUrl;
+    tegnforklaringsBilde.onerror = function(){
+      console.log("hentTegnforklaring ~ getLegendUrl() feilet for lagNavn: " + lagNavn);
+      // Hvis getLegendUrl() feiler, kan prøve å finne en fungerende legendUrl via Capabilities URLen.
+      hentBildeFraWMSCapabilities(lagNavn, kartlag, tegnforklaringsBilde, tegnforklaringsContainer); // Egen funksjon for bilde? ...
+    }
+    tegnforklaringsBilde.onload = function(){
+      console.log("hentTegnforklaring ~ Fant bilde fra getLegendUrl() for lagNavn: " + lagNavn);
+      tegnforklaringsContainer.style.display = "block";
+      tegnforklaringsBilde.style.display = "block";
+    }
+
+  }catch(e){
+    console.log("visInfoForAktivtKartlagMedLagNavn ~ catcha error: " + e);
+  }
+}
+
+async function sjekkLegendUrl(legendUrl){
+  console.log("sjekkLegendUrl: " + legendUrl);
+  try{
+    var fetched = await fetch(legendUrl);
+    if(fetched.ok){
+      var text = await fetched.text();
+      var url = fetched.url;
+      console.log(url);
+    } else {
+      console.log("fetched failed for lagNavn: " + lagNavn);
+    }
+  }catch(e){
+    console.log("sjekkLegendUrl ~ exception: " + e);
+  }
+}
+
+async function hentWMSCapabilitiesMetaData(lagNavn, kartlag){
+  // console.log("hentWMSCapabilitiesMetaData ~ lagNavn: " + lagNavn);
+  try{
+    if(kartlag == null){
+      kartlag = hentKartlagMedLagNavn(lagNavn);
+    }
+    // var kartlag = hentKartlagMedLagNavn(lagNavn);
+    var parser = new ol.format.WMSCapabilities();
+
+    var capabilitiesUrl = kartlag.get("capabilitiesURL");
+    // var capabilitiesUrl = null; // For testing / debug.
+    // console.log(capabilitiesUrl);
+    // Hvis capabilitiesURL ikke er lagret, prøv å lag den:
+    if(capabilitiesUrl == null){
+      capabilitiesUrl = kartlag.getSource().getUrl();
+      const inneholderSporsmaalstegn = capabilitiesUrl.includes("?");
+      const inneholderVersjon = capabilitiesUrl.includes("VERSION");
+      const urlSplit = capabilitiesUrl.split("?");
+      // console.log("urlSplit: " + urlSplit + ", urlSplit length: " + urlSplit.length + ", url: " + capabilitiesUrl);
+      if(!inneholderSporsmaalstegn){
+        capabilitiesUrl += "?service=wms&request=getcapabilities";
+      } else {
+        if(urlSplit.length > 1){
+          if(urlSplit[1].length > 0){
+            capabilitiesUrl += "&";
+          }
+        }
+        capabilitiesUrl += "service=wms&request=getcapabilities";
+      }
+      // if(!inneholderVersjon) capabilitiesUrl += "&version=1.3.0";
+      console.log("hentWMSCapabilitiesMetaData ~ Ferdige capabilitiesURL: " + capabilitiesUrl);
+    }
+
+    var fetched = await fetch(capabilitiesUrl);
+    if(fetched.ok){
+      var text = await fetched.text();
+      // console.log(text); // XML
+
+      const result = await parser.read(text);
+      console.log(result);
+
+      // Service tittel og organisasjon:
+      try{
+        var service = result["Service"];
+        if(service != null){
+          var tittel = service["Title"];
+          var organisasjon = service["ContactInformation"]["ContactPersonPrimary"]["ContactOrganization"];
+          var epost = service["ContactInformation"]["ContactElectronicMailAddress"];
+          // console.log("tittel: " + tittel);
+          // console.log("organisasjon: " + organisasjon);
+          // console.log("epost: " + epost);
+          document.getElementById("tegnforklaringOrganisasjon" + lagNavn).innerHTML = organisasjon;
+          document.getElementById("tegnforklaringEpost" + lagNavn).innerHTML = epost;
+        }
+      }catch(e){
+        console.log("hentWMSCapabilitiesMetaData ~ feilet med å hente noe informasjon fra capabilities sin Service del for lagNavn: " + lagNavn);
+      } 
+
+    } else {
+      console.log("fetched failed for lagNavn: " + lagNavn);
+    }
+
+  }catch(e){
+    console.log("hentWMSCapabilitiesMetaData ~ Noe feilet!? catch(e): " + e);
+  }
+}
+// BRUK DENNE FOR WMS-BILDER!
+// tegnforklaringsBilde blir brukt til å sette bilde hvis legendUrl blir funnet!
+async function hentBildeFraWMSCapabilities(lagNavn, kartlag, tegnforklaringsBilde, tegnforklaringsContainer){
+  // console.log("hentBildeFraWMSCapabilities ~ lagNavn: " + lagNavn);
+  try{
+    if(tegnforklaringsBilde == null){
+      tegnforklaringsBilde = document.getElementById("aktivtLagTegnforklaringBilde" + lagNavn);
+    }
+    if(kartlag == null){
+      kartlag = hentKartlagMedLagNavn(lagNavn);
+    }
+    const wmsLayersName = kartlag.getSource().getParams()["LAYERS"]; // Alle WMS-lag skal ha en LAYERS i sin kilde-params.
+    // console.log("wmsLayersName: " + wmsLayersName + " for lagNavn " + lagNavn);
+
+    // var kartlag = hentKartlagMedLagNavn(lagNavn);
+    var parser = new ol.format.WMSCapabilities();
+
+    var capabilitiesUrl = kartlag.get("capabilitiesURL");
+    // console.log(capabilitiesUrl);
+    if(capabilitiesUrl == null){
+      capabilitiesUrl = kartlag.getSource().getUrl();
+      const inneholderSporsmaalstegn = capabilitiesUrl.includes("?");
+      const inneholderVersjon = capabilitiesUrl.includes("VERSION");
+      const urlSplit = capabilitiesUrl.split("?");
+      // console.log("urlSplit: " + urlSplit + ", urlSplit length: " + urlSplit.length + ", url: " + capabilitiesUrl);
+      if(!inneholderSporsmaalstegn){
+        capabilitiesUrl += "?service=wms&request=getcapabilities";
+      } else {
+        if(urlSplit.length > 1){
+          if(urlSplit[1].length > 0){
+            capabilitiesUrl += "&";
+          }
+        }
+        capabilitiesUrl += "service=wms&request=getcapabilities";
+      }
+      // if(!inneholderVersjon) capabilitiesUrl += "&version=1.3.0";
+      console.log("hentBildeFraWMSCapabilities ~ Ferdige capabilitiesURL: " + capabilitiesUrl);
+    }
+
+    var fetched = await fetch(capabilitiesUrl);
+    if(fetched.ok){
+      var text = await fetched.text();
+      // console.log(text); // XML
+
+      const result = await parser.read(text);
+      // console.log(result);
+
+      var lagFraKilden = result["Capability"]["Layer"]["Layer"]; // 
+      // console.log(lagFraKilden);
+
+      var funnetLag = null;
+      // var fantMatch = false;
+      for(var i = 0; i < lagFraKilden.length; i++){
+        var lag = lagFraKilden[i];
+        // console.log(lag);
+
+        // NOTE: Må sjekke kartlag under kartlag! (layer i layer)
+        var lagILag = lag["Layer"];
+        // console.log(lagILag);
+        // Hvis lagILag ikke er null så sjekkes lag under laget.
+        if(lagILag != null){
+          for(var j = 0; j < lagILag.length; j++){
+            var underLag = lagILag[j];
+            if(underLag["Name"] == wmsLayersName){
+              funnetLag = underLag;
+              break;
+            }
+          }
+        } else {
+          // Hvis laget ikke inneholder underlag så sjekkes laget direkte.
+          if(lag["Name"] == wmsLayersName){
+            funnetLag = lag;
+            break;
+          }
+        }
+      }
+
+      if(funnetLag != null){
+        const legendUrl = funnetLag["Style"][0]["LegendURL"][0]["OnlineResource"];
+        // console.log(legendUrl);
+        tegnforklaringsBilde.src = legendUrl;
+        tegnforklaringsBilde.onerror = function(){
+          console.log("hentBildeFraWMSCapabilities ~ getCapabilities for tegnforklaringsbildet feilet også for lagNavn: " + lagNavn);
+        }
+        tegnforklaringsBilde.onload = function(){
+          console.log("hentBildeFraWMSCapabilities ~ Fant bilde med getCapabilities metadata for lagNavn: " + lagNavn);
+          tegnforklaringsContainer.style.display = "block";
+          tegnforklaringsBilde.style.display = "block";
+        }
+      } else {
+        console.log("hentBildeFraWMSCapabilities ~ Fant ingen match i meta data fra urlen: " + capabilitiesUrl + " for lagNavn: " + lagNavn);
+      }
+
+    } else {
+      console.log("fetched failed for lagNavn: " + lagNavn);
+    }
+
+  }catch(e){
+    console.log("hentBildeFraWMSCapabilities ~ Noe feilet!? catch(e): " + e);
+  }
+}
+
+//
+function visInfoForAktivtKartlagMedLagNavn(lagNavn){
+  console.log("visInfoForAktivtKartlagMedLagNavn ~ lagNavn: " + lagNavn);
+
+  toggleVisInfo(lagNavn);
+}
+
+// Bare setter opacity (gjennomsiktighet) til null for kartlaget.
+function settOpacityTilNullForKartlagMedLagNavn(lagNavn){
+  try {
+    var kartlag = hentKartlagMedLagNavn(lagNavn);
+    var opacity = kartlag.getOpacity();
+    if(opacity <= 0){
+      kartlag.setOpacity(0.8);
+    } else {
+      kartlag.setOpacity(0);
+    }
+    hentSynligeKartlagForAktiveLagSiden(); // Oppdater aktive kartlag listen.
+    updateSlider(lagNavn); // Oppdater slider.
+  } catch(exception){
+    console.log("settOpacityTilNullForKartlagMedLagNavn ~ exception: " + exception);
+  }
+}
+// Gjør kartlaget usynlig (visible == false), som tar kartlaget vekk fra "aktive lag" tabben.
+function deaktiverAktivtKartlagMedLagNavn(lagNavn){
+  skjulKartlagMedLagNavn(lagNavn);
+  hentSynligeKartlagForAktiveLagSiden();
+}
+
+function updateSlider(lagNavn){
+  // Debug:
+  // console.log("updateSlider, lagNavn: " + lagNavn);
+  // var sliderNavn = "slider" + lagNavn;
+  // var sliderVerdiNavn = "sliderVerdi" + lagNavn;
+  // console.log("updateSlider ~ sliderNavn: " + sliderNavn + ", sliderVerdiNavn: " + sliderVerdiNavn);
+
+  var val = document.getElementById("slider" + lagNavn).value;
+  document.getElementById("sliderVerdi" + lagNavn).innerHTML = val;
+  var o = val / 100;
+
+  // Hm... Hente kartlaget fra map-objektet hver gang? Blir mange kall... ... Men funker.
+
+  var kartlag = hentKartlagMedLagNavn(lagNavn);
+  if(kartlag != null){
+    // console.log("kartlag er ikke null. kartlag: " + kartlag);
+    kartlag.setOpacity(o);
+
+    // For debug:
+    // var opacity = kartlag.getOpacity();
+    // console.log("kartlag.getOpacity: " + opacity);
+  }
+
+  // Opacity for farge-ikonet:
+  document.getElementById("aktivtLagFarge" + lagNavn).style.opacity = o;
+
+}
+
+function hentKartlagMedLagNavn(inLagNavn) {
+  var funnet = false;
+  var funnetLag = null;
+
+  map.getLayers().getArray().forEach(group => {
+
+    if(!funnet){
+      if(group.get("name") != "Bakgrunnskart") {
+
+        group.getLayers().forEach(layer => {
+          if(!funnet){
+            if(inLagNavn == layer.get("name")){
+              console.log("hentKartlagMedLagNavn ~ fant kartlaget! inLagNavn: " + inLagNavn + ", layer: " + layer);
+              funnetLag = layer;
+              funnet = true; // For å gjøre færre operasjoner? Viktigst for group, siden da vil den ikke sjekke hvert lag i gruppene.
+              return layer; // Denne funker ikke...
+            }
+          }
+        });
+
+      }
+    }
+
+  });
+
+  if(funnetLag != null){
+    return funnetLag;
+  } else {
+    return null;
+  }
+  // return null;
+}
 
 // Hm... Begynne med bakgrunnskartene?
 
@@ -1426,6 +2168,31 @@ function lagFinnesIKartObjektet(gruppeNavn, kartlagNavn){
   }
 
   return fantKartlag;
+}
+
+function skjulKartlagMedLagNavn(lagNavn){
+  var layer = hentKartlagMedLagNavn(lagNavn);
+  if(layer != null){
+      // Må hente lagIndeks:
+      var lagIndeks = -1;
+      try {
+        lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
+        console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+      } catch (error) {
+        console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+      }
+      skjulKartlag(layer, lagIndeks); // Denne inneholder errorsjekk for lagIndeks -1.
+  } else {
+    console.log("skjulKartlagMedLagNavn ~ fant ikke kartlag med lagNavn: " + lagNavn);
+  }
+  // if (layer.get("visible") == true){
+  //   layer.setVisible(false);
+  //   if(lagIndeks > -1){
+  //     // hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0";
+  //     hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0.1";
+  //   }
+  //   console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
+  // }
 }
 
 function skjulKartlag(layer, lagIndeks){
@@ -1662,10 +2429,16 @@ function resetBorderBottom(){
   headerKnappStott.style.borderBottomColor = fargeTones5;
 }
 
+// 
 function visSideOgSkjulResten(side){
   side.style.display = "block";
+
   if(side != sideKartMeny){
-    sideKartMeny.style.display = "none";
+    // sideKartMeny.style.display = "none";
+    skjulBeggeLagSiderUtenEndreBoolean();
+  } else {
+    // Unikt for hovedmenyen. Viser riktig side mellom "alle" og "aktive".
+    visRiktigLagSideForMenyUtenEndreBoolean();
   }
   if(side != sideDelKartvisning){
     sideDelKartvisning.style.display = "none";
@@ -1686,8 +2459,10 @@ function skjulSide(side){
   side.style.display = "none";
 }
 
+// Ikke i bruk (enda)?
 function skjulSider(){
-  sideKartMeny.style.display = "none";
+  skjulBeggeLagSiderUtenEndreBoolean();
+  // sideKartMeny.style.display = "none";
   sideDelKartvisning.style.display = "none";
   sideOmMarkakartet.style.display = "none";
   sideStott.style.display = "none";
@@ -1732,7 +2507,7 @@ function genererURL(){
   }
 
   // 
-  var kodeStreng = String(hentAktiveKartlag());
+  var kodeStreng = String(hentAktiveKartlagOgReturnerKodestreng());
   // console.log("kodeStreng: " + kodeStreng + ", typeof: " + typeof(kodeStreng));
   if(kodeStreng != "" && kodeStreng != "undefined"){
     // console.log("genererURL ~ kodeStreng er ikke tom og heller ikke undefined.");
@@ -1764,7 +2539,7 @@ function copyTextToClipboard(text) {
 // Hm... Så det den skal gjøre... Finne ut hvilke kartlag som er aktive,
 // altså har get("visible") == true.
 // Også... Hm... Returnere noe? Lage en streng?
-function hentAktiveKartlag() {
+function hentAktiveKartlagOgReturnerKodestreng() {
   if(map == null) return; // Funker!
 
   // var kodeStreng = "".toString(); // Dette funker. Lol... :/
@@ -1784,7 +2559,7 @@ function hentAktiveKartlag() {
         // console.log(lagNavn);
 
         if (layer.get("visible") == true) {
-          // console.log("hentAktiveKartlag ~ Fant synlig kartlag!: " + lagNavn);
+          // console.log("hentAktiveKartlagOgReturnerKodestreng ~ Fant synlig kartlag!: " + lagNavn);
 
           // Hent lagIndeks:
           var lagIndeks = -1;
@@ -1792,17 +2567,18 @@ function hentAktiveKartlag() {
 
           try {
             lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-            lagKode = layer.get("kode");
+            // lagKode = layer.get("kode");
+            lagNavn = layer.get("name");
             // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
           } catch (error) {
             console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
           }
 
-          if(lagIndeks > -1 && lagKode != ""){
+          if(lagIndeks > -1 && lagNavn != ""){
             if(kodeStreng != ""){
               kodeStreng += ",";
             }
-            kodeStreng += lagKode;
+            kodeStreng += lagNavn;
           }
         }
 
@@ -1812,7 +2588,7 @@ function hentAktiveKartlag() {
 
   });
 
-  // console.log("hentAktiveKartlag ~ kodeStreng: " + kodeStreng);
+  // console.log("hentAktiveKartlagOgReturnerKodestreng ~ kodeStreng: " + kodeStreng);
   return kodeStreng;
   return String(kodeStreng);
 }
@@ -2140,6 +2916,7 @@ function skjulAlleLag(){
 }
 
 // Aktiverer alle kartlag UNNTATT bakgrunnskartlag!
+// Hm, ikke bruke?
 function visAlleLag(){
   if(blokkerKnappAlleTrykk) return;
 
@@ -2170,6 +2947,7 @@ function visAlleLag(){
 
 }
 
+// Ikke brukt nå?
 function toggleKartKnapperEtterDelay(TillattPointerEvents, delay){
   console.log("toggleKartKnapperEtterDelay triggered!");
   setTimeout(() => {
@@ -2178,6 +2956,12 @@ function toggleKartKnapperEtterDelay(TillattPointerEvents, delay){
       // Bare tillatt pointerEvents, hvis hovedmenyen faktisk er synlig.
       if(hovedVindu.style.overflowY != "hidden"){
         document.getElementById("alleKnapperContainer").style.pointerEvents = "all";
+
+        // Re-enable map interactions
+        // map.getInteractions().forEach(x => x.setActive(true));
+        // Tillatt trykk på hovedmenyen igjen etter delay
+        hovedMenyTabsContainer.style.pointerEvents = "auto";
+        sideKartMeny.style.pointerEvents = "auto";
       }
       // document.getElementById("alleKnapperContainer").style.pointerEvents = "all";
     } else {
@@ -2204,9 +2988,15 @@ function tillattKartKnapperEtterDelay(){
         // hovedVindu.style.pointerEvents = "all"; // Funker ikke.
         blokkerHovedVinduTrykk = false;
 
+        // Re-enable map interactions
+        // map.getInteractions().forEach(x => x.setActive(true));
+        // Tillatt trykk på hovedmenyen igjen etter delay
+        hovedMenyTabsContainer.style.pointerEvents = "auto";
+        sideKartMeny.style.pointerEvents = "auto";
+
         // console.log("tillattKartKnapperEtterDelay ~ hovedVindu har overflowY som IKKE er hidden!");
       } else {
-      // console.log("tillattKartKnapperEtterDelay ~ hovedVindu har overflowY HIDDEN!");
+        // console.log("tillattKartKnapperEtterDelay ~ hovedVindu har overflowY HIDDEN!");
     }
   // }, 1000);
 }, 500); // Prøve med et halvt sekund istedenfor? Kanskje det holder?
@@ -2220,6 +3010,24 @@ function aktiverKartlagMedKoder(){
       group.getLayers().forEach(layer => {
         var kode = layer.get("kode");
         if(lagListeFraURL.includes(kode)){
+          var lagNavn = layer.get("name");
+          // console.log("aktiverKartlagMedKoder ~ layer i lagListeFraURL! kode: " + kode + ", lagNavn: " + lagNavn);
+          forandreSynlighetKartlagUtenIndeks(gruppeNavn, lagNavn);
+        }
+      });
+    }
+  });
+
+}
+
+function aktiverKartlagMedNavn(){
+
+  map.getLayers().getArray().forEach(group => {
+    var gruppeNavn = group.get("name");
+    if(gruppeNavn != "bakgrunnskart"){
+      group.getLayers().forEach(layer => {
+        var navn = layer.get("name");
+        if(lagListeFraURL.includes(navn)){
           var lagNavn = layer.get("name");
           // console.log("aktiverKartlagMedKoder ~ layer i lagListeFraURL! kode: " + kode + ", lagNavn: " + lagNavn);
           forandreSynlighetKartlagUtenIndeks(gruppeNavn, lagNavn);
@@ -2576,6 +3384,87 @@ function deaktiverByttBakgrunn(){
   containerBytteBakgrunn.style.display = "none";
   byttBakgrunn.style.opacity = "0.75";
   // console.log("deaktiverByttBakgrunn triggered!");
+}
+
+// Alle/Aktive lag knapper.
+
+function skjulHovedMenyTabsKnapper(){
+  hovedMenyTabsContainer.style.display = "none";
+}
+function visHovedMenyTabsKnapper(){
+  hovedMenyTabsContainer.style.display = "flex";
+}
+
+// Forandrer/Setter IKKE boolean aktiveLagVises.
+function skjulBeggeLagSiderUtenEndreBoolean(){
+  sideKartMeny.style.display = "none";
+  sideAktiveLag.style.display = "none";
+}
+// Enkleste løsningen for å sett riktig side for hovedmenyen. Altså enten "alle" eller "aktive".
+// Forandrer/Setter IKKE boolean aktiveLagVises.
+function visRiktigLagSideForMenyUtenEndreBoolean(){
+  if(aktiveLagVises){
+    sideKartMeny.style.display = "none";
+    sideAktiveLag.style.display = "block";
+  } else {
+    sideKartMeny.style.display = "block";
+    sideAktiveLag.style.display = "none";
+  }
+}
+function byttHovedMenyVisning(){
+  if(aktiveLagVises){
+    aktiveLagVises = false;
+    sideKartMeny.style.display = "none";
+  } else {
+    aktiveLagVises = true;
+    sideAktiveLag.style.display = "block";
+  }
+}
+// Viser "alle" siden og skjuler "aktive". Setter boolean aktiveLagVises.
+function byttTilAlleLagSiden(){
+  aktiveLagVises = false;
+  sideKartMeny.style.display = "block";
+  sideAktiveLag.style.display = "none";
+  settRiktigStilForTabKnapperUtenEndreBoolean();
+}
+// Viser "aktive" siden og skjuler "alle". Setter boolean aktiveLagVises.
+function byttTilAktiveLagSiden(){
+  aktiveLagVises = true;
+  sideKartMeny.style.display = "none";
+  sideAktiveLag.style.display = "block";
+  settRiktigStilForTabKnapperUtenEndreBoolean();
+  // TEST: Hente kartlag her.
+  hentSynligeKartlagForAktiveLagSiden();
+}
+function visAlleLagSide(){
+  aktiveLagVises = false;
+  sideKartMeny.style.display = "block";
+}
+function skjulAlleLagSide(){
+  aktiveLagVises = true;
+  sideKartMeny.style.display = "none";
+}
+function visAktiveLagSide(){
+  aktiveLagVises = true;
+  sideAktiveLag.style.display = "block";
+}
+function skjulAktiveLagSide(){
+  aktiveLagVises = false;
+  sideAktiveLag.style.display = "none";
+}
+// Setter stil. Forandrer/Setter ikke boolean aktiveLagVises.
+function settRiktigStilForTabKnapperUtenEndreBoolean(){
+  if(aktiveLagVises){
+    tabAktivKnapp.classList.add("hovedMenyTabAktiv");
+    tabAktivKnapp.classList.remove("hovedMenyTabInaktiv");
+    tabAlleKnapp.classList.add("hovedMenyTabInaktiv");
+    tabAlleKnapp.classList.remove("hovedMenyTabAktiv");
+  } else {
+    tabAktivKnapp.classList.remove("hovedMenyTabAktiv");
+    tabAktivKnapp.classList.add("hovedMenyTabInaktiv");
+    tabAlleKnapp.classList.remove("hovedMenyTabInaktiv");
+    tabAlleKnapp.classList.add("hovedMenyTabAktiv");
+  }
 }
 
 function init(){
