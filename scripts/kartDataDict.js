@@ -2,9 +2,11 @@
 DataDict, eller egentlig bare Data, men kaller dem for DataDict under testing for å bevare Data.
 */
 
+// const originIKartDataDict = window.location.origin + "/";
+
 var dataDictOksBevaringsskoger = {
     type: "GeoJSONdata",
-    dataUrl: "data/oksBevaringsskoger.geojson",
+    dataUrl: window.location.origin + "/" + "data/oksBevaringsskoger.geojson",
     dataDictName: "dataDictOksBevaringsskoger",
     vectorName: "vektorlagOksBevaringsskoger",
     uiName: "Bevaringsskoger, Oslo kommune",

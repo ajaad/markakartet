@@ -9,7 +9,12 @@ Ikke nødvendigvis relaterte til kartdata.
 const SHADE_RATIO = 0.125; // 12.5%
 const SHADE_1 = 0.125; const SHADE_2 = 0.25; const SHADE_3 = 0.375;
 const SHADE_STROKE = 0.37; // Stroke er mørkere enn fill.
-const SHADE_SELECT = 0.13; // Select er 13% mørkere for både stroke og fill.
+// const SHADE_SELECT = 0.13; // Select er 13% mørkere for både stroke og fill.
+// const SHADE_STROKE = 0.75; // Stroke er mørkere enn fill.
+const SHADE_SELECT = 0.33; // Select er 13% mørkere for både stroke og fill.
+// Kan sette shade styrken?
+let shadeStroke = SHADE_STROKE;
+let shadeSelect = SHADE_SELECT;
 
 var testFargeStringGul = "rgba(255,255,0,1)";
 var testFargeIntegersGul = [255,255,0,1];
@@ -94,3 +99,83 @@ function konverterArrayRGBtilStreng(arrayRGB){
     }
     return null;
 }
+
+// For device orientation
+// Fra kompas.js: https://github.com/pirxpilot/kompas/blob/main/lib/kompas.js
+const RAD_PER_DEG = Math.PI / 180;
+function toRad(deg) { return deg * RAD_PER_DEG; }
+function toDeg(rad) { return rad / RAD_PER_DEG; }
+
+function calculateHeading(alpha, beta, gamma) {
+
+    // Convert degrees to radians
+    var alphaRad = alpha * (Math.PI / 180);
+    var betaRad = beta * (Math.PI / 180);
+    var gammaRad = gamma * (Math.PI / 180);
+  
+    // Calculate equation components
+    var cA = Math.cos(alphaRad);
+    var sA = Math.sin(alphaRad);
+    var cB = Math.cos(betaRad);
+    var sB = Math.sin(betaRad);
+    var cG = Math.cos(gammaRad);
+    var sG = Math.sin(gammaRad);
+  
+    // Calculate A, B, C rotation components
+    var rA = - cA * sG - sA * sB * cG;
+    var rB = - sA * sG + cA * sB * cG;
+    var rC = - cB * cG;
+  
+    // Calculate compass heading
+    // var compassHeading = Math.atan(rA / rB);
+    var compassHeading = Math.atan2(rA / rB);
+  
+    // Convert from half unit circle to whole unit circle
+    if(rB < 0) {
+      compassHeading += Math.PI;
+    }else if(rA < 0) {
+      compassHeading += 2 * Math.PI;
+    }
+  
+    // Convert radians to degrees
+    // compassHeading *= 180 / Math.PI;
+  
+    return compassHeading;
+  }
+
+function calculateHeadingInDegrees(alpha, beta, gamma) {
+
+    // Convert degrees to radians
+    var alphaRad = alpha * (Math.PI / 180);
+    var betaRad = beta * (Math.PI / 180);
+    var gammaRad = gamma * (Math.PI / 180);
+  
+    // Calculate equation components
+    var cA = Math.cos(alphaRad);
+    var sA = Math.sin(alphaRad);
+    var cB = Math.cos(betaRad);
+    var sB = Math.sin(betaRad);
+    var cG = Math.cos(gammaRad);
+    var sG = Math.sin(gammaRad);
+  
+    // Calculate A, B, C rotation components
+    var rA = - cA * sG - sA * sB * cG;
+    var rB = - sA * sG + cA * sB * cG;
+    var rC = - cB * cG;
+  
+    // Calculate compass heading
+    // var compassHeading = Math.atan(rA / rB);
+    var compassHeading = Math.atan2(rA / rB);
+  
+    // Convert from half unit circle to whole unit circle
+    if(rB < 0) {
+      compassHeading += Math.PI;
+    }else if(rA < 0) {
+      compassHeading += 2 * Math.PI;
+    }
+  
+    // Convert radians to degrees
+    compassHeading *= 180 / Math.PI;
+  
+    return compassHeading;
+  }

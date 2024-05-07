@@ -5,8 +5,6 @@ var logoFarge = "#0C775D";
 var fargeTones5 = "#547C73";
 var fargeTones7 = "#717E7B";
 
-var map;
-//
 var scale;
 var scaleFremhevet = true;
 var byttBakgrunn;
@@ -16,35 +14,8 @@ var bytteBakgrunnSatelitt;
 var bytteBakgrunnTopografisk;
 var bytteBakgrunnTopografiskGraa;
 var bytteBakgrunnForenklet;
-//
-var gpsKnapp;
-var geolocation;
-var trackingIsOn = false;
-var positionFeature;
-var accuracyFeature;
-var prevPosition = null;
-var tidFlyttStart = 0;
-var lineStringFlytt = new ol.geom.LineString([]);
-var msHastighet = 1 / 1000;
-var positionFeaturePunkt;
-var brukeViewSentreringMedGPS = true; // Bare har denne også så sentrering kan skrus av enklere.
-var sentrertViewPaaGPS = false; // Sentrere view når GPS skrus på?
 
 var kartlagDict;
-// Del kartvisning form: Inputfelt, etc.
-var delFormTittel;
-var delFormBeskrivelse;
-var delFormX;
-var delFormY;
-var delFormEPSG;
-var delFormZoom;
-var delFormSirkelDiameter;
-var delFormGenererURLKnapp;
-var delGenerertURL;
-var delKopierURL;
-var delCallbackKopiering;
-// var delFargeVelger;
-var delFigurFarge;
 
 var headerKnappKartMeny;
 var headerKnappDel;
@@ -59,17 +30,9 @@ var divMenyDelBilde;
 var divMenyOmBilde;
 var divMenyStottBilde;
 var sisteMenyAktiv = "divMenyKart"; // Default.
-// Popup
-var popupContainer;
-var popupContent;
-var popupClose;
-var popupOverlay;
-var featureSelectionList = []; // For "all" featureSelection.
-var featureSelectionDict = {}; // Hm... Support til featureSelectionList. Ikke bytte ut.
-var featureSelected = null; // Click on feature... Possible to do it with multiple features? Hm...
-var featureHovered = null;
-var useDefaultWhiteStyle = false; // Bare bruke hvit stil for highlight.
+
 var aapneHovedMenyKnapp;
+let hovedVinduVisesPaaDesktop = true; // hovedVinduVises er for mobil. Muligens forvirrende.
 var markaKnappene;
 var hovedVinduKnapper;
 var hovedVinduContainer;
@@ -90,6 +53,10 @@ var underMarginTopShowThreshold = true;
 var slideTextTest;
 var blokkerKnappAlleTrykk = false;
 var blokkerHovedVinduTrykk = false; // For hele hovedvinduet...
+let hovedVinduContainerTopMargin = 0; // For kalkulering av midtpunkt og om menyen skal lukkes eller åpnes.
+let hovedVinduPixelHeight = 0; // For kalkulering av midtpunkt og om menyen skal lukkes eller åpnes.
+let midtpunktRundet = 0; // For kalkulering av midtpunkt og om menyen skal lukkes eller åpnes.
+let hovedVinduVises = true; // Boolean for å vise om hoved-vinduet/menyen er skjult (hidden) eller ikke.
 
 // var sideAktiv;
 var sideKartMeny;
@@ -99,15 +66,16 @@ var sideStott;
 //
 var sideFeatureInfo;
 var featureInfoAktiv = false;
+var featureInfoVises = false;
 var featureTilbakeKnapp;
 var finnKnapp;
+var featureStartKoordinater;
 // Kartmeny-siden
 var sideAktiveLag;
 var hovedMenyTabsContainer;
 var tabAlleKnapp;
 var tabAktivKnapp;
 var aktiveLagVises = false;
-
 
 var mainMenuClassGroupLink;
 var mainMenuClassSubmenus;
@@ -120,7 +88,15 @@ var htmlKartLagListe;
 // Prøve med dict:
 var htmlKartLagDict;
 
-var testBilde = new Image();
+// var testBilde = new Image();
+
+// Bare for kalenderturer
+// Måtte sette en sjekk om at tilbakestill / feature info hadde trigget, siden feature info trigger to ganger av en eller annen grunn...
+var kalenderOpacityErLagret = false;
+var kalenderTurerErSkjult = false;
+var kalenderTurerSisteOpacity = -1;
+var midlertidigFeatureIkonKlone = null;
+var midlertidigFeatureKlone = null;
 
 function addGroupLinkListener(classIndex){
 
@@ -281,6 +257,10 @@ function lagKartMenyHTML(){
 
 $(document).ready(function(){
 
+  KartKjorer = true;
+  console.log("kartKjorer: " + KartKjorer);
+  // console.log("featureHoverSelectKjorer: " + featureHoverSelectKjorer);
+
   lagKartMenyHTML();
 
   // On mobile?
@@ -288,10 +268,9 @@ $(document).ready(function(){
   // console.log(window.isMobile);
 
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
-    // some code..
-    console.log("On mobile?");
+    // console.log("On mobile?");
   } else {
-    console.log("Not on mobile? window.isMobile: " + window.isMobile + ", navigator.userAgent: " + navigator.userAgent);
+    // console.log("Not on mobile? window.isMobile: " + window.isMobile + ", navigator.userAgent: " + navigator.userAgent);
   }
 
   // 
@@ -312,25 +291,6 @@ $(document).ready(function(){
   bytteBakgrunnTopografisk = document.getElementById("bytteBakgrunnTopografisk");
   bytteBakgrunnTopografiskGraa = document.getElementById("bytteBakgrunnTopografiskGraa");
   bytteBakgrunnForenklet = document.getElementById("bytteBakgrunnForenklet");
-  //
-  gpsKnapp = document.getElementById("gpsButtonContainer");
-  //
-  delFormTittel = document.getElementById("titleForm");
-  delFormBeskrivelse = document.getElementById("beskrivelseForm");
-  delFormX = document.getElementById("xCoordForm");
-  delFormY = document.getElementById("yCoordForm");
-  delFormEPSG = document.getElementById("epsgForm");
-  delFormZoom = document.getElementById("zoomForm");
-  delFormSirkelDiameter = document.getElementById("sirkelForm");
-  delFormGenererURLKnapp = document.getElementById("genererUrlKnapp");
-  delGenerertURL = document.getElementById("generertURL");
-  delKopierURL = document.getElementById("kopierURL");
-  delCallbackKopiering = document.getElementById("callbackKopiering");
-  delFigurFarge = document.getElementById("figurFargeForm");
-  // Popup
-  popupContainer = document.getElementById('ol-popup');
-  popupContent = document.getElementById('popup-content');
-  popupClose = document.getElementById('popup-closer');
 
   headerKnappKartMeny = document.getElementById("headerKnappKartMeny");
   headerKnappDel = document.getElementById("headerKnappDel");
@@ -413,8 +373,8 @@ $(document).ready(function(){
     addGroupLinkListener(i);
   }
 
-  // toggleGruppeVisning("Naturopplevelser"); // Hm... Expande den første med en gang?
-  toggleGruppeVisning("ArealPlanOslo");
+  toggleGruppeVisning("Naturopplevelser"); // Hm... Expande den første med en gang?
+  // toggleGruppeVisning("ArealPlanOslo");
 
   for(j = 0; j < hovedMenyKlasseIndikator.length; j++){
     settIndikatorFargerForKartlag(j);
@@ -422,34 +382,6 @@ $(document).ready(function(){
 
   var outputArray = prepareView();
   var newView = outputArray[0];
-
-  $("#popup-closer").click(function(e){
-    console.log("popupClose clicked! Hiding.");
-    popupContainer.style.display = "none";
-    e.stopPropagation();
-  })
-
-  $("#popup-content").click(function(e){
-    console.log("popupContent clicked!");
-    e.stopPropagation();
-  })
-
-  $("#ol-popup").click(function(){
-    console.log("popupContainer clicked! Hiding.");
-    popupContainer.style.display = "none";
-  })
-
-  // Popup:
-  popupOverlay = new ol.Overlay({
-    element: popupContainer,
-    autoPan: {
-      animation: {
-        // duration: 250,
-        duration: 0
-      },
-    },
-    name: "Popup"
-  });
 
   scale.onclick = function(){
     // console.log("scale-line-id clicked!");
@@ -511,15 +443,8 @@ $(document).ready(function(){
     overlays: [popupOverlay]
   });
 
-  // Test:
-  // popupOverlay.setPosition(outputArray[1]);
-
   // En sjekk for popup:
-  map.getOverlays().getArray().forEach(overlay => {
-    var overlayName = overlay["options"]["name"];
-    console.log("overlay name: " + overlayName); // Popup
-  });
-  // console.log(map.getOverlays().getArray());
+  // map.getOverlays().getArray().forEach(overlay => { var overlayName = overlay["options"]["name"]; console.log("overlay name: " + overlayName); });
 
   lagWMTSLag(); // Lager dem async.
 
@@ -529,7 +454,6 @@ $(document).ready(function(){
   // Aktivere kartlag fra URL her.
   if(lagListeFraURL != null){
     console.log("lagListeFraURL er ikke null!");
-    // aktiverKartlagMedKoder(); // Funker!
     aktiverKartlagMedNavn();
   } else {
     forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa");
@@ -537,40 +461,62 @@ $(document).ready(function(){
     forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGPS");
   }
 
-  // VEKTOR TESTER START
+  // Legger til midlertidige kartlag til kartet. De vises ikke under aktive kartlag.
+  leggTilKartlag("Naturopplevelser", vektorLagMidlertidig);
+  leggTilKartlag("Naturopplevelser", vektorlagMidlertidigIkoner);
 
-  // vectorSourceGeometry.addFeature(outputArray[3]);
+  // Test:
 
-  // console.log(vectorSourceGeometry.getFeatures());
-  // // console.log(vectorSourceGeometry.getFeatures().length); // Denne funker.
+  function settKartlagetsUITekstfargeUtenIndeks(lagNavn, farge){
+    try {
+      const lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
+      if(lagIndeks) hovedMenyKlasseKartlagTekst[lagIndeks].style.color = farge;
+    } catch (error) { 
+      console.log(e);
+    }
+  }
 
-  // console.log(vectorSourceGeometry.getFeaturesAtCoordinate(outputArray[4]));
-
-  // // Works!
-  // vectorSourceGeometry.forEachFeature(feature => {
-  //   // console.log(feature);
-  //   var name = feature.get("name");
-  //   console.log(name);
-
-  //   // Funker!
-  //   // if(name == "circle"){
-  //   //   vectorSourceGeometry.removeFeature(feature);
-  //   // }
-  //   // Kan jeg ta bort i loopen? ...
-  //   // vectorSourceGeometry.removeFeature(feature); // Virker faktisk! ...
-  // });
-
-  // // Get in order?
-  // console.log(vectorSourceGeometry.getFeaturesCollection().getArray());
-
-  // // Teste noe... For å slette den siste:
-  // vectorSourceGeometry.removeFeature(vectorSourceGeometry.getFeaturesCollection().getArray()[vectorSourceGeometry.getFeatures().length-1]);
-  // console.log(vectorSourceGeometry.getFeaturesCollection().getArray());
-  // // Funker! Men hvorfor forandrer begge log-meldingene seg (også den før jeg gjør removeFeature)? ...
-
-  // // vectorSourceGeometry.clear(); // Removes all features? // Yep.
-
-  // VEKTOR TESTER END
+  map.getLayers().getArray().forEach(group => {
+    if(group.get("name") != "Bakgrunnskart")
+    group.getLayers().forEach(layer => {
+      const lagNavn = layer.get("name");
+      if(lagNavn.includes("wms")){
+        // console.log("Fant wms lag!: " + lagNavn);
+        layer.getSource().on(["change","error","imageloadstart","imageloaderror","imageloadend"], 
+        function(event){
+          // console.log(event);
+          const eventType = event["type"];
+          // console.log(lagNavn + " ~ " + eventType);
+          switch(eventType){
+            case "change":
+              break;
+            case "error":
+              fadeInnogUtDebugMelding(layer.get("uiName") + " feilet.", 10000);
+              settKartlagetsUITekstfargeUtenIndeks(lagNavn, "#C0C0C0");
+              break;
+            case "imageloadstart":
+              // fadeInnogUtDebugMelding(layer.get("uiName") + " laster inn...", 10000);
+              break;
+            case "imageloaderror":
+              fadeInnogUtDebugMelding(layer.get("uiName") + " feilet.", 10000);
+              // Gjør teksten grå hvis bildet feilet.
+              settKartlagetsUITekstfargeUtenIndeks(lagNavn, "#C0C0C0");
+              break;
+            case "imageloadend":
+              // Ha med tro? Nyttig, men samtidig som at den vises veldig ofte - etter hver zoom.
+              // fadeInnogUtDebugMelding(layer.get("uiName") + " er klar.", 10000);
+              // Jeg tror enten imageloadend eller imageloaderror trigger.
+              settKartlagetsUITekstfargeUtenIndeks(lagNavn, "black");
+              // Idé: Gi melding om bruker behøver å zoome inn mer for å se WMS laget? ...
+              // console.log(map.getView().getZoom());
+              break;
+            default:
+              break;
+          }
+        });
+      }
+    });
+  });
 
   map.on('click',function(e){
     console.log("Klikket på kartet!");
@@ -583,19 +529,44 @@ $(document).ready(function(){
 
     console.log("Koordinatsystem: " + coordSys + ", koordinater: " + e.coordinate + ", koordinaterKonv: " + koordinaterKonv);
 
-    // Bare lage sirkel på divMenyDel?
-    if(sisteMenyAktiv == "divMenyDel"){
-      delFormX.value = koordinaterKonv[0];
-      delFormY.value = koordinaterKonv[1];
-  
-      lagOgSettNySirkel(delFormX.value, delFormY.value, delFormSirkelDiameter.value, delFigurFarge.value);
-      genererURL();
-    }
+    // // Deaktivere nå siden delefunksjonen ikke brukes.
+    // // Kan nå bruke funksjonen lageSirkelPaaKartKlikk().
+    // // Bare lage sirkel på divMenyDel?
+    // if(sisteMenyAktiv == "divMenyDel"){
+    //   lageSirkelPaaKartKlikk(koordinaterKonv[0], koordinaterKonv[1]);
+    // }
 
-    popupOverlay.setPosition(e.coordinate);
+    // popupOverlay.setPosition(e.coordinate);
+
+    // Sentrere kartet rundt popup.
+    // map.getView().setCenter(e.coordinate); // Må ha for å unngå rart hopp mens popup er oppe.
+    // map.getView().animate(
+    //   {
+    //     zoom: map.getView().getZoom(),
+    //     center: e.coordinate,
+    //     duration: 500
+    //   },
+    // );
+
     // vise boks med informasjon:
     const pixel = map.getEventPixel(e.originalEvent); // pixel i skjermvinduet
-    displayFeatureInfo(pixel);
+
+    // Sjekke at scriptene featureHoverSelect og popup kjører.
+    if(featureHoverSelectKjorer && popupKjorer){
+      settFeatureSelectionListeOgLagPopup(pixel, e.coordinate); // Passe koordinatene også
+      // skjulHoverInfo();
+    } else {
+      console.log("map klikk ~ featureHoverSelect eller popup scriptet kjører ikke.");
+    }
+
+    // Sjekker at popup.js er loadet.
+    if(popupKjorer){
+      // Bare setter popup posisjon, hvis popup skal vises. Forhindrer store flytt i blant ved klikk på kartet.
+      if(popupVises){
+        popupOverlay.setPosition(e.coordinate);
+      }
+    }
+
   });
 
   // Sukk... Egentlig best å ikke ha engang for mobil? Siden det ikke er hover der.
@@ -603,130 +574,85 @@ $(document).ready(function(){
   map.on('pointermove', function (e) {
     // console.log("pointermove triggered?!");
 
+    document.body.style.cursor = "default";
+
     // Disable on mobile?
     // Hm, prøve å se om det hjelper med laggen...
     if(window.isMobile){
       return;
       console.log("Map pointermove ~ On mobile, so skipping hover.");
     }
+
+    if(!featureHoverSelectKjorer){
+      console.log("Scriptet featureHoverSelect kjører ikke.");
+      return;
+    }
     
     // Debug
     // document.getElementById("debugVinduTekst").innerHTML = "map on pointermove";
 
-    // Funker! Hover med featureSelectionList.
-    if(featureSelectionList.includes(featureHovered)) {
-      console.log("featureHovered is in featureSelectionList!");
+    // // Funker! Hover med featureSelectionList.
+    if(featureClickSelectionList.includes(featureHovered)) {
+      // DEBUG:
+      // console.log("featureHovered is in featureSelectionList!");
     } else if (featureHovered != null) {
-
-      // Sette til dashed for tur-snarveier!
-      var snarvei = featureHovered.get("Stiplet");
-      if(snarvei == null){
-        // Ikke en tur.
-        featureHovered.setStyle(undefined);
-        // featureHovered = null;
-      } else {
-        // Er en tur.
-        snarvei = parseInt(snarvei);
-        if(snarvei <= 0){
-          // Tur, men ikke en snarvei.
-          featureHovered.setStyle(undefined);
-          // featureHovered = null;
-        } else {
-          // Turen er en snarvei!
-          var NAVN = featureHovered.get("NAVN");
-          var dictEntry = featureSelectionDict[NAVN];
-          if(dictEntry != null){
-            var stilDashed = dictEntry["stilDashed"];
-            if(stilDashed != null){
-              featureHovered.setStyle(stilDashed);
-              console.log("Satt stilDashed for snarveien kalt med NAVN: " + NAVN);
-
-              // Debug
-              // document.getElementById("debugVinduTekst").innerHTML += " | hover, satt til null ~ satt stilDashed for snarvei: " + NAVN;
-            } else {
-              // Bare bruke layer-stilen, hvis fortsatt problemer...
-              featureHovered.setStyle(undefined);
-            }
-          }
-        }
-      }
-
-      featureHovered = null;
-
-      // featureHovered.setStyle(undefined);
-      // featureHovered = null;
-      // console.log("featureHovered was set to null.");
+      nullstillFeatureHovered();
+      // Må gjøre denne hver gang også nå? Pga. ikonene.
+      // nullstillFeatureSelection();
     }
+
+    // Alltid nullstill først?
+    skjulHoverInfo();
   
     map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
 
-      var lagnavn = layer.get("name"); // navn på kartlaget
+      var lagNavn = layer.get("name"); // navn på kartlaget
       var clickable = layer.get("clickable");
       // console.log("lagnavn: " + lagnavn + ", clickable: " + clickable);
   
       if(clickable && feature){
-        var navn = feature.get('navn');
-        var name = feature.get('name');
-        var NAME = feature.get('NAME');
-        var featureName = "Navn på området mangler";
-        // console.log("clickable og feature! navn: " + navn + ", name: " + name + ", NAME: " + NAME);
-  
-        // Sjekke for snarvei (stiplet):
-        var snarvei = feature.get("Stiplet");
-        var erEnSnarvei = false;
+        // Ikke gjøre hover for ikonLag? Men gjøre noe annet. Hm.
+        // settFeatureHovered(feature, layer);
+        // 
+        document.body.style.cursor = "pointer";
 
-        featureHovered = feature;
+        if(!lagNavn.includes("Ikon") && !lagNavn.includes("ikon")){
+          
+          settFeatureHovered(feature, layer, false);
 
-        if(snarvei != null){
-          snarvei = parseInt(snarvei);
-          if(snarvei > 0){
-            // Her er turen en snarvei...
-            erEnSnarvei = true;
-          }
-        }
+          // Hover? Hm.
+          // visHoverInfo(e.pixel, feature, layer, false);
 
-        if(!erEnSnarvei){
-          if(useDefaultWhiteStyle){
-            featureHovered.setStyle(defaultWhiteSelectStyle);
-          } else {
-            var stilSelect = layer.get("stilSelect");
-            if(stilSelect != null){
-              featureHovered.setStyle(stilSelect);
-            } else {
-              featureHovered.setStyle(defaultWhiteSelectStyle);
+          // Hvis popup er aktivert, bare hvis hover info hvis popup ikke vises.
+          // Hvis popup er uaktivert, alltid hvis hover info.
+          if(popupKjorer){
+            if(!popupVises && !kalenderTurerErSkjult){
+              visHoverInfo(e.pixel, feature, layer, false);
             }
+          } else {
+            visHoverInfo(e.pixel, feature, layer, false);
           }
+
+          return true;
         } else {
-          // Er en tur snarvei!
-          if(useDefaultWhiteStyle){
-            featureHovered.setStyle(defaultWhiteDashedSelectStyle);
-          } else {
-            // Legge til i dictionary her også, i tilfelle brukeren ikke har trykket på turen enda.
-            var snarveiNavn = feature.get("NAVN");
-            var stilDashedGet = layer.get("stilDashed");
-            var stilDashedSelectGet = layer.get("stilDashedSelect");
+          // Hover over ikon
 
-            featureSelectionDict[snarveiNavn] = {
-              // navn: endeligeNavn,
-              featureSelection: feature,
-              stilDashed: stilDashedGet,
-              stilDashedSelect: stilDashedSelectGet
-            };
-            console.log(featureSelectionDict);
-
-            // var stilDashedSelect = layer.get("stilDashedSelect");
-            if (stilDashedSelectGet != null) {
-              featureHovered.setStyle(stilDashedSelectGet);
-
-              // Debug:
-              // document.getElementById("debugVinduTekst").innerHTML += " | Hover ~ Satt stilDashedSelect på snarvei: " + snarveiNavn;
-            } else {
-              featureHovered.setStyle(defaultWhiteDashedSelectStyle);
+          // Hvis popup er aktivert, bare hvis hover info hvis popup ikke vises.
+          // Hvis popup er uaktivert, alltid hvis hover info.
+          if(popupKjorer){
+            if(!popupVises && !kalenderTurerErSkjult){
+              visHoverInfo(e.pixel, feature, layer, true);
             }
+          } else {
+            visHoverInfo(e.pixel, feature, layer, true);
           }
+
+          settFeatureHovered(feature, layer, true);
+
+          return true;
         }
 
-        return true; // For å bare velge den første gyldige featuren?
+        // return true; // For å bare velge den første gyldige featuren?
       }
 
     });
@@ -735,58 +661,7 @@ $(document).ready(function(){
 
   // Sette zoom...
   map.on('moveend', function(e) {
-    delFormZoom.value = map.getView().getZoom();
-  });
-
-  $("#titleForm").on("input", null, null, function(){
-    console.log("delFormTittel forandret verdi!");
-    genererURL();
-  });
-  $("#beskrivelseForm").on("input", null, null, function(){
-    console.log("beskrivelseForm forandret verdi!");
-    genererURL();
-  });
-
-  // Egentlig, for disse, best å ikke forandre med en gang.
-  delFormZoom.addEventListener("change", function () {
-    console.log("delFormZoom forandret verdi!");
-    // Hvis forandret manuelt:
-    if(delFormZoom.value != map.getView().getZoom()){
-      map.getView().setZoom(delFormZoom.value);
-    }
-  })
-  delFormX.addEventListener("change", function () {
-    console.log("delFormX forandret verdi!");
-    lagOgSettNySirkel(delFormX.value, delFormY.value, delFormSirkelDiameter.value, delFigurFarge.value);
-    genererURL();
-  })
-  delFormY.addEventListener("change", function () {
-    console.log("delFormY forandret verdi!");
-    lagOgSettNySirkel(delFormX.value, delFormY.value, delFormSirkelDiameter.value, delFigurFarge.value);
-    genererURL();
-  })
-  delFormSirkelDiameter.addEventListener("change", function () {
-    console.log("delFormSirkelDiameter forandret verdi!");
-    lagOgSettNySirkel(delFormX.value, delFormY.value, delFormSirkelDiameter.value, delFigurFarge.value);
-    genererURL();
-  })
-  delFigurFarge.addEventListener("change", function () {
-    console.log("delFigurFarge ~ verdien ble forandret!");
-    lagOgSettNySirkel(delFormX.value, delFormY.value, delFormSirkelDiameter.value, delFigurFarge.value);
-    // Funker dette.
-    settIndikatorFargeManuelt("vektorLagGeometri", delFigurFarge.value, "rgba(0,0,0,0)");
-  });
-
-  delFormGenererURLKnapp.addEventListener('click', function(){
-    genererURL();
-  });
-
-  delKopierURL.addEventListener('click', function(){
-    console.log("Trykket på delKopierURL knappen!");
-    // alert("Trykket på delKopierURL knappen!"); // Funker!
-    copyTextToClipboard(delGenerertURL.textContent);
-    // navigator.clipboard.writeText(delGenerertURL.textContent);
-    // delCallbackKopiering.innerHTML = "Lenken ble kopiert!";
+    
   });
 
   // BYTTING AV BAKGRUNN (knapp)
@@ -818,7 +693,7 @@ $(document).ready(function(){
     // try catch her, siden kartlaget kan være null.
     try{
       visBakgrunnskartlag(bakgrunnskartNorgeIBilder.get("name"));
-      byttBakgrunn.src = "./images/bakgrunn-satelitt-350x350.jpg";
+      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-satelitt-350x350.jpg";
       deaktiverByttBakgrunn();
     }catch(exception){
       console.log("bytteBakgrunnSatelitt klikk error: " + error);
@@ -828,7 +703,7 @@ $(document).ready(function(){
     console.log("bytteBakgrunnTopografisk clicked!");
     try{
       visBakgrunnskartlag(bakgrunnskartTopo4.get("name"));
-      byttBakgrunn.src = "./images/bakgrunn-topografisk-350x350.jpg";
+      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-topografisk-350x350.jpg";
       deaktiverByttBakgrunn();
     }catch(exception){
       console.log("bytteBakgrunnTopografisk klikk error: " + error);
@@ -838,7 +713,7 @@ $(document).ready(function(){
     console.log("bytteBakgrunnTopografiskGraa clicked!");
     try{
       visBakgrunnskartlag(bakgrunnskartTopoGraa.get("name"));
-      byttBakgrunn.src = "./images/bakgrunn-topografisk-graa-350x350.jpg";
+      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-topografisk-graa-350x350.jpg";
       deaktiverByttBakgrunn();
     }catch(exception){
       console.log("bytteBakgrunnTopografiskGraa klikk error: " + error);
@@ -848,183 +723,23 @@ $(document).ready(function(){
     console.log("bytteBakgrunnForenklet clicked!");
     try{
       visBakgrunnskartlag(bakgrunnskartEnkel.get("name"));
-      byttBakgrunn.src = "./images/bakgrunn-forenklet-350x350.jpg";
+      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-forenklet-350x350.jpg";
       deaktiverByttBakgrunn();
     }catch(exception){
       console.log("bytteBakgrunnForenklet klikk error: " + error);
     }
   }
 
-  // GPS
-
-  lagGpsStiler();
-
-  geolocation = new ol.Geolocation({
-    // enableHighAccuracy must be set to true to have the heading value.
-    trackingOptions: {
-      enableHighAccuracy: true,
-    },
-    // projection: view.getProjection(),
-    projection: viewProjection,
-    tracking: false
-  });
-
-  function setGPSKnappStil(isTrackingState){
-    if(isTrackingState){
-      gpsKnapp.style.backgroundColor = logoFarge;
-      gpsKnapp.style.borderColor = logoFarge;
-      gpsKnapp.classList.add('enabledHover');
-      gpsKnapp.classList.remove('disabledHover');
-    } else {
-      gpsKnapp.style.backgroundColor = fargeTones7;
-      gpsKnapp.style.borderColor = fargeTones7;
-      gpsKnapp.classList.add('disabledHover');
-      gpsKnapp.classList.remove('enabledHover');
-    }
-  }
-
-  geolocation.on('change:tracking', function(event){
-    // console.log("geolocation ~ tracking changed! event: " + event);
-    var isTracking = geolocation.getTracking();
-    console.log("geolocation ~ isTracking: " + isTracking);
-
-    setGPSKnappStil(isTracking);
-
-    // Bruker trackingIsOn for gps-knappen.
-    // trackingIsOn = geolocation.getTracking();
-    // console.log("geolocation ~ change:tracking ~ trackingIsOn: " + trackingIsOn);
-    // if(isTracking){
-    //   gpsKnapp.style.backgroundColor = logoFarge;
-    //   gpsKnapp.style.borderColor = logoFarge;
-    //   gpsKnapp.classList.add('enabledHover');
-    //   gpsKnapp.classList.remove('disabledHover');
-    // } else {
-    //   gpsKnapp.style.backgroundColor = fargeTones7;
-    //   gpsKnapp.style.borderColor = fargeTones7;
-    //   gpsKnapp.classList.add('disabledHover');
-    //   gpsKnapp.classList.remove('enabledHover');
-    // }
-  });
-
-  accuracyFeature = new ol.Feature();
-  vectorSourceGPS.addFeature(accuracyFeature);
-
-  positionFeature = new ol.Feature();
-  positionFeature.setStyle(
-    positionFeatureStil
-  );
-  vectorSourceGPS.addFeature(positionFeature);
-
-  gpsKnapp.addEventListener('click', function(){
-    console.log("gpsKnapp clicked!");
-    // document.getElementById("debugGPS").innerHTML = "Clicked!";
-    trackingIsOn = !trackingIsOn;
-    toggleTracking(trackingIsOn);
-  });
-
-// update the HTML page when the position changes.
-geolocation.on('change', function () {
-  var accuracy = geolocation.getAccuracy();
-  var altitude = geolocation.getAltitude();
-  var altitudeAccuracy = geolocation.getAltitudeAccuracy();
-  var heading = geolocation.getHeading();
-  var speed = geolocation.getSpeed();
-  var position = geolocation.getPosition();
-  var x = geolocation.getPosition()[0];
-  var y = geolocation.getPosition()[1];
-  var intX = parseInt(x);
-  var intY = parseInt(y);
-  var intAccuracy = parseInt(accuracy);
-  // var headingShort = toFixed(heading);
-  // var headingShort = parseFloat(heading.toString(), 2); // Funket ikke...
-  var headingShort = parseFloat(heading).toFixed(2);
-  var intAltitude = parseInt(altitude);
-  var headingDegrees = radToDeg(heading);
-  var intHeadingDegrees = parseInt(headingDegrees);
-
-  // // document.getElementById("debugGPS").innerHTML = "acc: " + intAccuracy + ", alt: " + intAltitude + ", head: " + headingShort + ", hDegrees: " + intHeadingDegrees;
-  // console.log("geolocation on change ~ x: " + x + ", y: " + y);
-  // // 
-  if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
-    if(position != null){
-      sentrertViewPaaGPS = true;
-      // map.getView().setCenter(coordinates); // Ser ut til å virke!
-      sentrerMapPaaKoordinater(geolocation.getPosition());
-    }
-  }
-});
-
-// Hm... getAccuracyGeometry?
-geolocation.on('change:accuracyGeometry', function () {
-  onChangeAccuracyFeature();
-});
-
-geolocation.on('change:position', function () {
-  onChangePositionFeature();
-});
-
-geolocation.on('error', function (error) {
-  showError(error);
-});
-
-  // ol/Geolocation.GeolocationError (?)
-  // https://openlayers.org/en/latest/apidoc/module-ol_Geolocation.GeolocationError.html
-  function showError(error) {
-    // Hvis man printer error får man bare opp object Object.
-    console.log("geolocation, showError. error code: " + error.code + ", message: " + error.message);
-    switch(error.code) {
-      case error.PERMISSION_DENIED:
-        document.getElementById("debugGPS").innerHTML = "User denied the request for Geolocation.";
-        break;
-      case error.POSITION_UNAVAILABLE:
-        document.getElementById("debugGPS").innerHTML = "Location information is unavailable.";
-        break;
-      case error.TIMEOUT:
-        document.getElementById("debugGPS").innerHTML = "The request to get user location timed out.";
-        break;
-      case error.UNKNOWN_ERROR:
-        document.getElementById("debugGPS").innerHTML = "An unknown error occurred.";
-        break;
-      //
-      case 1:
-        document.getElementById("debugGPS").innerHTML = "User denied geolocation? In my case it was erroneous error. On Android: Settings > Location > App permissions > Set Chrome to allow when in use.";
-        break;
-      default:
-        // Hvis ingen, bare poste hele error meldingen? ...
-        // document.getElementById("debugGPS").innerHTML = error;
-        document.getElementById("debugGPS").innerHTML = "Error! code: " + error.code + ", message: " + error.message;
-        break;
-    }
-
-    setGPSKnappStil(false); // Hvis error så regner med at GPS ikke funker...
-  }
-
-  //
+  // 
 
   document.getElementById("lukkeHovedVinduKnapp").addEventListener("click", function(){
-
     console.log("Du klikket på lukkeHovedVinduKnapp!");
-
-    hovedVinduKnapper.style.opacity = "0";
-    hovedVinduKnapper.style.pointerEvents = "none";
-    hovedVinduContainer.style.opacity = "0";
-    hovedVinduContainer.style.pointerEvents = "none";
-
-    aapneHovedMenyKnapp.style.opacity = "0.9";
-    aapneHovedMenyKnapp.style.pointerEvents = "all";
-
+    visHovedMenyPaaDesktop(false);
   });
 
   aapneHovedMenyKnapp.addEventListener("click", function(){
     console.log("Du klikket på aapneHovedVinduKnapp!");
-
-    aapneHovedMenyKnapp.style.opacity = "0";
-    aapneHovedMenyKnapp.style.pointerEvents = "none";
-
-    hovedVinduKnapper.style.opacity = "1";
-    hovedVinduKnapper.style.pointerEvents = "all";
-    hovedVinduContainer.style.opacity = "1";
-    hovedVinduContainer.style.pointerEvents = "all";
+    visHovedMenyPaaDesktop(true);
   });
 
   hovedMenySlide.addEventListener("touchstart", touchHandler, false);
@@ -1038,16 +753,9 @@ geolocation.on('error', function (error) {
     featureTilbakeKnappFunksjon();
   });
 
-  document.getElementById("featureTilbakeKnapp2").addEventListener("click", function(){
-    featureTilbakeKnappFunksjon();
-  });
-
   finnKnapp.addEventListener("click", function(){
     featureFinnKnappFunksjon();
-  });
-
-  document.getElementById("finnKnapp2").addEventListener("click", function(){
-    featureFinnKnappFunksjon();
+    // console.log("Trykket på finnKnapp!");
   });
 
   // Kartmeny-knapper for "Alle lag" og "Aktive lag"
@@ -1069,28 +777,36 @@ geolocation.on('error', function (error) {
     }
   });
 
+  kalkulerThresholds(); // Gjøres før bruk av touchHandler.
+
 }); // onready END
 
-function featureTilbakeKnappFunksjon(){
-  console.log("featureTilbakeKnapp klikket!");
-  skjulSide(sideFeatureInfo);
-  kartMenySideKlikk("divMenyKart");
-  visSide(sideKartMeny);
-  featureInfoAktiv = false;
-  hovedVindu.scrollTop = 0; // Scroller til toppen.
-}
-
-function featureFinnKnappFunksjon(){
-  console.log("finnKnapp klikket!");
-    // For å sette view over center av feature.
-    // Teste ut med .getExtent.getCenter() eller noe? Se fane/post om det.
+function visHovedMenyPaaDesktop(visHovedVindu){
+  hovedVinduVisesPaaDesktop = visHovedVindu;
+  if(visHovedVindu){
+    aapneHovedMenyKnapp.style.opacity = "0";
+    aapneHovedMenyKnapp.style.pointerEvents = "none";
+  
+    hovedVinduKnapper.style.opacity = "1";
+    hovedVinduKnapper.style.pointerEvents = "all";
+    hovedVinduContainer.style.opacity = "1";
+    hovedVinduContainer.style.pointerEvents = "all";
+  } else {
+    hovedVinduKnapper.style.opacity = "0";
+    hovedVinduKnapper.style.pointerEvents = "none";
+    hovedVinduContainer.style.opacity = "0";
+    hovedVinduContainer.style.pointerEvents = "none";
+  
+    aapneHovedMenyKnapp.style.opacity = "0.9";
+    aapneHovedMenyKnapp.style.pointerEvents = "all";
+  }
 }
 
 // NOTE: Disse verdiene er definert øverst!
 // hovedVinduContainerMarginBottomWhenScroll // marginBottom fra style > Mobile > hovedVinduContainer
 // hovedVinduContainerMarginBottomWhenHidden // 36px mindre enn WhenScroll?
 let touchHandler = function (e) {
-  
+
   type = "";
   var x = 0, y = 0;
   var clickedSlideButton = false;
@@ -1140,105 +856,51 @@ let touchHandler = function (e) {
       endX = x;
       endY = y;
 
-      // // // Sigh... Kalkulere det hver gang?
-      var containerClick = getComputedStyle(hovedVinduContainer);
-      var itemTopMarginClick = containerClick.marginTop; // 140px
-      var topMarginClick = parseInt(itemTopMarginClick);
-
-      var hovedVinduHeightClick = getComputedStyle(hovedVindu);
-      var itemHeightClick = hovedVinduHeightClick.height;
-      var pixelHeightClick = parseInt(itemHeightClick);
-
-      // // Denne vil alltid starte som høy, siden det er default? Altså marginBottom: 108px;
-      if(thresholdWhenHighMarginBottom == null){
-        thresholdWhenHighMarginBottom = topMarginClick + pixelHeightClick;
-        console.log("thresholdWhenHighMarginBottom: " + thresholdWhenHighMarginBottom);
-        // Hm...
-        marginTopMax = topMarginClick + pixelHeightClick; // 570
-        marginTopHide = marginTopMax - 40; // 530
-      }
+      // Kalkulere det hver gang, pga. få riktig marginTop og pixelHeight.
+      hovedVinduContainerTopMargin = hentHovedVinduContainerTopMargin();
+      hovedVinduPixelHeight = hentHovedVinduPixelHeight();
 
       if(startX == moveX && startY == moveY){
+        // Enkelt klikk på slideren.
         clickedSlideButton = true;
         // console.log("Single click?"); // Funker.
 
-        // Så minTopMargin er 140. Kalkulere midtpunktet? F.eks. mt 140, h 827.
-        // (827 - 140) / 2? = 687 / 2 = 343.5 // Nei? mt kan økes med 827 helt til h er 0.
-        // Helt ned til null er: 140 + 827 = 967 (maks marginTop).
-        // Så... Når marginTop er 140, er pixelHeight / 2 midtpunktet...
-        // Hm... Hva gjør jeg hvis mt er over 140? F.eks. mt 295, h 672.
-        // ((mt - 140) + h) / 2
-        var midtpunktRounded = Math.round(((topMarginClick - 140) + pixelHeightClick) / 2); // Blir 414 uansett!
+        midtpunktRundet = kalkulerMidtpunktet();
 
-        console.log("topMarginClick: " + topMarginClick + ", pixelHeightClick: " + pixelHeightClick + ", midtpunktRounded: " + midtpunktRounded);
-
-        if(pixelHeightClick > midtpunktRounded){
+        if(hovedVinduPixelHeight > midtpunktRundet){
           // Lukke hovedVindu.
-          // hovedVinduContainer.style.marginBottom = "60px";
-          // hovedVinduContainer.style.marginBottom = "44px";
-          hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenHidden;
-          hovedVindu.style.overflowY = "hidden";
-          hovedVindu.style.opacity = "0";
-          blokkerKartKnapper();
-
-          var nyTopMarginNed = calculateThresholdMarginBottom();
-          hovedVinduContainer.style.marginTop = nyTopMarginNed + "px";
-          console.log("hovedVindu lukket!");
+          lukkHovedVindu();
         } else {
           // Åpne hovedVindu.
-          // hovedVinduContainer.style.marginBottom = "96px";
-          // hovedVinduContainer.style.marginBottom = "80px";
-          hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenScroll;
-          hovedVindu.style.overflowY = "scroll";
-          hovedVindu.style.opacity = "1";
-          tillattKartKnapperEtterDelay();
-
-          var nyTopMarginOpp = minHovedMarginTop;
-          hovedVinduContainer.style.marginTop = nyTopMarginOpp + "px";
-          console.log("hovedVindu åpnet!");
+          aapneHovedVindu();
         }
+
       }
 
-      // Re-enable map interactions
-      // map.getInteractions().forEach(x => x.setActive(true));
-
-      // Gjøre kartmenyen trykkbar igjen.
-      // hovedMenyTabsContainer.style.pointerEvents = "auto";
-      // sideKartMeny.style.pointerEvents = "auto";
       break;
     case "touchcancel":
       type = "touchcancel";
       endX = x;
       endY = y;
-
-      // Re-enable map interactions
-      // map.getInteractions().forEach(x => x.setActive(true));
-
-      // Gjøre kartmenyen trykkbar igjen.
-      // hovedMenyTabsContainer.style.pointerEvents = "auto";
-      // sideKartMeny.style.pointerEvents = "auto";
       break;
   }
 
-  // Do something with hovedVinduContainer, if touchmove er forskjellig.
+  // Altså hvis holder inne og flytter slideren på mobil.
+
+  // Gjør noe med hovedVinduContainer, if touchmove er forskjellig.
   if(moveY != prevMoveY){
 
     var yDifference = moveY - prevMoveY;
     var yDiffRounded = Math.round(yDifference); // Rounds to nearest integer!
     console.log("yDifference: " + yDifference + ", yDiffRounded: " + yDiffRounded); // + down, - up
-    var style = getComputedStyle(hovedVinduContainer);
-    var itemTopMargin = style.marginTop; // 140px
-    var topMargin = parseInt(itemTopMargin); // 140
-    // Check current height of hovedVindu
-    var hovedVinduHeight = getComputedStyle(hovedVindu);
-    var itemHeight = hovedVinduHeight.height;
-    var pixelHeight = parseInt(itemHeight);
 
-    console.log("itemTopmargin: " + itemTopMargin + ", topMargin: " + topMargin + ", hovedVinduHeight: " + itemHeight + ", pixelHeight: " + pixelHeight);
+    hovedVinduContainerTopMargin = hentHovedVinduContainerTopMargin();
+    hovedVinduPixelHeight = hentHovedVinduPixelHeight();
 
     // Håndtere mindre og større enn 0. Hvis akkurat 0, ikke gjøre noe?...
-    if(yDiffRounded < 0){ // Oppover hvis marginTop mindre.
-      var nyTopMarginOpp = topMargin + yDiffRounded;
+    if(yDiffRounded < 0){
+      // Oppover hvis marginTop mindre.
+      var nyTopMarginOpp = hovedVinduContainerTopMargin + yDiffRounded;
       if(nyTopMarginOpp < minHovedMarginTop){
         nyTopMarginOpp = minHovedMarginTop; // Ikke mindre enn min.
       }
@@ -1249,23 +911,24 @@ let touchHandler = function (e) {
 
       hovedVinduContainer.style.marginTop = nyTopMarginOpp + "px";
       console.log("yDiffRounded: " + yDiffRounded + ", minHovedMarginTop: " + minHovedMarginTop + ". Ny marginTop er: " + nyTopMarginOpp);
-    } else if(yDiffRounded > 0){ // Nedover hvis marginTop større.
+    
+    } else if(yDiffRounded > 0){
+      // Nedover hvis marginTop større.
 
-      var nyTopMarginNed = topMargin + yDiffRounded;
-      var nyHovedVinduHeight = pixelHeight - yDiffRounded;
+      var nyTopMarginNed = hovedVinduContainerTopMargin + yDiffRounded;
+      var nyHovedVinduHeight = hovedVinduPixelHeight - yDiffRounded;
 
-      if(pixelHeight == 0){
+      if(hovedVinduPixelHeight == 0){
         // Ikke forandre på noe.
-        nyTopMarginNed = topMargin;
-      } else if(pixelHeight < 0){
+        nyTopMarginNed = hovedVinduContainerTopMargin;
+      } else if(hovedVinduPixelHeight < 0){
         // Substrahere pixelHeight slik at pixelHeight blir 0?
-        nyTopMarginNed = topMargin + pixelHeight;
+        nyTopMarginNed = hovedVinduContainerTopMargin + hovedVinduPixelHeight;
       } else {
         // Når pixelHeight er større enn 0:
         if(nyHovedVinduHeight <= 0){
           // Hvis y-forskjellen gjør at pixelHeight blir under 0:
           nyTopMarginNed += nyHovedVinduHeight;
-
           // Lukke hovedVindu.
         }
       }
@@ -1279,150 +942,37 @@ let touchHandler = function (e) {
   prevMoveX = moveX;
   prevMoveY = moveY;
 
-  // Sjekke til slutt etter å ha satt topMargin:
-  var hovedVinduHeightEnd = getComputedStyle(hovedVindu);
-  var itemHeightEnd = hovedVinduHeightEnd.height;
-  var pixelHeightEnd = parseInt(itemHeightEnd);
-  if (pixelHeightEnd >= 1) {
-    // Åpne hovedVindu.
-  } else {
-    // Lukke hovedVindu.
-  }
-
+  // Håndtere klikk-event når brukeren holder og flytter på slideren på mobil.
+  // Hm...
   if(!clickedSlideButton){
+    // console.log("!clickedSlideButton ~ hovedVinduContainerTopMargin: " + hovedVinduContainerTopMargin);
 
-    if(parseInt(hovedVinduContainer.style.marginTop) < marginTopHide){
+    // if(parseInt(hovedVinduContainer.style.marginTop) < marginTopHide){
+      if(hovedVinduContainerTopMargin < marginTopHide){
       if(!underMarginTopShowThreshold){
+        hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenScroll;
         hovedVindu.style.overflowY = "scroll";
         hovedVindu.style.opacity = "1";
         tillattKartKnapperEtterDelay();
-        // hovedVinduContainer.style.marginBottom = "96px";
-        // hovedVinduContainer.style.marginBottom = "80px";
-        hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenScroll;
+
+        hovedVinduVises = true;
       }
       underMarginTopShowThreshold = true;
     } else {
       if(underMarginTopShowThreshold){
+        hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenHidden;
         hovedVindu.style.overflowY = "hidden";
         hovedVindu.style.opacity = "0";
         blokkerKartKnapper();
-        // hovedVinduContainer.style.marginBottom = "60px";
-        // hovedVinduContainer.style.marginBottom = "44px";
-        hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenHidden;
+
+        hovedVinduVises = false;
       }
       underMarginTopShowThreshold = false;
     }
 
   }
 
-  // // For debug:
-  // var hovedContainerStyle = getComputedStyle(hovedVinduContainer);
-  // var containerHeight = hovedContainerStyle.height;
-  // var containerHeightPixels = parseInt(containerHeight);
-  // document.getElementById("slideTextTest").innerHTML = "v: 15" + ", hv h: " + pixelHeightEnd + ", c h: " + containerHeightPixels + ", c mtop: " + hovedVinduContainer.style.marginTop + ", c mb: " + hovedVinduContainer.style.marginBottom + ", mtT: " + marginTopShowThreshold + ", isUT: " + underMarginTopShowThreshold + ", tmb: " + thresholdWhenHighMarginBottom;
-
 } // touchhandler END
-
-function kartMenySideKlikk(divTrykketPaa){
-
-  // 1: Hvis trykket på den som allerede er aktiv, ikke gjør noe.
-  // 2: Hvis trykket på en som ikke er aktiv, deaktiver den aktive...
-  // 3: Aktiver den nye som er trykket på.
-
-  if(divTrykketPaa == sisteMenyAktiv){
-    console.log("kartMenySideKlikk ~ trykket på den som allerede er aktiv, så ikke gjøre noe.");
-    return;
-  } else {
-    console.log("kartMenySideKlikk ~ divTrykketPaa: " + divTrykketPaa + ", sisteMenyAktiv: " + sisteMenyAktiv);
-    // resetBorderBottom(); // For enkelhetsskyld, resetter alle? ...
-
-    // Deaktivering av den siste som var aktiv.
-    switch(sisteMenyAktiv){
-      case "divMenyKart":
-        skjulSide(sideKartMeny);
-        divMenyKartBilde.src = "./images/layer.png";
-        headerKnappKartMeny.style.color = "black";
-        headerKnappKartMeny.style.borderBottomColor = fargeTones5;
-        //
-        skjulSide(sideFeatureInfo); // Skjuler alltid begge.
-        // Skjul alle/aktive-knappene for de andre sidene:
-        skjulHovedMenyTabsKnapper();
-        skjulBeggeLagSiderUtenEndreBoolean(); // Skjuler både "alle" og "aktive".
-        break;
-      case "divMenyDel":
-        skjulSide(sideDelKartvisning);
-        divMenyDelBilde.src = "./images/share.png";
-        headerKnappDel.style.color = "black";
-        headerKnappDel.style.borderBottomColor = fargeTones5;
-        break;
-      case "divMenyOm":
-        skjulSide(sideOmMarkakartet);
-        divMenyOmBilde.src = "./images/information.png";
-        headerKnappOm.style.color = "black";
-        headerKnappOm.style.borderBottomColor = fargeTones5;
-        break;
-      case "divMenyStott":
-        skjulSide(sideStott);
-        divMenyStottBilde.src = "./images/favicon-only-inner-large-black.png";
-        headerKnappStott.style.color = "black";
-        headerKnappStott.style.borderBottomColor = fargeTones5;
-        break;
-      default:
-        break;
-    }
-
-    // Setter ny siste-aktiv:
-    sisteMenyAktiv = divTrykketPaa;
-  }
-
-  hovedVindu.scrollTop = 0; // Scroll to top når bytter side.
-
-  // Aktivering:
-  switch(divTrykketPaa){
-    case "divMenyKart":
-      divMenyKartBilde.src = "./images/layer-white.png";
-      headerKnappKartMeny.style.color = "white";
-      headerKnappKartMeny.style.borderBottom = "3px solid white";
-      // visSide(sideKartMeny);
-      // visSide(sideFeatureInfo);
-      if(featureInfoAktiv){
-        visSide(sideFeatureInfo);
-      } else {
-        visSide(sideKartMeny);
-        // Vis alle/aktive-lag knapper.
-        // Ikke med sideFeatureInfo, men lurer på om jeg skal gjøre det annerledes?
-        visHovedMenyTabsKnapper();
-        // Unikt for hovedmenyen. Vise riktig mellom "alle" og "aktive".
-        visRiktigLagSideForMenyUtenEndreBoolean();
-      }
-
-      break;
-    case "divMenyDel":
-      divMenyDelBilde.src = "./images/share-white.png";
-      headerKnappDel.style.color = "white";
-      headerKnappDel.style.borderBottom = "3px solid white";
-      visSide(sideDelKartvisning);
-      // Test
-      document.getElementById("colorPickerButton").jscolor.show();
-      // Kjør genererURL når divMenyDel velges, siden kartlag kanskje har blitt forandret.
-      genererURL();
-      break;
-    case "divMenyOm":
-      divMenyOmBilde.src = "./images/information-white.png";
-      headerKnappOm.style.color = "white";
-      headerKnappOm.style.borderBottom = "3px solid white";
-      visSide(sideOmMarkakartet);
-      break;
-    case "divMenyStott":
-      divMenyStottBilde.src = "./images/favicon-only-inner-large-white.png";
-      headerKnappStott.style.color = "white";
-      headerKnappStott.style.borderBottom = "3px solid white";
-      visSide(sideStott);
-      break;
-    default:
-      break;
-  }
-}
 
 // Kartlag-funksjoner
 
@@ -1450,14 +1000,17 @@ function hentSynligeKartlagForAktiveLagSiden(){
         // Hm... Ikke inkludere GPS-laget her? Siden det ikke er meningen å kunne skru av.
         var lagNavn = layer.get("name");
 
-        if(lagNavn != "vektorLagGPS"){
+        // Sjekker om "ikon" eller "Ikon" er i lagNavnet.
+        // Hm. Kunne også bruke includes for å sjekke om layer er i en layerSkipListe eller lignende.
+        if(lagNavn != "vektorLagGPS" && (!lagNavn.includes("Ikon") && !lagNavn.includes("ikon")) && (!lagNavn.includes("Midlertidig") && !lagNavn.includes("midlertidig"))){
+        // if(lagNavn != "vektorLagGPS"){
           // console.log(layer.get("name"));
 
           if(layer.get("visible") == true){
             // Kartlag som er synlige/aktivert under "Alle lag"!
             console.log(lagNavn);
 
-            // Hm... Hente kartlaget her?
+            // Hm... Hente kartlaget her
             var kartlag = hentKartlagMedLagNavn(lagNavn);
             
             var lagFargeNavn = "aktivtLagFarge" + lagNavn;
@@ -1564,6 +1117,7 @@ function hentSynligeKartlagForAktiveLagSiden(){
   }
 }
 
+// Setter kartlagets gjennomsiktighet (opacity) basert på dets opacity-verdi. Denne hentes med: kartlag.getOpacity()
 function settStartVerdierForAktivtLag(lagNavn, kartlag) {
   console.log("settStartVerdierForAktivtLag triggered! lagNavn: " + lagNavn);
   var aktivtLagFarge = document.getElementById("aktivtLagFarge" + lagNavn);
@@ -1619,21 +1173,6 @@ function settStartVerdierForAktivtLag(lagNavn, kartlag) {
     } catch(e){
 
     }
-    // const style = kartlag.getStyle(); //
-    // if (style != null) {
-    //   var type = kartlag.get("type");
-    //   console.log("vektorlag ~ type: " + type);
-    //   if(type == null){
-    //     setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, null);
-    //   } else {
-    //     if(type == "vektor_skygge"){
-    //       // Ikke la brukeren endre farge på vektorlaget.
-    //     } else {
-    //       // For f.eks. markagrensa.
-    //       setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type);
-    //     }
-    //   }
-    // }
 
   }
 }
@@ -1652,16 +1191,6 @@ function setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type){
   // console.log("inputKlassen: " + inputKlassen);
   var fargeArray = null;
 
-  // if(type == null){
-  //   fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
-  // } else {
-  //   if(type == "vektor_grense"){
-  //     fargeArray = hentOgKonverterFargeArrayRGB(strokeFargen);
-  //   } else {
-  //     fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
-  //   }
-  // }
-
   // Håndterer også hvis type == null?
   if(type == "vektor_grense"){
     fargeArray = hentOgKonverterFargeArrayRGB(strokeFargen);
@@ -1669,20 +1198,10 @@ function setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type){
     fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
   }
 
-  // var fargeArray = hentOgKonverterFargeArrayRGB(fillFargen);
-  // var strokeFargeArray = hentOgKonverterFargeArrayRGB(strokeFargen);
-  // console.log("fargeArray: " + fargeArray);
-
   var klasseElement = document.getElementsByClassName("aktivtLagRedigerFargeInput" + lagNavn)[0];
   console.log(klasseElement);
   klasseElement.setAttribute('value', fargeArray);
   klasseElement.style.backgroundColor = fargeArray;
-  // Lagre en backup for default farge-arrayet under kartlaget
-  // kartlag.set("opprinneligFillFargeArray", fillFargen); // Hm, disse brukes egentlig ikke nå?
-  // kartlag.set("opprinneligFillFargeRGB", fargeArray);
-  // console.log("opprinneligFillFargeArray: " + kartlag.get("opprinneligFillFargeArray"));
-  // console.log("opprinneligFillFargeRGB: " + kartlag.get("opprinneligFillFargeRGB"));
-  // console.log(fillFargen[0]);
 
   Coloris.setInstance(inputKlassen, {
     theme: 'polaroid',
@@ -1713,12 +1232,6 @@ function setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type){
       var strokeColorSelect = getDarkerColorIntegerListRGBA(strokeColor, SHADE_SELECT);
       var strengFillColorSelect = konverterArrayRGBAtilStreng(fillColorSelect);
       var strengStrokeColorSelect = konverterArrayRGBAtilStreng(strokeColorSelect);
-      // console.log("strengFillColorSelect: " + strengFillColorSelect);
-      // console.log("strengStrokeColorSelect: " + strengStrokeColorSelect);
-      // console.log("fillColorSelect: " + fillColorSelect);
-      // console.log("strokeColorSelect: " + strokeColorSelect);
-      // console.log("stilSelect fill color: " + kartlag.get("stilSelect").getFill().getColor());
-      // console.log("stilSelect stroke color: " + kartlag.get("stilSelect").getStroke().getColor());
       
       // Spesiell instruks for markagrensa (og andre grenser)
       if(type == "vektor_grense"){
@@ -1729,7 +1242,6 @@ function setupEndreFarge(lagNavn, kartlag, aktivtLagFarge, style, type){
         aktivtLagFarge.style.borderColor = strengStrokeColorSelect;
         // Bytte farge på indikatoren i hovedmenyen
         hovedMenyKlasseIndikator[kartlagIndeks].style.borderColor = strengStrokeColorSelect;
-        // hovedMenyKlasseIndikator[finnIndeksForKartlag(lagNavn)].style.backgroundColor = fillFarge;
       } else {
         style.getFill().setColor(rgbArray);
         style.getStroke().setColor(strokeColor);
@@ -1805,13 +1317,6 @@ function hentTegnforklaring(lagNavn, kartlag){
     var url = kartlag.getSource().getUrl(); // Hoved url
     var attributions = kartlag.getSource().getAttributions();
     var legendUrl = kartlag.getSource().getLegendUrl(); // Legend url. Ikke alle har en som fungerer, f.eks. nibio.
-
-    // console.log("visInfoForAktivtKartlagMedLagNavn ~ url: " + url); 
-    // console.log("visInfoForAktivtKartlagMedLagNavn ~ attributions: " + attributions);
-    // console.log("visInfoForAktivtKartlagMedLagNavn ~ legendUrl: " + legendUrl); 
-
-    // var params = kartlag.getSource().getParams();
-    // console.log(params);
 
     var tegnforklaringsContainer = document.getElementById("aktivtLagTegnforklaring" + lagNavn);
     var tegnforklaringsBilde = document.getElementById("aktivtLagTegnforklaringBilde" + lagNavn);
@@ -2029,10 +1534,17 @@ function settOpacityTilNullForKartlagMedLagNavn(lagNavn){
   try {
     var kartlag = hentKartlagMedLagNavn(lagNavn);
     var opacity = kartlag.getOpacity();
+    var ikonLag = kartlag.get("ikonLag");
     if(opacity <= 0){
       kartlag.setOpacity(0.8);
+      if(ikonLag){
+        ikonLag.setOpacity(0.9);
+      }
     } else {
       kartlag.setOpacity(0);
+      if(ikonLag) {
+        ikonLag.setOpacity(0);
+      }
     }
     hentSynligeKartlagForAktiveLagSiden(); // Oppdater aktive kartlag listen.
     updateSlider(lagNavn); // Oppdater slider.
@@ -2067,44 +1579,22 @@ function updateSlider(lagNavn){
     // For debug:
     // var opacity = kartlag.getOpacity();
     // console.log("kartlag.getOpacity: " + opacity);
+
+    // For ruter med ikoner, skjul ikoner hvis opacity er 0?
+    var ikonLag = kartlag.get("ikonLag");
+    if(ikonLag){
+      if(o <= 0){
+        ikonLag.setOpacity(0);
+      } else {
+        ikonLag.setOpacity(0.9);
+      }
+    }
+
   }
 
   // Opacity for farge-ikonet:
   document.getElementById("aktivtLagFarge" + lagNavn).style.opacity = o;
 
-}
-
-function hentKartlagMedLagNavn(inLagNavn) {
-  var funnet = false;
-  var funnetLag = null;
-
-  map.getLayers().getArray().forEach(group => {
-
-    if(!funnet){
-      if(group.get("name") != "Bakgrunnskart") {
-
-        group.getLayers().forEach(layer => {
-          if(!funnet){
-            if(inLagNavn == layer.get("name")){
-              console.log("hentKartlagMedLagNavn ~ fant kartlaget! inLagNavn: " + inLagNavn + ", layer: " + layer);
-              funnetLag = layer;
-              funnet = true; // For å gjøre færre operasjoner? Viktigst for group, siden da vil den ikke sjekke hvert lag i gruppene.
-              return layer; // Denne funker ikke...
-            }
-          }
-        });
-
-      }
-    }
-
-  });
-
-  if(funnetLag != null){
-    return funnetLag;
-  } else {
-    return null;
-  }
-  // return null;
 }
 
 // Hm... Begynne med bakgrunnskartene?
@@ -2121,7 +1611,7 @@ function leggTilKartlag(gruppe, kartlag){
       // 
       group.setLayers(layers); // Funka nå! På Stack exchange eller noe.
 
-      console.log("La til kartlaget " + kartlag.get("name") + " til gruppen " + group.get("name") + ".");
+      // console.log("La til kartlaget " + kartlag.get("name") + " til gruppen " + group.get("name") + ".");
     }
 
   });
@@ -2132,13 +1622,26 @@ function taBortKartlag(gruppe, kartlag){
 
   // TA BORT
 
-  // // Funker... Fant på Stackoverflow.
-  // map.getLayers().getArray()
-  // .filter(layer => layer.get('name') === 'Geometri')
-  // .forEach(
-  //   layer => {
-  //   // map.removeLayer(layer)
-  //   );
+  map.getLayers().forEach(group => {
+
+    if(group.get("name") == gruppe){
+      var layers = group.getLayers();
+      layers.pop(kartlag);
+      // 
+      group.setLayers(layers);
+
+      // console.log("Tok bort kartlaget " + kartlag.get("name") + " fra gruppen " + group.get("name") + ".");
+    }
+
+  });
+
+//   // // Funker... Fant på Stackoverflow.
+//   map.getLayers().getArray()
+//   .filter(layer => layer.get('name') === 'Geometri')
+//   .forEach(
+//     layer => {
+//     // map.removeLayer(layer)
+// });
 
 }
 
@@ -2185,14 +1688,6 @@ function skjulKartlagMedLagNavn(lagNavn){
   } else {
     console.log("skjulKartlagMedLagNavn ~ fant ikke kartlag med lagNavn: " + lagNavn);
   }
-  // if (layer.get("visible") == true){
-  //   layer.setVisible(false);
-  //   if(lagIndeks > -1){
-  //     // hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0";
-  //     hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0.1";
-  //   }
-  //   console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
-  // }
 }
 
 function skjulKartlag(layer, lagIndeks){
@@ -2202,7 +1697,16 @@ function skjulKartlag(layer, lagIndeks){
       // hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0";
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0.1";
     }
-    console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
+    const lagNavn = layer.get("name");
+    const ikonLag = layer.get("ikonLag");
+    // console.log(lagNavn);
+    // console.log(ikonLag);
+    // For turer med ikoner
+    if(ikonLag){
+      ikonLag.setVisible(false);
+      // console.log(lagNavn + " har et ikonLag! Gjør det usynlig. ikonLagNavn: " + ikonLag.get("name"));
+    }
+    console.log(lagNavn + " er nå skjult! visible: " + layer.get("visible"));
   }
 }
 
@@ -2212,24 +1716,49 @@ function visKartlag(layer, lagIndeks){
     if(lagIndeks > -1){
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "1";
     }
-    console.log(layer.get("name") + " er nå synlig! visible: " + layer.get("visible"));
+    const lagNavn = layer.get("name");
+    const ikonLag = layer.get("ikonLag");
+    // console.log(lagNavn);
+    // console.log(ikonLag);
+    // For turer med ikoner
+    if(ikonLag){
+      ikonLag.setVisible(true);
+      // console.log(lagNavn + " har et ikonLag! Gjør det synlig! ikonLagNavn: " + ikonLag.get("name"));
+    }
+    // console.log(lagNavn + " er nå synlig! visible: " + layer.get("visible"));
   }
 }
 
 function settSynlighetKartlag(layer, lagIndeks){
+  // OBS! Spesiell regel for kalenderrutene!
+  const lagNavn = layer.get("name");
+  if(lagNavn.includes("kalender") || lagNavn.includes("Kalender")){
+    tilbakestillMidlertidigeKartlag();
+    // I tilfelle bruker klikket inn på rute via popup
+    skjulPopupContainer();
+  }
+
+  const ikonLag = layer.get("ikonLag");
+  // console.log(ikonLag);
   if (layer.get("visible") == true) {
     layer.setVisible(false);
     if(lagIndeks > -1){
       // hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0";
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0.1";
     }
-    console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
+    if(ikonLag){
+      ikonLag.setVisible(false);
+    }
+    // console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
   } else {
     layer.setVisible(true);
     if(lagIndeks > -1){
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "1";
     }
-    console.log(layer.get("name") + " er nå synlig! visible: " + layer.get("visible"));
+    if(ikonLag){
+      ikonLag.setVisible(true);
+    }
+    // console.log(layer.get("name") + " er nå synlig! visible: " + layer.get("visible"));
   }
 }
 
@@ -2348,6 +1877,9 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
   // Blokkering ved åpning av hovedVindu på mobil:
   if(blokkerHovedVinduTrykk) return;
 
+  // clicky logging av forsøk på visning av kartlag // Ikke i bruk
+  // try{ clicky.log("#kartlag-forandre-synlighet", kartlagNavn); }catch(e){ console.log(e); }
+
   console.log("kartlagGruppe: " + kartlagGruppe + ", kartlagNavn: " + kartlagNavn + ", kartLagIndeks: " + kartLagIndeks);
 
   map.getLayers().getArray().forEach(group => {
@@ -2418,425 +1950,9 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
 
 }
 
-function resetBorderBottom(){
-  headerKnappKartMeny.style.color = "black";
-  headerKnappKartMeny.style.borderBottomColor = fargeTones5;
-  headerKnappDel.style.color = "black";
-  headerKnappDel.style.borderBottomColor = fargeTones5;
-  headerKnappOm.style.color = "black";
-  headerKnappOm.style.borderBottomColor = fargeTones5;
-  headerKnappStott.style.color = "black";
-  headerKnappStott.style.borderBottomColor = fargeTones5;
-}
-
-// 
-function visSideOgSkjulResten(side){
-  side.style.display = "block";
-
-  if(side != sideKartMeny){
-    // sideKartMeny.style.display = "none";
-    skjulBeggeLagSiderUtenEndreBoolean();
-  } else {
-    // Unikt for hovedmenyen. Viser riktig side mellom "alle" og "aktive".
-    visRiktigLagSideForMenyUtenEndreBoolean();
-  }
-  if(side != sideDelKartvisning){
-    sideDelKartvisning.style.display = "none";
-  }
-  if(side != sideOmMarkakartet){
-    sideOmMarkakartet.style.display = "none";
-  }
-  if(side != sideStott){
-    sideStott.style.display = "none";
-  }
-}
-
-function visSide(side){
-  side.style.display = "block";
-}
-
-function skjulSide(side){
-  side.style.display = "none";
-}
-
-// Ikke i bruk (enda)?
-function skjulSider(){
-  skjulBeggeLagSiderUtenEndreBoolean();
-  // sideKartMeny.style.display = "none";
-  sideDelKartvisning.style.display = "none";
-  sideOmMarkakartet.style.display = "none";
-  sideStott.style.display = "none";
-}
-
-function genererURL(){
-  var tittel = delFormTittel.value;
-  var beskrivelse = delFormBeskrivelse.value;
-  var EPSG = delFormEPSG.value;
-  var x = delFormX.value;
-  var y = delFormY.value;
-  var zoom = delFormZoom.value;
-  var sirkel = delFormSirkelDiameter.value;
-
-  var url = window.location.href;
-  var baseURL = window.location.href.split("?")[0];
-
-  // console.log("url: " + url + ", baseURL: " + baseURL); // Base: http://127.0.0.1:5500/index.html
-
-  var generertURL = baseURL + "?"; // Funker at alle variablene starter med &.
-
-  if(tittel != ""){
-    generertURL += "&tittel=" + tittel;
-  }
-  if(beskrivelse != ""){
-    generertURL += "&beskrivelse=" + beskrivelse;
-  }
-  if(zoom != ""){
-    generertURL += "&zoom=" + zoom;
-  }
-  if(EPSG != ""){
-    generertURL += "&EPSG=" + EPSG;
-  }
-  if(x != ""){
-    generertURL += "&x=" + x;
-  }
-  if(y != ""){
-    generertURL += "&y=" + y;
-  }
-  if(sirkel != ""){
-    generertURL += "&sirkel=" + sirkel;
-  }
-
-  // 
-  var kodeStreng = String(hentAktiveKartlagOgReturnerKodestreng());
-  // console.log("kodeStreng: " + kodeStreng + ", typeof: " + typeof(kodeStreng));
-  if(kodeStreng != "" && kodeStreng != "undefined"){
-    // console.log("genererURL ~ kodeStreng er ikke tom og heller ikke undefined.");
-    generertURL += "&lag=" + kodeStreng;
-  }
-
-  console.log("generertURL: " + generertURL);
-  delGenerertURL.textContent = generertURL;
-  // Reset:
-  delCallbackKopiering.textContent = "";
-}
-
-// Oof, blir feil med &! 
-function copyTextToClipboard(text) {
-  if (!navigator.clipboard) {
-    // fallbackCopyTextToClipboard(text);
-    return;
-  }
-  navigator.clipboard.writeText(text).then(function() {
-    // alert("Du kopierte dette til utklippstavlen: " + text);
-    delCallbackKopiering.textContent = "Lenken ble kopiert!";
-    console.log('Async: Copying to clipboard was successful!');
-  }, function(err) {
-    delCallbackKopiering.textContent = "Lenken må kopieres manuelt.";
-    console.error('Async: Could not copy text: ', err);
-  });
-}
-
-// Hm... Så det den skal gjøre... Finne ut hvilke kartlag som er aktive,
-// altså har get("visible") == true.
-// Også... Hm... Returnere noe? Lage en streng?
-function hentAktiveKartlagOgReturnerKodestreng() {
-  if(map == null) return; // Funker!
-
-  // var kodeStreng = "".toString(); // Dette funker. Lol... :/
-  // var kodeStreng = String("");
-  var kodeStreng = "";
-
-  map.getLayers().getArray().forEach(group => {
-
-    var gruppeNavn = group.get("name");
-    // console.log(gruppeNavn);
-
-    if (gruppeNavn != "Bakgrunnskart") {
-
-      group.getLayers().forEach(layer => {
-
-        var lagNavn = layer.get("name");
-        // console.log(lagNavn);
-
-        if (layer.get("visible") == true) {
-          // console.log("hentAktiveKartlagOgReturnerKodestreng ~ Fant synlig kartlag!: " + lagNavn);
-
-          // Hent lagIndeks:
-          var lagIndeks = -1;
-          var lagKode = "";
-
-          try {
-            lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-            // lagKode = layer.get("kode");
-            lagNavn = layer.get("name");
-            // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
-          } catch (error) {
-            console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
-          }
-
-          if(lagIndeks > -1 && lagNavn != ""){
-            if(kodeStreng != ""){
-              kodeStreng += ",";
-            }
-            kodeStreng += lagNavn;
-          }
-        }
-
-      });
-
-    }
-
-  });
-
-  // console.log("hentAktiveKartlagOgReturnerKodestreng ~ kodeStreng: " + kodeStreng);
-  return kodeStreng;
-  return String(kodeStreng);
-}
-
-const displayFeatureInfo = function (pixel) {
-
-  // if(featureSelectionList.includes(featureHovered)) {
-  //   console.log("featureHovered is in featureSelectionList!");
-  // } else if (featureHovered != null) {
-
-  // }
-
-  // Ved klikk utenfor. // Hm... Bruke for alle?
-  if(featureSelectionList.length > 0){
-    featureSelectionList.forEach(feature => {
-      // Hm... For deselect, gjøre noe for dashed? Hm...
-
-      var snarvei = feature.get("Stiplet");
-      // var erEnSnarvei = false;
-
-      if(snarvei == null){
-        feature.setStyle(undefined); // Ikke en tur.
-      } else {
-        snarvei = parseInt(snarvei);
-        if (snarvei > 0) {
-          // Her er turen en snarvei...
-          // erEnSnarvei = true;
-          // Hm, lagre featureSelectionList som en dictionary eller noe? ...
-          // For så å kunne lagre feature style.
-          var NAVN = feature.get("NAVN");
-          var dictEntry = featureSelectionDict[NAVN];
-          if(dictEntry != null){
-            var stilDashed = dictEntry["stilDashed"];
-            if(stilDashed != null){
-              feature.setStyle(stilDashed);
-              console.log("Satt stilDashed for snarveien kalt med NAVN: " + NAVN);
-
-              // Debug:
-              // document.getElementById("debugVinduTekst").innerHTML += " | Klikk, tømmer lista ~ satt stilDash for snarvei: " + NAVN;
-            }
-          }
-
-        } else {
-          feature.setStyle(undefined); // En tur, men ikke en snarvei.
-        }
-      }
-
-      // feature.setStyle(undefined);
-    });
-    featureSelectionList = [];
-  }
-
-  popupContainer.style.display = "none";
-  popupContent.innerHTML = "";
-
-  // Bare første? ... Eller bare siste? ... // "all" bruker egentlig default.
-  var selectMetode = "all"; // first, last, all
-  // NOTE: Glem "last". Kommer til å bli kluss...
-  var firstFeatureSelected = false; // Bare brukt for "first" mode.
-  var fullTekst = ""; // Brukt for "all" feature selection.
-
-  map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-
-    var lagnavn = layer.get("name"); // navn på kartlaget
-    var uiLagnavn = layer.get("uiName");
-    var clickable = layer.get("clickable");
-    // console.log("displayFeatureInfo ~ lagnavn: " + lagnavn + ", uiLagnavn: " + uiLagnavn + ", clickable: " + clickable);
-
-    if (clickable && feature) {
-      var navn = feature.get('navn');
-      var name = feature.get('name');
-      // Hm/Sukk, kalenderrutene bruker "NAVN", så sjekk for det også?
-      var NAVN = feature.get('NAVN');
-      var endeligeNavn = "Navn på området mangler";
-      // console.log("clickable og feature! navn: " + navn + ", name: " + name + ", NAVN: " + NAVN);
-
-      var featureSelection = feature; // Bruke featureSelectionList for alle?
-
-      // NOTE: Ta bort de andre modes... Bare ha "all".
-
-      var fargeFill = layer.get("fillColorSelect");
-      var fargeStroke = layer.get("strokeColorSelect");
-      var cssStil = "style='background-color: " + fargeFill + "; border-color: " + fargeStroke + ";'";
-
-      // fullTekst += "<div class='divHolder'><div class='divFarge' " + cssStil + "></div><span class='divNavn'>";
-
-      // Hm, ikke optimal måte å sjekke feature-navn på... Finne en bedre måte senere?
-
-      if (navn) {
-        if (navn != "" && navn != "na") {
-          endeligeNavn = navn;
-        }
-      } else if (name) {
-        if (name != "" && name != "na") {
-          endeligeNavn = name;
-        }
-      } else if(NAVN){
-        if(NAVN != "" && NAVN != "na"){
-          endeligeNavn = NAVN;
-        }
-      }
-
-      // Hm... Bare navn? Men det er ikke nok, siden noen turer har samme navn..
-      
-      // VIKTIG NOTAT (VERSJON 1): IKKE VIS FEATURE INFO på versjon 1.
-      fullTekst += '<div class="divHolder">';
-      // fullTekst += '<div class="divHolder" onclick="viseFeatureInfo(\'' + endeligeNavn + '\')">';
-      fullTekst += "<div class='divFarge' " + cssStil + "></div><span class='divNavn'>";
-
-      fullTekst += endeligeNavn;
-      fullTekst += "</span>"; // For divNavn klassen.
-      fullTekst += "</div>"; // For divHolder klassen.
-
-      // Gjøre for dashed...
-
-      // Sjekke for snarvei (stiplet):
-      var snarvei = feature.get("Stiplet");
-      var erEnSnarvei = false;
-
-      if (snarvei != null) {
-        snarvei = parseInt(snarvei);
-        if (snarvei > 0) {
-          // Her er turen en snarvei...
-          erEnSnarvei = true;
-        }
-      }
-
-      if (!erEnSnarvei) {
-        // Ikke en snarvei.
-        if (useDefaultWhiteStyle) {
-          featureSelection.setStyle(defaultWhiteSelectStyle);
-        } else {
-          var stilSelect = layer.get("stilSelect");
-          if (stilSelect != null) {
-            featureSelection.setStyle(stilSelect);
-          } else {
-            featureSelection.setStyle(defaultWhiteSelectStyle);
-          }
-        }
-      } else {
-        // Er en tur snarvei!
-
-        // Bare lage dictionary-entry for snarveier?
-        var NAVN = feature.get("NAVN");
-        var stilDashedGet = layer.get("stilDashed");
-        var stilDashedSelectGet = layer.get("stilDashedSelect");
-
-        featureSelectionDict[NAVN] = {
-          // navn: endeligeNavn,
-          feature: featureSelection,
-          stilDashed: stilDashedGet,
-          stilDashedSelect: stilDashedSelectGet
-        };
-        console.log(featureSelectionDict);
-
-        if (useDefaultWhiteStyle) {
-          featureSelection.setStyle(defaultWhiteDashedSelectStyle);
-        } else {
-          if (stilDashedSelectGet != null) {
-            featureSelection.setStyle(stilDashedSelectGet);
-
-            // Debug
-            // document.getElementById("debugVinduTekst").innerHTML += " | Klikk ~ Satt stilDashedSelect på snarvei: " + NAVN;
-          } else {
-            featureSelection.setStyle(defaultWhiteDashedSelectStyle);
-          }
-        }
-
-        // Debug
-        // document.getElementById("debugVinduTekst").innerHTML += " | satt dashed for snarvei: " + NAVN;
-      }
-
-      featureSelectionList.push(featureSelection); // !
-      popupContainer.style.display = "block";
-    }
-
-    popupContent.innerHTML = fullTekst;
-
-  });
-
-};
-
-// Denne funka... Funka ikke å gjøre feature.get('') på den over, fikk error om at den ikke har .get...
-// NOTE: Hm, trenger å finne en måte å identifisere om feature er en tur eller et område...
-function viseFeatureInfo(featureNavn){
-  console.log("viseFeatureInfo triggered! featureNavn: " + featureNavn);
-  // Hm... Gjøre aktiv uansett ved klikk på feature? Selv om feature-objektet er null? ...
-  visSide(sideFeatureInfo);
-  kartMenySideKlikk("divMenyKart");
-  skjulSide(sideKartMeny);
-  featureInfoAktiv = true;
-
-  // Kan så finne feature-objektet i listen featureSelectionList.
-  var feature = hentFeatureMedNavn(featureNavn);
-  console.log(feature); // DEBUG
-  // Hm. Det vil også være forskjellig feature info for turer og områder...
-  var aar = feature.get("AAR");
-  var maanednavn = feature.get("MAANEDNAVN");
-  var kort = feature.get("KORT");
-  var maanedstur = feature.get("MAANEDSTUR");
-  // var snarveier = feature.get("Stiplet"); // Stiplets / "snarveier"
-
-  // Hm... Så hvis ikke finner feature, nullstille alt kanskje? ...
-  // IDs:
-  // sideFeatureInfo (definert)
-  // featureInfoTittel        --- Tittel
-  // featureKalenderTekst     --- 
-  // featureSted              --- 
-  // featureArstid            --- 
-  // featureVanskelighetsgrad --- 
-  // featureTurType           --- 
-  // featureBilder            --- 
-  // featureBeskrivelse       --- 
-  // featureReisevei          --- 
-  // featureTags              --- 
-  // featureLink              --- 
-
-  // Bare for turer:
-  // featureTurKalenderGruppe --- 
-  // featureTurArstidGruppe   --- 
-  // featureTurVanskelighetsgradGruppe  --- 
-  // featureTurTypeGruppe     --- 
-  if(feature != null){
-    console.log("viseFeatureInfo ~ fant feature! feature: " + feature);
-
-    if(maanedstur != null){
-      // TUR
-      document.getElementById("featureInfoTittel").innerHTML = featureNavn;
-      document.getElementById("featureKalenderTekst").innerHTML = kort;
-
-      document.getElementById("featureTurKalenderGruppe").style.display = "block";
-      document.getElementById("featureTurArstidGruppe").style.display = "block";
-      document.getElementById("featureTurVanskelighetsgradGruppe").style.display = "block";
-      document.getElementById("featureTurTypeGruppe").style.display = "block";
-    } else {
-      // OMRÅDE
-      document.getElementById("featureTurKalenderGruppe").style.display = "none";
-      document.getElementById("featureTurArstidGruppe").style.display = "none";
-      document.getElementById("featureTurVanskelighetsgradGruppe").style.display = "none";
-      document.getElementById("featureTurTypeGruppe").style.display = "none";
-
-      document.getElementById("featureInfoTittel").innerHTML = featureNavn;
-    }
-
-  } else {
-    console.log("viseFeatureInfo ~ Hm, fant ikke feature i featureSelectionList?!");
-  }
-}
+// const displayFeatureInfo = function (pixel) {
+//   settFeatureSelectionListeOgLagPopup(pixel);
+// };
 
 function hentFeatureMedNavn(featureNavn){
   var featureNavnFunnet = false;
@@ -3059,184 +2175,6 @@ function toggleGruppeVisning(inputGruppeNavn){
   }
 }
 
-function settIndikatorFargeManuelt(inputLagNavn, strokeFarge, fillFarge){
-  // Hm. Først, trenger å finne indeks for kartlaget for så å finne riktig indikator.
-  // Check if color is valid?
-  if(CSS.supports("color", strokeFarge) && CSS.supports("color", fillFarge)){
-    var lagIndeks = finnIndeksForKartlag(inputLagNavn);
-    if(lagIndeks >= 0){
-      hovedMenyKlasseIndikator[finnIndeksForKartlag(inputLagNavn)].style.borderColor = strokeFarge;
-      hovedMenyKlasseIndikator[finnIndeksForKartlag(inputLagNavn)].style.backgroundColor = fillFarge;
-    }
-  }
-}
-
-function toggleTracking(state){
-  geolocation.setTracking(state);
-  console.log("tracking er nå: " + state);
-
-  var debugGPS = document.getElementById("debugGPS");
-  if(debugGPS != null){
-    debugGPS.innerHTML = "Tracking: " + state;
-  }
-
-  if(!state){
-    // Ta bort features i vectorSourceGPS:
-    // vectorSourceGPS.clear();
-    // vectorSourceGPS.getFeatures()
-    vectorSourceGPS.forEachFeature(feature => {
-      vectorSourceGPS.removeFeature(feature);
-    });
-  } else {
-    // Geolocation (GPS) skrus på. Resette denne booleanen:
-    sentrertViewPaaGPS = false;
-
-    // Lage på nytt?
-    lagAccuracyFeature();
-    lagpositionFeature();
-    // Trigge disse når GPS blir skrudd på igjen.
-    onChangeAccuracyFeature();
-    onChangePositionFeature();
-    // For debug:
-    var coordinates = geolocation.getPosition();
-    // Er den null her? I så fall, må trigge den et annet sted...
-    if(coordinates != null){
-      console.log(coordinates);
-      // if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
-      //   sentrertViewPaaGPS = true;
-      //   // map.getView().setCenter(coordinates); // Ser ut til å virke!
-      //   sentrerMapPaaKoordinater(coordinates);
-      // }
-    }
-  }
-}
-
-function onChangeAccuracyFeature(){
-  accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-  // Test... // Funket ikke? Men ikke error heller? Hm... Eller vet ikke.
-  // Siden den trigger ikke på desktop...
-  // flash(accuracyFeature, bakgrunnskartOSM);
-}
-
-// Omg... Prøve å gjøre animeringen på map.click først? ...
-
-function onChangePositionFeature(){
-  const coordinates = geolocation.getPosition();
-  // positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
-
-  if(coordinates){
-    if(positionFeaturePunkt != null){
-      // Sentrere view til gps posisjon her?
-      // NOTE: Satt det i geolocation.on(change) istedenfor.
-      // if(!sentrertViewPaaGPS && brukeViewSentreringMedGPS){
-      //   sentrertViewPaaGPS = true;
-      //   // map.getView().setCenter(coordinates); // Ser ut til å virke!
-      //   sentrerMapPaaKoordinater(coordinates);
-      // }
-
-      var start = positionFeaturePunkt.getCoordinates();
-      // console.log(start);
-      var end = coordinates;
-      // console.log(end);
-      // Så, sette dem i en lineString.
-      lineStringFlytt.setCoordinates([start, end]); // Yep!
-      // console.log(lineStringFlytt.getCoordinates());
-      // Linjedistanse.
-      const lineDistance = ol.sphere.getLength(lineStringFlytt); // Funker bra!
-      // console.log("lineStringFlytt ~ lineDistance: " + lineDistance);
-      // Så... Start animering? ...
-      startFlyttPosisjonFeature();
-    } else {
-      positionFeaturePunkt = new ol.geom.Point(coordinates);
-      positionFeature.setGeometry(positionFeaturePunkt);
-    }
-  } else {
-    positionFeaturePunkt = null;
-    positionFeature.setGeometry(positionFeaturePunkt);
-  }
-
-}
-
-  // Støtte for zoom? Hm.
-  function sentrerMapPaaKoordinater(coordinates){
-    map.getView().setCenter(coordinates);
-    // Animasjon?
-    // map.getView().animate({
-    //   center: coordinates,
-    //   duration: 1000,
-    // });
-  }
-
-function lagGpsStiler(){
-  positionFeatureStil = new ol.style.Style({
-    image: new ol.style.Circle({
-      radius: 6,
-      fill: new ol.style.Fill({
-        color: '#3399CC',
-      }),
-      stroke: new ol.style.Stroke({
-        color: '#fff',
-        width: 2,
-      }),
-    }),
-  })
-}
-
-function lagAccuracyFeature(){
-  accuracyFeature = new ol.Feature();
-  vectorSourceGPS.addFeature(accuracyFeature);
-}
-
-function lagpositionFeature(){
-  // positionFeature = new ol.Feature();
-  positionFeature = new ol.Feature({
-    type: 'geoMarker',
-    name: "positionFeature",
-    geometry: null
-  });
-  positionFeature.setStyle(
-    positionFeatureStil
-  );
-  vectorSourceGPS.addFeature(positionFeature);
-}
-
-function flyttFeature(event){
-
-  var msBrukt = event.frameState.time - tidFlyttStart;
-  var distanse = msBrukt * msHastighet;
-
-  // console.log("flyttFeature ~ msBrukt: " + msBrukt + ", distanse: " + distanse);
-
-  const currentCoordinate = lineStringFlytt.getCoordinateAt(
-    distanse
-  );
-
-  positionFeaturePunkt.setCoordinates(currentCoordinate);
-  const vectorContext = ol.render.getVectorContext(event);
-  vectorContext.setStyle(positionFeatureStil);
-  vectorContext.drawGeometry(positionFeaturePunkt);
-  map.render(); // // tell OpenLayers to continue the postrender animation
-
-  if(distanse >= 1){
-    avsluttFlyttPosisjonFeature();
-    return;
-  }
-}
-
-function startFlyttPosisjonFeature(){
-  tidFlyttStart = Date.now();
-  vektorLagGPS.on('postrender', flyttFeature);
-  positionFeature.setGeometry(null);
-  console.log("startFlyttPosisjonFeature starter!");
-}
-
-function avsluttFlyttPosisjonFeature(){
-  tidFlyttStart = 0;
-  positionFeature.setGeometry(positionFeaturePunkt);
-  vektorLagGPS.un('postrender', flyttFeature);
-  console.log("avsluttFlyttPosisjonFeature ferdig!");
-}
-
 function calculateThresholdMarginBottom(){
   var containerClick = getComputedStyle(hovedVinduContainer);
   var itemTopMarginClick = containerClick.marginTop; // 140px
@@ -3247,7 +2185,7 @@ function calculateThresholdMarginBottom(){
   var pixelHeightClick = parseInt(itemHeightClick);
 
   var thresholdMarginBottom = topMarginClick + pixelHeightClick;;
-  console.log("thresholdMarginBottom: " + thresholdMarginBottom);
+  // console.log("thresholdMarginBottom: " + thresholdMarginBottom);
   return thresholdMarginBottom;
 }
 
@@ -3291,7 +2229,7 @@ async function lagBakgrunnskartWMTS(capabilityURL, kartlagWMTS, lagNavn, lagKode
         visible: false
       });
 
-      console.log("WMTS lag laget for " + lagNavn + "!");
+      // console.log("WMTS lag laget for " + lagNavn + "!");
 
       leggTilKartlag("Bakgrunnskart", kartLagUt);
 
@@ -3350,7 +2288,7 @@ async function lagBakgrunnskartWMTS(capabilityURL, kartlagWMTS, lagNavn, lagKode
       // Bytte farge på teksten fra grå til sort.
       try {
         var lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-        console.log("lagBakgrunnskartWMTS ~ lagIndeks: " + lagIndeks + " for kartlag: " + lagNavn);
+        // console.log("lagBakgrunnskartWMTS ~ lagIndeks: " + lagIndeks + " for kartlag: " + lagNavn);
         hovedMenyKlasseKartlagTekst[lagIndeks].style.color = "black";
       } catch (exception) {
         console.log("lagBakgrunnskartWMTS ~ prøvde å hente lagIndeks og forandre på fargen til kartlagTeksten. error: " + exception);
@@ -3385,6 +2323,116 @@ function deaktiverByttBakgrunn(){
   byttBakgrunn.style.opacity = "0.75";
   // console.log("deaktiverByttBakgrunn triggered!");
 }
+
+/* NAVIGERE TIL SKOLESIDEN */
+
+function navigerTilSkoleprosjektet(){
+  // location.href = originWithSlash + "skole";
+
+  // // Må ha forskjellig logikk for testsiden på github
+  // if(originWithSlash.includes("github.io")){
+  //   location.href = originWithSlash + "markakartet_dev/skole";
+  // } else {
+  //   location.href = originWithSlash + "skole";
+  // }
+
+  location.href = originWithSlash + "skole";
+}
+
+// Debug-funksjon. Kan kanskje lage en egen JS-fil med debug-funksjoner?
+// Parameteren kan være tom (gav ikke error).
+function debugPrintAlleKartlagIMap(spesifikkGruppe){
+  console.log("debugPrintAlleKartlagIMap kjører! spesifikkGruppe: " + spesifikkGruppe);
+  map.getLayers().getArray().forEach(group => {
+    const gruppeNavn = group.get("name");
+    // Hardcodet ikke Bakgrunnskart-gruppen.
+    if(gruppeNavn != "Bakgrunnskart"){
+      if(spesifikkGruppe){
+        if(gruppeNavn == spesifikkGruppe){
+          console.log("debugPrintAlleKartlagIMap ~ GRUPPE: " + gruppeNavn);
+          group.getLayers().forEach(layer => {
+            console.log("debugPrintAlleKartlagIMap ~ kartlag: " + layer.get("name"));
+          });
+        }
+      } else {
+        console.log("debugPrintAlleKartlagIMap ~ GRUPPE: " + gruppeNavn);
+        group.getLayers().forEach(layer => {
+          console.log("debugPrintAlleKartlagIMap ~ kartlag: " + layer.get("name"));
+        });
+      }
+
+      // group.getLayers().forEach(layer => {
+      //   console.log("debugPrintAlleKartlagIMap ~ kartlag: " + layer.get("name"));
+      // });
+    }
+  });
+}
+
+/* Hovedmeny slide metoder */
+
+//
+function hentHovedVinduContainerTopMargin(){
+  var container = getComputedStyle(hovedVinduContainer);
+  var containerTopMargin = container.marginTop;
+  return parseInt(containerTopMargin);
+}
+//
+function hentHovedVinduPixelHeight(){
+  var hoved = getComputedStyle(hovedVindu);
+  var hovedVinduHeight = hoved.height;
+  return parseInt(hovedVinduHeight);
+}
+//
+function kalkulerMidtpunktet(){
+  return Math.round(((hovedVinduContainerTopMargin - 140) + hovedVinduPixelHeight) / 2);
+}
+//
+function kalkulerThresholds(){
+  if(thresholdWhenHighMarginBottom == null){
+    hovedVinduContainerTopMargin = hentHovedVinduContainerTopMargin();
+    hovedVinduPixelHeight = hentHovedVinduPixelHeight();
+    thresholdWhenHighMarginBottom = hovedVinduContainerTopMargin + hovedVinduPixelHeight;
+    // console.log("thresholdWhenHighMarginBottom: " + thresholdWhenHighMarginBottom);
+  
+    marginTopMax = hovedVinduContainerTopMargin + hovedVinduPixelHeight; // 570
+    marginTopHide = marginTopMax - 40; // 530
+    // console.log("kalkulerThresholds ~ thresholdWhenHighMarginBottom: " + thresholdWhenHighMarginBottom + ", marginTopMax: " + marginTopMax + ", marginTopHide: " + marginTopHide);
+  }
+}
+
+//
+function lukkHovedVindu(){
+  hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenHidden;
+  hovedVindu.style.overflowY = "hidden";
+  hovedVindu.style.opacity = "0";
+  blokkerKartKnapper();
+
+  var nyTopMarginNed = calculateThresholdMarginBottom();
+  hovedVinduContainer.style.marginTop = nyTopMarginNed + "px";
+  // console.log("hovedVindu lukket!");
+
+  hovedVinduVises = false;
+}
+
+// 
+function aapneHovedVindu(){
+  hovedVinduContainer.style.marginBottom = hovedVinduContainerMarginBottomWhenScroll;
+  hovedVindu.style.overflowY = "scroll";
+  hovedVindu.style.opacity = "1";
+  tillattKartKnapperEtterDelay();
+
+  var nyTopMarginOpp = minHovedMarginTop;
+  hovedVinduContainer.style.marginTop = nyTopMarginOpp + "px";
+  // console.log("hovedVindu åpnet!");
+
+  hovedVinduVises = true;
+}
+
+function init(){
+
+}
+
+/* NAVIGASJON AV HOVEDVINDUET (TABS) */
 
 // Alle/Aktive lag knapper.
 
@@ -3467,6 +2515,483 @@ function settRiktigStilForTabKnapperUtenEndreBoolean(){
   }
 }
 
-function init(){
+function resetBorderBottom(){
+  headerKnappKartMeny.style.color = "black";
+  headerKnappKartMeny.style.borderBottomColor = fargeTones5;
+  headerKnappDel.style.color = "black";
+  headerKnappDel.style.borderBottomColor = fargeTones5;
+  headerKnappOm.style.color = "black";
+  headerKnappOm.style.borderBottomColor = fargeTones5;
+  headerKnappStott.style.color = "black";
+  headerKnappStott.style.borderBottomColor = fargeTones5;
+}
+
+// 
+function visSideOgSkjulResten(side){
+  side.style.display = "block";
+
+  if(side != sideKartMeny){
+    // sideKartMeny.style.display = "none";
+    skjulBeggeLagSiderUtenEndreBoolean();
+  } else {
+    // Unikt for hovedmenyen. Viser riktig side mellom "alle" og "aktive".
+    visRiktigLagSideForMenyUtenEndreBoolean();
+  }
+  if(side != sideDelKartvisning){
+    sideDelKartvisning.style.display = "none";
+  }
+  if(side != sideOmMarkakartet){
+    sideOmMarkakartet.style.display = "none";
+  }
+  if(side != sideStott){
+    sideStott.style.display = "none";
+  }
+}
+
+function visSide(side){
+  side.style.display = "block";
+}
+
+function skjulSide(side){
+  side.style.display = "none";
+}
+
+// Ikke i bruk (enda)?
+function skjulSider(){
+  skjulBeggeLagSiderUtenEndreBoolean();
+  // sideKartMeny.style.display = "none";
+  sideDelKartvisning.style.display = "none";
+  sideOmMarkakartet.style.display = "none";
+  sideStott.style.display = "none";
+}
+
+function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapneHovedVindu){
+
+  // Åpne meny hvis hovedvinduet er skjult mens brukeren trykker på en navigasjonstab.
+  if(aapneHovedVindu && !hovedVinduVises){
+    aapneHovedVindu();
+  }
+
+  console.log("kartMenySideKlikk ~ divTrykketPaa: " + divTrykketPaa + ", sisteMenyAktiv: " + sisteMenyAktiv + ", inVisFeatureInfo: " + inVisFeatureInfo);
+  // resetBorderBottom(); // For enkelhetsskyld, resetter alle? ...
+
+  // Deaktivering av den siste som var aktiv.
+  switch(sisteMenyAktiv){
+    case "divMenyKart":
+      skjulSide(sideKartMeny);
+      divMenyKartBilde.src = "./images/layer.png";
+      headerKnappKartMeny.style.color = "black";
+      headerKnappKartMeny.style.borderBottomColor = fargeTones5;
+      // Skjul alle/aktive-knappene for de andre sidene:
+      skjulHovedMenyTabsKnapper();
+      skjulBeggeLagSiderUtenEndreBoolean(); // Skjuler både "alle" og "aktive".
+
+      skjulSide(sideFeatureInfo); // Skjuler alltid begge.
+      break;
+    case "divMenyDel":
+      skjulSide(sideDelKartvisning);
+      divMenyDelBilde.src = "./images/share.png";
+      headerKnappDel.style.color = "black";
+      headerKnappDel.style.borderBottomColor = fargeTones5;
+      break;
+    case "divMenyOm":
+      skjulSide(sideOmMarkakartet);
+      divMenyOmBilde.src = "./images/information.png";
+      headerKnappOm.style.color = "black";
+      headerKnappOm.style.borderBottomColor = fargeTones5;
+      break;
+    case "divMenyStott":
+      skjulSide(sideStott);
+      divMenyStottBilde.src = "./images/favicon-only-inner-large-black.png";
+      headerKnappStott.style.color = "black";
+      headerKnappStott.style.borderBottomColor = fargeTones5;
+      break;
+    default:
+      break;
+  }
+
+  // Setter ny siste-aktiv:
+  sisteMenyAktiv = divTrykketPaa;
+
+  hovedVindu.scrollTop = 0; // Scroll to top når bytter side.
+
+  // Aktivering:
+  switch(divTrykketPaa){
+    case "divMenyKart":
+      divMenyKartBilde.src = "./images/layer-white.png";
+      headerKnappKartMeny.style.color = "white";
+      headerKnappKartMeny.style.borderBottom = "3px solid white";
+
+      if(inVisFeatureInfo){
+        visSide(sideFeatureInfo);
+      } else {
+        visSide(sideKartMeny);
+        // Vis alle/aktive-lag knapper.
+        // Ikke med sideFeatureInfo, men lurer på om jeg skal gjøre det annerledes?
+        visHovedMenyTabsKnapper();
+        // Unikt for hovedmenyen. Vise riktig mellom "alle" og "aktive".
+        visRiktigLagSideForMenyUtenEndreBoolean();
+      }
+
+      break;
+    case "divMenyDel":
+      divMenyDelBilde.src = "./images/share-white.png";
+      headerKnappDel.style.color = "white";
+      headerKnappDel.style.borderBottom = "3px solid white";
+      visSide(sideDelKartvisning);
+      // Test
+      document.getElementById("colorPickerButton").jscolor.show();
+      // Kjør genererURL når divMenyDel velges, siden kartlag kanskje har blitt forandret.
+      // genererURL();
+      break;
+    case "divMenyOm":
+      divMenyOmBilde.src = "./images/information-white.png";
+      headerKnappOm.style.color = "white";
+      headerKnappOm.style.borderBottom = "3px solid white";
+      visSide(sideOmMarkakartet);
+      break;
+    case "divMenyStott":
+      divMenyStottBilde.src = "./images/favicon-only-inner-large-white.png";
+      headerKnappStott.style.color = "white";
+      headerKnappStott.style.borderBottom = "3px solid white";
+      visSide(sideStott);
+      break;
+    default:
+      break;
+  }
+
+  // clicky manuell logging // Ikke i bruk
+  // try{ clicky.log("#informasjonsside-trykk", divTrykketPaa); }catch(e){ console.log(e); }
 
 }
+
+// Spesifikt for kalender turer
+function tilbakestillMidlertidigeKartlag(){
+  if(kalenderTurerErSkjult){
+    kalenderOpacityErLagret = false;
+    kalenderTurerErSkjult = false;
+    console.log("tilbakestillMidlertidigeKartlag ~ kalenderTurerSisteOpacity: " + kalenderTurerSisteOpacity);
+    midlertidigFeatureIconsCollection.clear();
+    midlertidigFeatureCollection.clear();
+    vektorLagKalenderRuter2021.setOpacity(kalenderTurerSisteOpacity);
+    if(kalenderTurerSisteOpacity > 0){
+      vektorlagKalenderRuter2021Ikoner.setOpacity(0.9);
+    }
+  }
+}
+
+// 
+function visFeatureInfoSide(feature, featureNavn, kartlag, aapneHovedMeny){
+  console.log("visFeatureInfoSide triggered!");
+  // console.log(feature);
+
+  // clicky logging av visning av tur side // Ikke i bruk
+  // try{ clicky.log("#visning-av-rute", featureNavn); }catch(e){ console.log(e); }
+
+  // Bare for kalender turer. Skal ikke påvirke naturstien.
+  const kartlagNavn = kartlag.get("name");
+  if(kartlagNavn.includes("kalender") || kartlagNavn.includes("Kalender")){
+    // Idé: Lage ny feature mens man skjuler de andre kartlagene...
+    // Lage feature for ruten og ikonet.
+
+    // Sørge for at det bare er en rute som vises om gangen.
+    midlertidigFeatureIconsCollection.clear();
+    midlertidigFeatureCollection.clear();
+
+    const midlertidigFeatureIkon = hentIkonForRute(feature, vektorlagKalenderRuter2021Ikoner);
+    const midlertidigFeature = feature;
+    // console.log(midlertidigFeatureIkon);
+    // console.log(midlertidigFeature);
+
+    midlertidigFeatureIkonKlone = midlertidigFeatureIkon.clone();
+    midlertidigFeatureIkonKlone.setProperties(midlertidigFeatureIkon.getProperties());
+    midlertidigFeatureKlone = midlertidigFeature.clone();
+    midlertidigFeatureKlone.setProperties(midlertidigFeature.getProperties());
+
+    midlertidigFeatureIconsCollection.push(midlertidigFeatureIkonKlone);
+    midlertidigFeatureCollection.push(midlertidigFeatureKlone);
+
+    selectRute(midlertidigFeatureKlone, vektorLagMidlertidig);
+
+    if(!kalenderOpacityErLagret){
+      kalenderOpacityErLagret = true;
+      kalenderTurerSisteOpacity = vektorLagKalenderRuter2021.getOpacity();
+      console.log("visFeatureInfoSide ~ henter opacity fra vektorLagKalenderRuter2021. kalenderTurerSisteOpacity: " + kalenderTurerSisteOpacity);
+      vektorLagKalenderRuter2021.setOpacity(0);
+      vektorlagKalenderRuter2021Ikoner.setOpacity(0);
+    }
+
+    kalenderTurerErSkjult = true; // Sørger for at tilbakestillMidlertidigeKartlag() ikke trigger for tidlig.
+  }
+  
+  // Åpne hovedvinduet hvis det er skjult (hidden).
+  if(aapneHovedMeny && !hovedVinduVises){
+    aapneHovedVindu();
+  }
+  // For desktop
+  if(!hovedVinduVisesPaaDesktop) visHovedMenyPaaDesktop(true);
+
+  // Oppdatere HTML elementer med feature info.
+
+  kartMenySideKlikk("divMenyKart", true, aapneHovedMeny);
+
+  const elFeatureInfoTittel = document.getElementById("featureInfoTittel");
+  const elFeatureHovedBilde = document.getElementById("featureHovedBilde");
+  const elFeatureInfoGrad = document.getElementById("featureInfoGrad");
+  const elFeatureLengde = document.getElementById("featureLengde");
+  //
+  const elFeatureGradTekst = document.getElementById("featureGradTekst");
+  const elFeatureTurTypeTekst = document.getElementById("featureTurTypeTekst");
+  const elFeatureSkaper = document.getElementById("featureSkaper");
+  const elFeatureTransport = document.getElementById("featureTransport");
+  const elFeatureIngress = document.getElementById("featureIngress");
+  const elFeatureTurType = document.getElementById("featureTurType");
+  const elFeatureMaanedFraTil = document.getElementById("featureMaanedFraTil");
+  const elFeatureBeskrivelse = document.getElementById("featureBeskrivelse");
+  //
+  const elFeatureTagsContainer = document.getElementById("featureTagsContainer");
+  const elFeatureBilder = document.getElementById("featureBilder");
+  const elFeatureIngressContainer = document.getElementById("featureIngressContainer");
+  const elFeatureTransportContainer = document.getElementById("featureTransportContainer");
+  const elFeatureBeskrivelseContainer = document.getElementById("featureBeskrivelseContainer");
+  const elFeatureTurenVidereContainer = document.getElementById("featureTurenVidereContainer");
+  const elFeatureSkaperContainer = document.getElementById("featureSkaperContainer");
+  const elFeatureSkaperOrganisasjon = document.getElementById("featureSkaperOrganisasjon");
+  //
+  const elFeatureTurenVidere = document.getElementById("featureTurenVidere");
+  // Lyd
+  const elFeatureLydContainer = document.getElementById("featureLydContainer");
+  const elFeatureLyd = document.getElementById("featureLyd");
+  // const elFeatureLydKilde = document.getElementById("featureLydKilde");
+
+  elFeatureInfoTittel.innerHTML = featureNavn;
+  elFeatureHovedBilde.src = feature.get("bilde_url");
+  elFeatureHovedBilde.onerror = function(){
+    elFeatureHovedBilde.style.display = "none";
+  }
+  elFeatureHovedBilde.onload = function(){
+    elFeatureHovedBilde.style.display = "block";
+  }
+
+  const kartlagType = feature.get("kartlagType");
+  if(kartlagType){
+    if(kartlagType == "natursti"){
+      elFeatureTagsContainer.style.display = "none";
+    } else {
+      // Vis for kalender ruter.
+      elFeatureTagsContainer.style.display = "flex";
+    }
+  } else {
+      // Hvis kartlagType ikke er definert, vis by default.
+      elFeatureTagsContainer.style.display = "flex";
+  }
+
+  const grad = feature.get("grad");
+  const turType = feature.get("tur_type");
+
+  const ikonData = hentRiktigTurIkonPlassering(grad, turType);
+  const ikonPlassering = ikonData[0];
+  const ikonType = ikonData[1];
+  const endeligTurType = ikonType[0];
+  const endeligGrad = ikonType[1];
+  // console.log("ikonPlassering: " + ikonPlassering + ", ikonType: " + ikonType);
+
+  // For featureGradTypeTekst
+  let tagTurType = "";
+  let tagTurGrad = "";
+  let gradFarge = "";
+
+  // For featureInfoGrad
+  let turTypeStreng = "";
+  let vanskelighetsgradStreng = "";
+
+  switch(endeligTurType){
+    case "0": turTypeStreng += "Tur av ukjent type"; tagTurType = ""; break;
+    case "1": turTypeStreng += "Skituren"; tagTurType = "Skitur"; break;
+    case "2": turTypeStreng += "Gåturen"; tagTurType = "Gåtur"; break;
+    case "3": turTypeStreng += "Sykkelturen"; tagTurType = "Sykkeltur"; break;
+    case "4": turTypeStreng += "Kanoturen"; tagTurType = "Kanotur"; break;
+    case "9": turTypeStreng += "Turen"; tagTurType = ""; break;
+  }
+  switch(endeligGrad){
+    case "0": vanskelighetsgradStreng += ' har ukjent vanskelighetsgrad'; tagTurGrad = ''; break;
+    case "1": vanskelighetsgradStreng += ' har vanskelighetsgraden: "Enkel"'; tagTurGrad = 'Enkel'; gradFarge = "#58D68D"; break;
+    case "2": vanskelighetsgradStreng += ' har vanskelighetsgraden: "Middels"'; tagTurGrad = 'Middels'; gradFarge = "#F4D03F"; break;
+    case "3": vanskelighetsgradStreng += ' har vanskelighetsgraden: "Vanskelig"'; tagTurGrad = 'Vanskelig'; gradFarge = "#EC7063"; break;
+    case "4": vanskelighetsgradStreng += ' har vanskelighetsgraden: "Lars Monsen"'; tagTurGrad = 'Lars Monsen'; gradFarge = "#9370DB"; break;
+    case "9": vanskelighetsgradStreng += ' har den høyeste vanskelighetsgraden: "Fridjof Nansen"'; tagTurGrad = 'Fridjof Nansen'; gradFarge = "#87CEEB"; break;
+  }
+
+  elFeatureInfoGrad.src = ikonPlassering;
+  elFeatureInfoGrad.title = turTypeStreng + vanskelighetsgradStreng;
+
+  if(tagTurGrad != ""){
+    elFeatureGradTekst.innerHTML = tagTurGrad;
+    elFeatureGradTekst.style.backgroundColor = gradFarge;
+    elFeatureGradTekst.style.display = "block";
+  } else {
+    elFeatureGradTekst.style.display = "none";
+  }
+
+  if(tagTurType != ""){
+    elFeatureTurTypeTekst.innerHTML = tagTurType;
+    elFeatureTurTypeTekst.style.display = "block";
+  } else {
+    elFeatureTurTypeTekst.style.display = "none";
+  }
+
+  // Hm, gjøre dette til en fellesfunksjon? Å hente koordinater fra start_3857.
+  let featureStartString = feature.get("start_3857");
+  if(!featureStartString) featureStartString = feature.get("koordinater"); // Hvis ikke start_3857 er definert, sjekk "koordinater":
+  // console.log(featureStartString);
+  try{
+    var coordinates3857String = featureStartString.split(",");
+    var coordinates3857x = parseFloat(coordinates3857String[0]);
+    var coordinates3857y = parseFloat(coordinates3857String[1]);
+    featureStartKoordinater = [
+      parseFloat(coordinates3857x), parseFloat(coordinates3857y)
+    ];
+    console.log("featureStartKoordinater: " + featureStartKoordinater);
+  } catch(e){
+    console.log("Klarte ikke hente koordinater fra featureStartString");
+  }
+
+  elFeatureLengde.innerHTML = feature.get("lengdeKm") + " km";
+
+  const lagetAv = feature.get("laget_av");
+  const organisasjon = feature.get("organisasjon");
+  const ingress = feature.get("ingress");
+  const transport = feature.get("transport");
+  const hovedbilde = feature.get("hoved_bilde");
+  const bilder = feature.get("bilder");
+  const tur_type = feature.get("tur_type");
+  const tekst = feature.get("tekst"); // beskrivelsen
+  const merket = feature.get("merket");
+  const maanedfra = feature.get("maanedfra");
+  const maanedtil = feature.get("maanedtil");
+  const grad_nr = feature.get("grad_nr"); // Samme som graden, men som tall / integer.
+  const overskrift = feature.get("overskrift"); // Som regel samme som "NAVN".
+  //
+  const turenVidere = feature.get("turen_videre");
+  const lyd = feature.get("lyd");
+
+  // console.log("maanedfra: " + maanedfra + ", maanedtil: " + maanedtil);
+
+  if(maanedfra && maanedtil){
+    let maanedfraStreng = "";
+    let maanedtilStreng = "";
+    switch(String(maanedfra)){
+      case "1": maanedfraStreng = "Jan"; break;
+      case "2": maanedfraStreng = "Feb"; break;
+      case "3": maanedfraStreng = "Mar"; break;
+      case "4": maanedfraStreng = "Apr"; break;
+      case "5": maanedfraStreng = "Mai"; break;
+      case "6": maanedfraStreng = "Jun"; break;
+      case "7": maanedfraStreng = "Jul"; break;
+      case "8": maanedfraStreng = "Aug"; break;
+      case "9": maanedfraStreng = "Sep"; break;
+      case "10": maanedfraStreng = "Okt"; break;
+      case "11": maanedfraStreng = "Nov"; break;
+      case "12": maanedfraStreng = "Des"; break;
+    }
+    switch(String(maanedtil)){
+      case "1": maanedtilStreng = "Jan"; break;
+      case "2": maanedtilStreng = "Feb"; break;
+      case "3": maanedtilStreng = "Mar"; break;
+      case "4": maanedtilStreng = "Apr"; break;
+      case "5": maanedtilStreng = "Mai"; break;
+      case "6": maanedtilStreng = "Jun"; break;
+      case "7": maanedtilStreng = "Jul"; break;
+      case "8": maanedtilStreng = "Aug"; break;
+      case "9": maanedtilStreng = "Sep"; break;
+      case "10": maanedtilStreng = "Okt"; break;
+      case "11": maanedtilStreng = "Nov"; break;
+      case "12": maanedtilStreng = "Des"; break;
+    }
+    if(maanedfraStreng != "" && maanedtilStreng != ""){
+      elFeatureMaanedFraTil.innerHTML = maanedfraStreng + " - " + maanedtilStreng;
+      elFeatureMaanedFraTil.style.display = "block";
+    } else {
+      elFeatureMaanedFraTil.innerHTML = "";
+      elFeatureMaanedFraTil.style.display = "none";
+    }
+  } else {
+    elFeatureMaanedFraTil.innerHTML = "";
+    elFeatureMaanedFraTil.style.display = "none";
+  }
+
+  // elFeatureSkaper.innerHTML = lagetAv ? lagetAv : "";
+  elFeatureIngress.innerText = ingress;
+  elFeatureIngressContainer.style.display = ingress ? "block" : "none";
+
+  elFeatureTransport.innerText = transport;
+  elFeatureTransportContainer.style.display = transport ? "block" : "none";
+
+  elFeatureBeskrivelse.innerText = tekst;
+  elFeatureBeskrivelseContainer.style.display = tekst ? "block" : "none";
+
+  elFeatureSkaperContainer.style.display = (!lagetAv && !organisasjon) ? "none" : "block";
+
+  elFeatureSkaper.innerText = lagetAv;
+  elFeatureSkaper.style.display = lagetAv ? "block" : "none";
+  // elFeatureSkaperContainer.style.display = lagetAv ? "block" : "none";
+
+  elFeatureSkaperOrganisasjon.innerText = organisasjon;
+  elFeatureSkaperOrganisasjon.style.display = organisasjon ? "block" : "none";
+  elFeatureSkaperOrganisasjon.style.paddingTop = (organisasjon && lagetAv) ? "4px" : "0px";
+  elFeatureSkaperOrganisasjon.style.fontSize = (organisasjon && !lagetAv) ? "medium" : "small";
+
+  ////
+
+  elFeatureTurenVidere.innerText = turenVidere;
+  elFeatureTurenVidereContainer.style.display = turenVidere ? "block" : "none";
+
+  // Lyd
+  // TEST: Vise lydspiller hvis turenVidere
+  // elFeatureLydContainer.style.display = kartlagType == "natursti" ? "block" : "none";
+  elFeatureLydContainer.style.display = lyd ? "block" : "none";
+  if(lyd){
+    elFeatureLyd.load();
+    elFeatureLyd.src = lyd;
+    // Re-load fix?
+    try{
+      // elFeatureLyd.play(); // Gir feilmelding...
+      // elFeatureLyd.load();
+    }catch(e){
+      // console.log(e);
+    }
+    // elFeatureLyd.play();
+    // elFeatureLyd.load();
+  } else {
+    // const rand = Math.random() * 100;
+    // elFeatureLyd.src = rand > 50 ? "./data/Epic Vocal Music  A World Of Imagination  by Cézame Trailers (Feat. Alina Lesnik).mp3" : "./data/Lost [Official Music Video] - Linkin Park.mp3";
+  }
+
+  // const rand = Math.random() * 100;
+  // elFeatureLyd.src = rand > 50 ? "./data/Epic Vocal Music  A World Of Imagination  by Cézame Trailers (Feat. Alina Lesnik).mp3" : "./data/Lost [Official Music Video] - Linkin Park.mp3";
+
+}
+
+function featureTilbakeKnappFunksjon(){
+  console.log("featureTilbakeKnapp klikket!");
+  kartMenySideKlikk("divMenyKart", false, true);
+  hovedVindu.scrollTop = 0; // Scroller til toppen.
+}
+
+function featureFinnKnappFunksjon(){
+  console.log("finnKnapp klikket!");
+    // For å sette view over center av feature.
+    // Teste ut med .getExtent.getCenter() eller noe? Se fane/post om det.
+    if(featureStartKoordinater){
+    // map.getView().setCenter(e.coordinate);
+    map.getView().animate(
+      {
+        zoom: map.getView().getZoom(),
+        center: featureStartKoordinater,
+        duration: 500
+      },
+    );
+    }
+}
+
+/* HOVEDMENY NAVIGASJON SLUTT */
