@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="../favicon.svg" type="image/x-icon" />
+    <link rel="stylesheet" href="../libs/v6.6.1-dist/ol.css" type="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+    <link rel="stylesheet" href="skole.css" type="text/css">
+    <link rel="stylesheet" href="../libs/coloris.css" type="text/css">
+
+    <script src="../libs/coloris.js"></script>
+
+    <meta http-equiv="Content-Language" content="text/html;charset=utf-8" />
+
+    <title>Skoleprosjektet</title>
+</head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M9RRKJR8LQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-M9RRKJR8LQ');
+</script>
+
+<body>
+
+    <main>
+
+<!--         <div class="midlertidigTittel" style="position: fixed; top: 0; left: 0; z-index: 1; color: black; margin-top: 8px; margin-left: 8px;">
+            Skoleprosjektet v.0.1
+        </div> -->
+
+        <div class="midlertidigTittel">
+            Skoleprosjektet v.0.1
+        </div>
+
+        <div class="hovedIkonContainer">
+            <img src="../images/favicon-ny.png" alt="Ikon" class="hovedIkon" />
+            <a>
+                <img src="../images/skoleprosjektet-ikon-forslag-tilbake-shades3-tints3.png" alt="Ikon Skoleprosjektet" class="hovedIkon skoleIkon" onclick="navigerTilSkoleprosjektet();" />
+            </a>
+        </div>
+
+    </main>
+
+<div class="map" id="map"></div>
+
+<div style="position: fixed; display: flex; flex-direction: column; bottom: 0; right: 0; margin-right: 16px; margin-bottom: 32px;">
+    <button class="rightButton zoomButtons" id="buttonZoomIn">+</button>
+    <button class="rightButton zoomButtons" id="buttonZoomOut">-</button>
+</div>
+
+<div id="ol-popup" class="ol-popup">
+    <div id="popup-closer" class="ol-popup-closer"></div>
+    <div id="popup-content"></div>
+</div>
+
+<!-- SCRIPTS START -->
+
+<script src="../libs/v6.6.1-dist/ol.js"></script>
+<script src="../libs/proj4.js"></script>
+<script src="../libs/jquery-3.6.1.min.js"></script>
+
+<script src="../scripts/funksjoner.js"></script>
+<script src="../scripts/kartDataDict.js"></script>
+<script src="../scripts/kartData.js"></script>
+<script src="../scripts/kartFunksjoner.js"></script>
+<script src="../scripts/featureHoverSelect.js"></script>
+<script src="../scripts/popup.js"></script>
+<script src="../scripts/gps.js"></script>
+<!-- <script src="./scripts/kart.js"></script> -->
+<!-- <script src="../scripts/dele.js"></script> -->
+
+<script src="skole.js"></script>
+
+<!-- SCRIPTS END -->
+
+</body>
+</html>

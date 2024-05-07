@@ -82,6 +82,7 @@
  */
   --andre-farger-graa-gainsboro: rgb(220, 220, 220, 1);
   --andre-farger-graa-gainsboro: rgb(211, 211, 211, 1);
+  --andre-farger-light-aqua: rgb(128,255,255);
 }
 
 /* Font */
@@ -128,6 +129,8 @@ li:before {
   right: 0;
   z-index: 2;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .hovedIkon {
@@ -137,6 +140,40 @@ li:before {
   margin-right: 1rem;
   border-radius: 16px;
   opacity: 0.8;
+}
+
+.skoleIkon {
+  pointer-events: all;
+  cursor: pointer;
+}
+.skoleIkon:hover {
+  opacity: 1;
+}
+
+.skoleLogoContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  /* background-color: rgba(0,0,0,0.25); */
+}
+
+.skoleLogo {
+  width: 100%;
+  max-width: 192px;
+  height: auto;
+  opacity: 0.8;
+  /* cursor: pointer; */
+}
+/* .skoleLogo:hover {
+  opacity: 1;
+} */
+
+.opacity0 {
+  opacity: 0;
+}
+.opacity1 {
+  opacity: 1;
 }
 
 /* =======================================================
@@ -913,6 +950,7 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
   width: 100%;
   /* padding-top: 1rem; */
   padding-top: 0.5rem;
+  /* padding-right: 0.5rem; */
 
 /*   margin: 0 auto;
   justify-self: center; */
@@ -925,6 +963,7 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
 /*   justify-self: center;
   margin: 0 auto; */
   border: 1px solid gainsboro;
+  max-width: 100%;
 }
 
 .toKolonnerContainer {
@@ -1195,6 +1234,11 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
   cursor: pointer;
 }
 
+.featureInfoGrad {
+  max-height: 2rem;
+  height: auto;
+}
+
 .featureBilder {
   width: 100%;
 }
@@ -1202,6 +1246,145 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
 .featureBilder img {
   width: 100%;
   height: auto;
+}
+
+.featureHovedBilde {
+
+}
+
+.featureTagsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.featureTagContainer {
+  display: flex;
+  align-items: center;
+}
+
+.featureLengdeContainer {
+  display: flex;
+  align-items: center;
+  margin-left: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid black;
+  /* background-color: rgba(0,0,0,0.2); */
+}
+
+.featureLengde {
+  font-size: 1rem;
+  font-weight: bold;
+  /* background-color:antiquewhite; */
+}
+
+.featureMaanedFraTil {
+  margin-left: 0.75rem;
+  align-self: center;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid black;
+  display: none;
+}
+
+.featureGradTekst {
+  margin-left: 0.75rem;
+  align-self: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid black;
+  display: none;
+}
+
+.featureTurTypeTekst {
+  margin-left: 0.75rem;
+  align-self: center;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid black;
+  display: none;
+}
+
+.featureIngress {
+  /* margin-top: 32px; */
+  margin-top: 16px;
+  margin-bottom: 16px;
+  font-size: medium;
+  font-weight:bold;
+}
+
+.featureTransport {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  font-size: medium;
+}
+
+.featureBeskrivelse {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  font-size: medium;
+}
+
+.featureTurenVidere {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  font-size: medium;
+}
+
+#featureSkaperContainer {
+/*   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background-color: rgba(0,0,0,0.25); */
+}
+.featureSkaper {
+  font-size: medium;
+  font-family: 'Times New Roman', Times, serif;
+  /* font-style:italic; */
+  /* font-weight: bold; */
+  width: fit-content;
+  margin: 0 auto;
+  color:var(--markakart-logo-fargen-shades7);
+  /* background-color: rgba(0,0,0,0.25); */
+}
+.featureSkaperOrganisasjon {
+  font-size: small;
+  font-style:italic;
+  font-family: 'Times New Roman', Times, serif;
+  width: fit-content;
+  margin: 0 auto;
+  color: var(--markakart-logo-fargen);
+  /* padding-top: 4px; */
+}
+
+.featureLydContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  /* background-color: rgba(0,0,0,0.25); */
+}
+#featureLyd {
+  display: block;
+  margin: 0 auto;
+}
+#featureLydIkon {
+  width: 48px;
+  height: auto;
+  cursor: pointer;
+}
+
+.featureInfoDivider {
+  height: 1rem;
 }
 
 /* =======================================================
@@ -1401,12 +1584,33 @@ h1 {
 == MAP OVERLAY
 ======================================================= */
 
- .divHolder {
+#hoverInfo {
+  position: absolute;
+  display: inline-block;
+  height: auto;
+  width: auto;
+  z-index: 100;
+  background-color: rgba(0,0,0,0.75);
+  color: white;
+/*   background-color: rgba(255,255,255,1);
+  color: black; */
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px;
+  left: 50%;
+  transform: translateX(1rem);
+  visibility: hidden;
+  pointer-events: none;
+  font-size: medium;
+}
+
+.divHolder {
   display: flex;
   flex-direction: row;
   margin-top: 4px;
   margin-bottom: 4px;
   /* background-color: rgba(0,0,0,1); */
+  /* width: auto; */
 }
 .divHolder:hover {
   /* VIKTIG NOTAT (VERSJON 1): Ingen hover farge på versjon 1. */
@@ -1424,15 +1628,32 @@ h1 {
   margin-right: 8px;
 }
 
+.popupTurIkon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 8px;
+  /* background-color: rgba(255,255,255,0.25); */
+}
+
 .divNavn {
   font-size:large;
   padding-right: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .popup-content {
   z-index: 1;
   /* pointer-events: all; */
   pointer-events: none; /* For versjon 1. */
+  /* width: auto; */
+  /* max-width: 256px; */
+/*   width: 50px;
+  text-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; */
 }
 
 .ol-popup {
@@ -1446,12 +1667,28 @@ h1 {
   padding: 16px;
   border-radius: 10px;
   border: 1px solid #cccccc;
+
   bottom: 12px;
   left: -50px;
 
-  width: auto;
-  min-width: 128px;
-  max-width: 256px;
+  width: max-content;
+
+  /* min-width: 128px; */
+  /* min-width: 156px; */
+  /* max-width: 256px; */
+
+  max-width: 420px;
+
+/*   max-width: 256px;
+  overflow: hidden;
+  text-wrap: nowrap;
+  white-space: nowrap;
+  text-overflow: ellipsis; */
+
+/*   width: 100px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow:ellipsis; */
 
   pointer-events: all;
   cursor: pointer;
@@ -1768,22 +2005,27 @@ h1 {
 }
 
 .debugGPSContainer {
+  padding: 4px;
   width: 256px;
   height: 32px;
   position: fixed;
   z-index: 1;
   bottom: 16rem;
   right: 0;
+  border-radius: 4px;
   text-align: center;
   background-color: rgba(0,0,0,0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  display: none;
+  pointer-events:none;
+  -webkit-transition: 1s;
+  -moz-transition: 1s;
+  transition: 1s;
 }
 
 .debugGPS {
-  font-size: medium;
+  font-size: small;
   color: white;
 }
 
@@ -1949,6 +2191,10 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
   MOBILE 
 */
 @media only screen and (max-width : 600px){
+  .featureGradTekst, .featureTurTypeTekst, .featureMaanedFraTil, .featureLengdeContainer {
+    margin-left: 0.5rem;
+    padding: 0.33rem;
+  }
   #scale-line-id {display: none;}
   #zoomknapper {display: none;}
   .hovedIkonContainer{
@@ -2072,6 +2318,10 @@ reduseres til litt under 600px. Derfor så jeg ingen forskjell med 384px og 512p
   DESKTOP
 */
 @media only screen and (min-width : 600px){
+  .featureGradTekst, .featureTurTypeTekst, .featureMaanedFraTil, .featureLengdeContainer {
+    margin-left: 0.75rem;
+    padding: 0.5rem;
+  }
   #scale-line-id {display: block;}
   #zoomknapper {display: block;}
   .hovedIkonContainer{

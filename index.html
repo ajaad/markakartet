@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="./libs/v6.6.1-dist/ol.css" type="text/css">
     <link rel="stylesheet" href="./style.css" type="text/css">
     <link rel="stylesheet" href="./libs/coloris.css" type="text/css">
-
-    <!-- ColorPicker -->
     <!-- <script src="./libs/jscolor.min.js"></script> -->
     <script src="./libs/coloris.js"></script>
 
@@ -25,6 +23,9 @@
 
         <div class="hovedIkonContainer">
             <img src="./images/favicon-ny.png" alt="Ikon" class="hovedIkon" />
+<!--             <a>
+                <img src="./images/skoleprosjektet-ikon-forslag-neutral3.png" alt="Ikon Skoleprosjektet" class="hovedIkon skoleIkon" onclick="navigerTilSkoleprosjektet();" />
+            </a> -->
         </div>
 
         <div class="" id="aapneHovedVinduKnapp">
@@ -38,12 +39,7 @@
                     <img class="" id="divMenyKartBilde" src="./images/layer-white.png">
                     <button class="markaKnapp" id="headerKnappKartMeny">Kart</button>
                 </div>
-                <!--
-                <div class="" id="divMenyDel" onclick="kartMenySideKlikk('divMenyDel');">
-                    <img class="" id="divMenyDelBilde" src="./images/share.png">
-                    <button class="markaKnapp" id="headerKnappDel">Del</button>
-                </div>
-                -->
+
                 <div class="" id="divMenyStott" onclick="kartMenySideKlikk('divMenyStott');">
                     <img class="" id="divMenyStottBilde" src="./images/favicon-only-inner-large-black.png">
                     <button class="markaKnapp" id="headerKnappStott">Støtt</button>
@@ -98,7 +94,6 @@
 
             <div class="slide" id="hovedMenySlide">
                 <div id="touchbar"><img src="./images/arrows-up-and-down-filled-triangles.png"></div>
-                <!-- <div id="slideTextTest">slideTextTest</div> -->
             </div>
 
             <div class="hovedVindu" id="hovedVindu">
@@ -112,113 +107,74 @@
                     </div>
                 </div>
 
-                <!-- Test: Info om en feature, at Kartlag blir skjult... -->
                 <div class="featureInfo" id="featureInfo">
 
                     <div class="featureInfoKnapper">
-                        <img src="./images/arrow-back.png" class="tilbakeKnapp" id="featureTilbakeKnapp" alt="Tilbake knapp" />
-                        <!-- <button class="finnKnapp" id="finnKnapp">Finn på kartet</button> -->
-                        <img src="./images/map-colorful.png" class="finnKnapp" id="finnKnapp" alt="Finn på kartet knapp"/>
+                        <img src="./images/arrow-back.png" class="tilbakeKnapp" id="featureTilbakeKnapp" alt="Tilbake knapp" title="Tilbake" />
+                        <img src="./images/map-colorful.png" class="finnKnapp" id="finnKnapp" alt="Finn-på-kartet knapp" title="Gå til startspunktet på kartet"/>
                     </div>
                     <br />
 
                     <div class="h2sentrert">
                         <div class="h2stil" id="featureInfoTittel">Test Sognsvann</div>
                     </div>
-                    <br />
 
-                    <!-- Bare for turene? -->
-                    <div id="featureTurKalenderGruppe">
-                        <div class="undertittel">Kalender</div>
-                        <p id="featureKalenderTekst">
-                            2021, juli. Sammenhengende tur 1 av 3. Av Isak Isakvik Isaksen.
-                        </p>
-                        <br />
+                    <div class="featureInfoDivider"></div>
+
+                    <div class="featureTagsContainer" id="featureTagsContainer">
+                        <div class="featureTagContainer">
+                            <img class="featureInfoGrad" id="featureInfoGrad" src="" />
+                        </div>
+                        <div class="featureGradTekst" id="featureGradTekst">Enkel</div>
+                        <div class="featureTurTypeTekst" id="featureTurTypeTekst">Gåtur</div>
+                        <div class="featureMaanedFraTil" id="featureMaanedFraTil"></div>
+                        <div id="featureLengdeContainer" class="featureLengdeContainer">
+                            <div id="featureLengde" class="featureLengde"></div>
+                        </div>
                     </div>
 
-                    <!-- For begge -->
-                    <div class="undertittel">Sted</div>
-                    <p id="featureSted">
-                        Nordmarka, Sognsvann.
-                    </p>
-                    <br />
-
-                    <!-- Bare for turene -->
-                    <div id="featureTurArstidGruppe">
-                        <div class="undertittel">Årstid</div>
-                        <p id="featureArstid">
-                            April - September.
-                        </p>
-                        <br />
-                    </div>
-
-                    <!-- Bare for turene -->
-                    <div id="featureTurVanskelighetsgradGruppe">
-                        <div class="undertittel">Vanskelighetsgrad</div>
-                        <p id="featureVanskelighetsgrad">
-                            Enkel. Flatt terreng. 60 min. 
-                        </p>
-                        <br />
-                    </div>
-
-                    <!-- Bare for turene -->
-                    <div id="featureTurTypeGruppe">
-                        <div class="undertittel">Tur type</div>
-                        <p id="featureTurType">
-                            Gå. (Sykle, padle)
-                        </p>
-                        <br />
-                    </div>
-
-                    <!-- Hm... Hvordan gjøre det for bilder? ... -->
-                    <!-- ... Hvordan ha flere bilder? -->
-                    <!-- Karusel? Swipe left/right? -->
-                    <!-- For begge? -->
-                    <div class="undertittel">Bilder</div>
+                    <div class="featureInfoDivider"></div>
+                    
                     <div class="featureBilder" id="featureBilder">
-                        <img src="./images/test-cat.jpg"/>
-                        <img src="./images/test-sauer.jpg"/>
-                        <img src="./images/test-cabin.jpg"/>
-                        <img src="./images/test-norway.jpg"/>
-                        <img src="./images/test-ocean.jpg"/>
+                        <img class="featureHovedBilde" id="featureHovedBilde" src="./images/test-cat.jpg"/>
                     </div>
-                    <br/>
 
-                    <!-- For begge? -->
-                    <div class="undertittel">Beskrivelse</div>
-                    <p id="featureBeskrivelse">
-                        Dette er test-beskrivelse for en tur.
-                        Området eller turen starter på Søndre Sandås og slutter på samme sted.
-                        Dette er en gåtur som egner seg best om våren til høsten.
-                    </p>
-                    <br/>
-
-                    <!-- Hm... For begge? -->
-                    <div class="undertittel">Reisevei</div>
-                    <p id="featureReisevei">
-                        T-bane til endestasjonen for 5 Sognsvann. Bil til parkeringsområdet ved Sognsvann. 
-                    </p>
                     <br />
 
-                    <!-- For begge? -->
-                    <div class="undertittel">Tags</div>
-                    <p id="featureTags">
-                        2021, juli, sognsvann, sommer, vår, høst, vann, innsjø, t-bane, parkering, gå
-                    </p>
-                    <br />
-
-                    <!-- For begge -->
-                    <div class="undertittel">Mer informasjon</div>
-                    <p>
-                        <a id="featureLink" href="https://google.com" target=”_blank” title="Lenke til Naturvernforbundets side for Sognsvann">Sognsvann.</a>
-                    </p>
-                    <br />
-
-                    <div class="featureInfoKnapper">
-                        <img src="./images/arrow-back.png" class="tilbakeKnapp" id="featureTilbakeKnapp2" alt="Tilbake knapp nederst" />
-                        <img src="./images/map-colorful.png" class="finnKnapp" id="finnKnapp2" alt="Finn på kartet knapp nederst"/>
+                    <div id="featureSkaperContainer">
+                        <div class="featureSkaper" id="featureSkaper"></div>
+                        <div class="featureSkaperOrganisasjon" id="featureSkaperOrganisasjon"></div>
+                        <br />
                     </div>
-                    <br />
+
+                    <div id="featureIngressContainer">
+                        <div class="featureIngress" id="featureIngress"></div>
+                        <br />
+                    </div>
+
+                    <div id="featureTransportContainer">
+                        <div class="undertittel">Transport</div>
+                        <div class="featureTransport" id="featureTransport"></div>
+                        <br />
+                    </div>
+
+                    <div id="featureLydContainer" class="featureLydContainer">
+                        <audio id="featureLyd" controls controlsList="nodownload">
+                            <source id="featureLydKilde" src="" type="audio/mpeg">
+                        </audio>
+                    </div>
+
+                    <div id="featureBeskrivelseContainer">
+                        <div class="undertittel">Beskrivelse</div>
+                        <div class="featureBeskrivelse" id="featureBeskrivelse"></div>
+                        <br />
+                    </div>
+
+                    <div id="featureTurenVidereContainer">
+                        <div class="undertittel">Turen videre</div>
+                        <div class="featureTurenVidere" id="featureTurenVidere"></div>
+                        <br />
+                    </div>
 
                 </div>
 
@@ -241,48 +197,9 @@
                 <!-- Aktive lag -->
 
                 <ul class="kartSideAktiveLag" id="kartSideAktiveLag">
-                    <!-- Test -->
-
-                    <!--
+                    <!-- Test li. Trenger ikke slette, siden HTML blir nullstilt før laging hver gang. -->
                     <li>
-                        <div class="aktivtLagFarge"></div>
 
-                        <div class="" style="display: flex; flex-direction: column;">
-
-                            <div class="aktivtLagGruppe">
-                                <span title="Gruppe">Gruppe Navn</span>
-                            </div>
-                            <div style="display: flex; flex-direction: row;">
-                                <div class="aktivtLagNavn">
-                                    Lag 1 Navn
-                                </div>
-                                <div class="aktivtLagInfo">
-                                    <img src="./images/information.png" alt="Informasjon" title="Info" />
-                                </div>
-                                <div class="aktivtLagRediger">
-                                    <img src="./images/editing.png" alt="Rediger" title="Edit" />
-                                </div>
-        
-                                <div class="aktivtLagGjennomsiktighet">
-
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </li>
-                    <li>
-                        Lag 2
-                    </li>
-                    -->
-
-                    <li>
-                        <!--
-                        <div class="aktivtLagHeader">
-                            <div class="aktivtLagFarge" id="testFarge"></div>
-                            <div class="aktivtLagNavn">Testlag med et veeeeeeeeeeeeeeeeeeeeeeeeeeeeeldig langt navn.</div>
-                        </div>                            
-                        -->
                         <div class="aktivtLagHeader">
                             <div class="aktivtLagHeaderVenstre">
                                 <div class="aktivtLagFarge" id="testFarge"></div>
@@ -303,20 +220,8 @@
 
                         <div class="slidecontainer">
                             <input type="range" min="0" max="100" value="50" class="slider" id="testSlider" oninput="updateSliderValue();">
-                            <!--
-                            <div class="sliderVerdierContainer">
-                                <div style="display:flex; gap: 4;">
-                                    <span class="sliderVerdier">Synlighet: </span>
-                                    <div class="aktivtLagFarge" id="testFarge"></div>                                    
-                                </div>
-                                <span id="sliderVerdi"></span>
-                            </div>
-                            -->
                             <span class="sliderVerdier">Synlighet: <span id="sliderVerdi"></span></span>
                         </div>
-                        <!-- <span class="sliderVerdier">Gjennomsiktighet: <span id="sliderVerdi"></span></span> -->
-
-                        <!-- <script src="./libs/jscolor.min.js"></script> -->
 
                         <div id="aktivtLagRedigerPanelId" class="aktivtLagRedigerPanel">
 
@@ -324,14 +229,6 @@
                                 <img src="./images/edit.png" alt="Edit Collapse" />
                             </div>
 
-                            <!-- <input value="3399FF" data-jscolor="{position: 'right', width: 181, height: 121}"> -->
-
-                            <!-- <div class="clr-field">
-                                <button type="button">::after</button>
-                                <input type="text" class="aktiv1test" data-coloris>
-                            </div> -->
-
-                            <!-- <input class="aktiv1test" type="text" value="rgb(70,140,70)" data-coloris> -->
                             <div class="aktivtLagEndreFargeContainer">
                                 <div class="aktivtLagEndreFargeTekst">
                                     Endre farge:
@@ -341,8 +238,6 @@
                                 </div>
                             </div>
 
-                            <!-- TEST MED TO INPUT FIELDS -->
-                            <!-- <input style="display: block;" class="aktiv2test" type="text" value="rgb(140,70,140)" data-coloris> -->
                         </div>
 
                         <div id="aktivtLagViserInfo" style="display: none;">false</div>
@@ -379,18 +274,9 @@
                                     </div>
                                 </div>
                             </div>
-
-<!--                             <div class="aktivtLagTegnforklaring" id="aktivtLagTegnforklaringTest">
-                                <img class="" src="" alt="Tegnforklaring" />
-                            </div> -->
                             
                         </div>
-                        
-<!--                         <div class="aktivtLagTegnforklaring" id="aktivtLagTegnforklaringTest">
-                            <img class="" src="" alt="Tegnforklaring" />
-                        </div> -->
-
-                        <!--<p>Value: <span id="sliderValue"></span></p> -->
+ 
                         <script>
                             // var testSlider = document.getElementById("testSlider");
                             // var output = document.getElementById("sliderValue");
@@ -410,21 +296,11 @@
                             }
 
                             Coloris.setInstance('.aktiv1test', {
-                                // inline: true,
-                                // wrap: false,
-                                // el: '.aktiv1test',
                                 theme: 'polaroid', // default, large, polaroid, pill
                                 themeMode: 'light',
                                 alpha: false,
-                                // forceAlpha: true,
                                 format: 'rgb',
-                                // clearButton: true,
-                                // clearLabel: "Angre",
-                                // closeButton: true,
-                                // closeLabel: "Lukk",
-                                // margin: 0,
                                 swatches: [
-                                    // 'rgb(70,140,70)',
                                     'rgb(255,255,255)'
                                 ],
                                 onChange: (color) => {
@@ -447,7 +323,6 @@
                                 alpha: false,
                                 format: 'rgb',
                                 swatches: [
-                                    // 'rgb(70,140,70)',
                                     'rgb(0,0,0)'
                                 ],
                                 onChange: (color) => {
@@ -477,10 +352,6 @@
                                 }
                             }
 
-                            // document.getElementById("clr-clear").addEventListener("click", function(){
-                            //     console.log("clear clicked!");
-                            // });
-
                             function TESTintegerToPercent(intNumber){
                                 return intNumber / 100;
                             }
@@ -488,7 +359,6 @@
                             function updateSliderValue(){
                                 // console.log("updateSliderValue triggered!");
                                 var val = document.getElementById("testSlider").value;
-                                // document.getElementById("sliderValue").innerHTML = val;
                                 var f = TESTintegerToPercent(val);
                                 // console.log("v: " + val + ", f: " + f); // Seems to work fine.
 
@@ -503,6 +373,7 @@
                             }
                             
                         </script>
+                        
                     </li>
 
                 </ul>
@@ -567,7 +438,6 @@
                         <label>Farge:</label><br />
 
                         <div class="formColorPickerContainer">
-
                             <!--
                             <button class="colorPickerButton" id="colorPickerButton" data-jscolor="{
                                 value: 'rgba(13, 12, 119, 0.75)',
@@ -585,7 +455,6 @@
                             -->
 
                             <!-- onChange: 'oppdatertFarge(this, \'#figurFargeForm\')' -->
-
                         </div>
 
                         <div class="colorInputContainer">
@@ -627,12 +496,6 @@
                     </p>
 
                     <br />
-
-<!--                     <div class="undertittel">Geometri</div>
-                    <p>
-                        Dette kartlaget inneholder figurer, for eksempel sirkler, lagt til av brukere.
-                    </p>
-                    <br /> -->
 
                     <div class="undertittel">Naturopplevelser</div>
                     <p>
@@ -677,19 +540,6 @@
                                 target="_blank" rel="noopener noreferrer">Info om statlig sikra friluftsområder</a>
                         </li>
                     </ul>
-                    <br />
-
-<!--                     <div class="undertittel">Naturopplevelser</div>
-                    <p>
-                        Disse lagene inneholder verdier som primært er knyttet til friluftsliv og opplevelser.
-                    </p>
-                    <br /> -->
-
-                    <div class="undertittel">Brukerformer</div>
-                    <p>
-                        Dette kartlaget inneholder figurer, for eksempel sirkler, lagt til av brukere.
-                        <!-- Dette kartlaget inneholder figurer, for eksempel sirkler, lagt til av brukere, samt GPS-relaterte former. -->
-                    </p>
                     <br />
 
                     <div class="undertittel">Bakgrunnskart</div>
@@ -752,16 +602,17 @@
                             fane)</a>.
                     </p>
 
+                    <!-- Bruker ikke analytics  -->
+<!--                     <a title="GDPR-compliant Web Analytics" href="https://clicky.com/101450407"><img alt="Clicky" src="//static.getclicky.com/media/links/badge.gif" /></a>
+                    <script async data-id="101450407" src="//static.getclicky.com/js"></script>  -->
+
                     <br />
 
                     <div class="undertittel">
                         Finansiering
                     </div>
                     <p>
-                        Tjenesten er utviklet med økonomisk tilskudd fra Kommunal- og moderniseringsdepartementet (KMD)
-                        gjennom <a
-                            href="https://www.regjeringen.no/no/dep/kmd/kmd-tilskudd/lokal-kompetanse-innen-plan-kart-og-geodata/id2549246/">
-                            kompetansetiltak innen plan, kart og geodata</a>.
+                        Tjenesten er utviklet med økonomisk tilskudd fra NOA.
                     </p>
 
                     <br />
@@ -771,7 +622,7 @@
                     </div>
                     <p>
                         Takk til interaksjonsdesigner Trine Lise Lindahl for kartlegging av brukerbehov og flotte
-                        designdokumenter.
+                        designdokumenter av det opprinnelige designet.
                     </p>
 
                     <br />
@@ -781,8 +632,7 @@
                     </div>
                     <p>
                         Markakartet er skrevet i javascript og bruker følgende biblioteker:
-
-                        <br />
+                    <br />
 
                     <ul class="tekstListe">
                         <li><a href="https://openlayers.org/" target="_blank" rel="noopener noreferrer">openlayers
@@ -800,7 +650,31 @@
                         laget av Anders Johan Konnestad <span style="font-style:italic;">(Konnestad Consulting)</span>. Videreutviklet av Erlend Kyrkjerud Hårtveit.
                     </p>
 
-                    <br />
+                    <br /><br />
+                    <div class="h2sentrert">
+                        <h2>Skoleprosjektet</h2>
+                    </div>
+
+                    <p>
+                        Kartlaget "Naturstien" under Naturopplevelser i kartmenyen blir brukt av NOAs pågående skoleprosjekt.
+                    </p>
+
+<!--                     <p>
+                        En separat side for et skoleprosjekt blir utviklet parallelt med markakartet. 
+                    </p> -->
+
+                    <br/>
+
+                    <p>
+                        Hensiktet med prosjektet er å lære barn og ungdom om naturen i nærmiljøet ved å bruke et interaktivt kart som de bruker til å finne poster med forskjellige oppgaver på.
+                    </p>
+
+                    <div class="skoleLogoContainer">
+                        <img src="./images/skoleprosjektet-ikon-forslag-neutral3.png" class="skoleLogo">
+<!--                         <a>
+                            <img src="./images/skoleprosjektet-ikon-forslag-neutral3.png" class="skoleLogo" onclick="navigerTilSkoleprosjektet();">
+                        </a> -->
+                    </div>
 
                 </div>
 
@@ -825,7 +699,7 @@
                     <p>
                         For mer informasjon om medlemskap
                         <a href="https://naturvernforbundet.no/bli-medlem/" target="_blank"
-                            rel="noopener noreferrer">klikk her (ny fane).</a>
+                            rel="noopener noreferrer">klikk her (ny fanLogonoae).</a>
                     </p>
 
                     <br />
@@ -850,19 +724,6 @@
             </div>
         </div>
 
-        <!-- add a custom WMS-layer (wmsmenu er satt til usynlig i css.)   -->
-        <!--
-        <form method="post" class="wmsmenu">
-            <br>
-            <label for="name">WMS URL: </label>
-            <input type="text" id="newurlwms" name="newurlwms">
-            <br>
-            <label for="name">WMS layer: </label>
-            <input type="text" id="newlayername" name="newlayername">
-            <input id="addwmslayer" type="button" value="Add a WMS-layer" onclick="doFunction();" />
-        </form>
-        -->
-
     </main>
 
     <footer>
@@ -878,7 +739,7 @@
         <img id="bytteBakgrunnForenklet" alt="bytte til Forenklet" src="./images/bakgrunn-forenklet-350x350.jpg" />
     </div>
 
-    <div class="debugGPSContainer" id="debugGPSContainer">
+    <div class="debugGPSContainer opacity0" id="debugGPSContainer">
         <div class="debugGPS" id="debugGPS"></div>
     </div>
 
@@ -890,11 +751,8 @@
         <button class="rightButton zoomButtons" id="buttonZoomOut">-</button>
     </div>
     
-    <!-- 
-        Hm. On OpenLayers, it says the map element must appear before the script that
-        initializes it, so...
-     -->
     <div class="map" id="map"></div>
+
     <div class="scale-line" id="scale-line-id"></div>
 
     <div id="ol-popup" class="ol-popup">
@@ -902,10 +760,9 @@
         <div id="popup-content"></div>
     </div>
 
-    <!-- ColorPicker -->
-    <!-- <script src="./libs/jscolor.min.js"></script> -->
-    <!-- <script src="./libs/coloris.js"></script> -->
+    <div id="hoverInfo"></div>
 
+    <!-- <script src="./libs/jscolor.min.js"></script> -->
     <script src="./libs/v6.6.1-dist/ol.js"></script>
     <script src="./libs/proj4.js"></script>
     <!-- JQuery -->
@@ -916,7 +773,11 @@
     <script src="./scripts/kartDataDict.js"></script>
     <script src="./scripts/kartData.js"></script>
     <script src="./scripts/kartFunksjoner.js"></script>
+    <script src="./scripts/featureHoverSelect.js"></script>
+    <script src="./scripts/popup.js"></script>
+    <script src="./scripts/gps.js"></script>
     <script src="./scripts/kart.js"></script>
+<!--     <script src="../scripts/dele.js"></script> -->
 
 </body>
 

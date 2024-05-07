@@ -1,0 +1,45 @@
+
+.midlertidigTittel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    color: black;
+    margin-top: 8px;
+    margin-left: 8px;
+}
+
+/* =======================================================
+== RESPONSIVE WIDTH
+======================================================= */
+
+/* 
+  MOBILE 
+*/
+@media only screen and (max-width : 600px){
+    .midlertidigTittel {
+        left: unset;
+        margin-left: unset;
+        right: 0;
+        margin-right: 8px;
+    }
+}
+
+/* 
+  DESKTOP
+*/
+@media only screen and (min-width : 600px){
+    .midlertidigTittel {
+        right: unset;
+        margin-right: unset;
+        left: 0;
+        margin-left: 8px;
+    }
+}
+
+/*
+DESKTOP+
+*/
+@media only screen and (min-width : 800px){
+
+}

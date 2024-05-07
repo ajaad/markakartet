@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "punktlag-test-kladdelag",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+"features": [
+{ "type": "Feature", "properties": { "navn": "Sørkedalen" }, "geometry": { "type": "Point", "coordinates": [ 1182240.819715893361717, 8397130.781989021226764 ] } },
+{ "type": "Feature", "properties": { "navn": "Sørkedalen (snarvei)" }, "geometry": { "type": "Point", "coordinates": [ 1181539.941659269621596, 8397197.038557337597013 ] } }
+]
+}

@@ -1,0 +1,22 @@
+{
+"type": "FeatureCollection",
+"name": "naturstien",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::25832" } },
+"features": [
+{ "type": "Feature", "properties": { "postnr": 1, "koordinater": "1194801.99,8392699.15" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596752.347368865273893, 6649156.077120170928538 ], [ 596752.347368865273893, 6649156.077120170928538 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 2, "koordinater": "1195172.28,8392965.35" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596752.347368865273893, 6649156.077120170928538 ], [ 596934.175365683855489, 6649294.546133134514093 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 3, "koordinater": "1195232.39,8393094.63" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596934.175365683855489, 6649294.546133134514093 ], [ 596962.615129288984463, 6649360.283947367221117 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 4, "koordinater": "1195380.65,8393438.16" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596962.615129288984463, 6649360.283947370015085 ], [ 597032.548974219243973, 6649533.719882795587182 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 5, "koordinater": "1195425.99,8393465.15" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 597032.548974219243973, 6649533.719882795587182 ], [ 597054.927804597071372, 6649547.706651782616973 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 6, "koordinater": "1195454.36,8393492.11" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 597054.927804597071372, 6649547.706651782616973 ], [ 597068.914573583053425, 6649561.693420767784119 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 7, "koordinater": "1195529.48,8393440.07" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 597068.914573583053425, 6649561.693420767784119 ], [ 597107.145075478241779, 6649536.517236593179405 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 8, "koordinater": "1195626.75,8393390.47" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 597107.145075478241779, 6649536.517236593179405 ], [ 597156.564992562285624, 6649513.205954943783581 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 9, "koordinater": "1195272.06,8393889.77" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 597157.031218195334077, 6649513.205954946577549 ], [ 596972.405867579393089, 6649758.440637831576169 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 10, "koordinater": "1195110.74,8394387.74" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596972.405867579393089, 6649758.440637831576169 ], [ 596884.755448600044474, 6650005.540223258547485 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 11, "koordinater": "1195008.58,8394179.89" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596884.755448600044474, 6650005.540223258547485 ], [ 596836.267982781748287, 6649901.105681493878365 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 12, "koordinater": "1194939.65,8394175.64" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596836.267982781864703, 6649900.173230226151645 ], [ 596801.767285949317738, 6649897.37587643135339 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 13, "koordinater": "1194864.45,8393860.89" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596801.767285949317738, 6649897.37587643135339 ], [ 596768.199040382751264, 6649738.859161257743835 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 14, "koordinater": "1195025.74,8393432.36" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596768.199040382751264, 6649738.859161257743835 ], [ 596854.917008096119389, 6649526.260272668674588 ] ] ] } },
+{ "type": "Feature", "properties": { "postnr": 15, "koordinater": "1194826.34,8392715.05" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 596854.917008096119389, 6649526.260272668674588 ], [ 596764.469235319527797, 6649164.469181571155787 ] ] ] } }
+]
+}

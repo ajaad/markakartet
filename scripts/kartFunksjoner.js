@@ -1,4 +1,49 @@
 
+// coordinates er i formatet [long, lat].
+function sentrerKart(coordinates){
+
+}
+
+// Hent kartlag fra map-objektet med kartlagets navn.
+function hentKartlagMedLagNavn(inLagNavn) {
+//   console.log("hentKartlagMedLagNavn ~ inLagNavn: " + inLagNavn);
+  var funnet = false;
+  var funnetLag = null;
+
+  map.getLayers().getArray().forEach((group) => {
+      if (!funnet) {
+
+        if (group.get("name") != "Bakgrunnskart") {
+
+          group.getLayers().forEach((layer) => {
+            // console.log(group.get("name") + " ~ " + layer.get("name"));
+            if (!funnet) {
+              if (inLagNavn === layer.get("name")) {
+                // Debug:
+                // console.log("hentKartlagMedLagNavn ~ fant kartlaget! inLagNavn: " + inLagNavn + ", layer: " + layer);
+                funnetLag = layer;
+                // console.log("Fant lag med samme navn!");
+                // console.log(layer);
+
+                funnet = true; // For å gjøre færre operasjoner? Viktigst for group, siden da vil den ikke sjekke hvert lag i gruppene.
+                return layer; // Denne funker ikke...
+              }
+            }
+          });
+
+        }
+
+      }
+    });
+
+  if (funnetLag != null) {
+    return funnetLag;
+  } else {
+    return null;
+  }
+  // return null; // Kommentert ut denne siden det var noe problem...
+}
+
 // ! Var egentlig i kart.js, men lagt til her siden lagBakgrunnskartWMTS bruker den?
 // var hovedMenyKlasseKartlagTekst;
 
@@ -11,105 +56,6 @@ function radToDeg(rad) {
   function degToRad(deg) {
     return (deg * Math.PI * 2) / 360;
   }
-
-// // Laging av WMTS kartlag. Spesielt for bakgrunnskart.
-// function lagWMTSLag(){
-//     for (const [key, value] of Object.entries(dataDictWMTS)) {
-//         // console.log(key, value);
-//         // console.log(value["capabilityURL"]); // Funker!
-//         lagBakgrunnskartWMTS(value["capabilityURL"], value["kartlagWMTS"], value["kartlagNavn"], value["kode"]);
-//     }
-// }
-
-// // Laging av WMTS kartlag. Spesielt for bakgrunnskart.
-// async function lagBakgrunnskartWMTS(capabilityURL, kartlagWMTS, lagNavn, lagKode){
-//     // var capabilityURL = "https://opencache.statkart.no/gatekeeper/gk/gk.open_wmts?Version=1.0.0&service=wmts&request=getcapabilities";
-//     // var kartlagWMTS = "topo4";
-
-//     var parser = new ol.format.WMTSCapabilities();
-//     var capability = await fetch(capabilityURL);
-
-//     if (capability.ok) {
-//         try {
-
-//             let capabilityText = await capability.text();
-//             const result = await parser.read(capabilityText);
-    
-//             // generer config for nytt lag
-//             const options = await ol.source.WMTS.optionsFromCapabilities(result, {
-//             layer: kartlagWMTS,
-//             matrixSet: 'EPSG:3857'
-//             })
-    
-//             // Lag nytt lag
-//             var kartLagUt = new ol.layer.Tile({
-//                 opacity: 1,
-//                 source: new ol.source.WMTS(options),
-//                 name: lagNavn,
-//                 kode: lagKode,
-//                 visible: false
-//             });
-
-//             console.log("WMTS lag laget for " + lagNavn + "!");
-
-//             leggTilKartlag("Bakgrunnskart", kartLagUt);
-
-//         } catch (error) {
-//             // Dersom den ikke klarer å legge til kartlaget som WMTS,
-//             // -> Prøv som WMS 
-//             let URLUtenCapability = capabilityURL.split("?")[0];
-
-//             kartLagUt = new ol.layer.Image({
-//                 source: new ol.source.ImageWMS({
-//                     url: URLUtenCapability,
-//                     params: {'LAYERS': kartlagWMTS},
-//                     ratio: 2,
-//                     serverType: 'mapserver',
-//                     //
-//                     name: lagNavn,
-//                     visible: false
-//                 })
-//             });
-
-//             console.log("WMS lag laget for " + lagNavn + "!");
-//             leggTilKartlag("Bakgrunnskart", kartLagUt);
-//         }
-
-//         // NOTAT: Få byttet farge på teksten til bakgrunnskartet i hovedmenyen!
-//         // Altså først skal den være grå. Hvis kartlaget ble funnet,
-//         // altsåkartLagUt er true, så skal teksten settes til sort!
-
-//         if(kartLagUt){
-//             // console.log(kartLagUt);
-//             switch(lagNavn){
-//                 case "bakgrunnskartTopo4":
-//                     bakgrunnskartTopo4 = kartLagUt;
-//                     break;
-//                 case "bakgrunnskartTopoGraa":
-//                     bakgrunnskartTopoGraa = kartLagUt;
-//                     break;
-//                 case "bakgrunnskartNorgeIBilder":
-//                     bakgrunnskartNorgeIBilder = kartLagUt;
-//                     break;
-//                 case "bakgrunnskartEnkel":
-//                     bakgrunnskartEnkel = kartLagUt;
-//                     break;
-//                 default:
-//                     break;
-//             }
-
-//             // Temp for debug:
-//             settInnKartlagIMasterListe(lagNavn, kartLagUt);
-//             // console.log(hentKartlagIMasterListe(lagNavn));
-//             // var kartlag = hentKartlagIMasterListe(lagNavn);
-//             // console.log(kartlag);
-
-//         } else {
-//             console.log("kartLagUt feilet for lagNavn: " + lagNavn);
-//         }
-
-//     }
-// }
 
 // Hm... Er noe som heter scale(sx, sy, anchor). Kanskje bruke? ...
 function lagFeaturePunkt(x, y, farge){
@@ -441,7 +387,7 @@ function prepareView() {
     });
 
     // 
-    genererURL();
+    // genererURL(); // Hm, ikke generere URL ved laging av map-viewet...
 
     // var outputArray = [coordSysFull, vektorLagGeometri, newView, circleFeatureEkstra, point];
     var outputArray = [newView, startpunktCoord];
