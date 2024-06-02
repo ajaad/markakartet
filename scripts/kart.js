@@ -1752,13 +1752,25 @@ function settSynlighetKartlag(layer, lagIndeks){
     // console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
   } else {
     layer.setVisible(true);
-    if(lagIndeks > -1){
+    if (lagIndeks > -1) {
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "1";
     }
-    if(ikonLag){
+    if (ikonLag) {
       ikonLag.setVisible(true);
     }
     // console.log(layer.get("name") + " er nå synlig! visible: " + layer.get("visible"));
+
+    // Plausible Analytics test
+    try {
+      plausible("kartlag_gjort_synlig", {
+        props: {
+          synlig_kartlag: lagNavn,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
   }
 }
 
@@ -2663,6 +2675,17 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapneHovedVindu){
   // clicky manuell logging // Ikke i bruk
   // try{ clicky.log("#informasjonsside-trykk", divTrykketPaa); }catch(e){ console.log(e); }
 
+  // Plausible Analytics test
+  try{
+    plausible('hovedknapper', {
+      props: {
+        side: divTrykketPaa,
+      }
+    })
+  }catch(e){
+    console.log(e);
+  }
+
 }
 
 // Spesifikt for kalender turer
@@ -2687,6 +2710,18 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, aapneHovedMeny){
 
   // clicky logging av visning av tur side // Ikke i bruk
   // try{ clicky.log("#visning-av-rute", featureNavn); }catch(e){ console.log(e); }
+
+  // Plausible Analytics test
+  try{
+    plausible('visning_av_infoSide', {
+      props: {
+        infoSide_ruteKartLag: kartlag.get("name"), 
+        infoSide_ruteNavn: featureNavn
+      }
+    })
+  }catch(e){
+    console.log(e);
+  }
 
   // Bare for kalender turer. Skal ikke påvirke naturstien.
   const kartlagNavn = kartlag.get("name");
