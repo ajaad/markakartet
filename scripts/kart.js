@@ -1765,6 +1765,7 @@ function settSynlighetKartlag(layer, lagIndeks){
       plausible("kartlag_gjort_synlig", {
         props: {
           synlig_kartlag: lagNavn,
+          synlig_kartlag_ui: layer.get("uiName"),
         },
       });
     } catch (e) {
