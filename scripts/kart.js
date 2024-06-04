@@ -2678,9 +2678,19 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapneHovedVindu){
 
   // Plausible Analytics test
   try{
+    let menySideUi = "Ingen side";
+
+    switch(divTrykketPaa){
+      case "divMenyKart": menySideUi = "Hovedmeny Kart"; break;
+      case "divMenyDel": menySideUi = "Hovedmeny Del"; break;
+      case "divMenyOm": menySideUi = "Hovedmeny Om"; break;
+      case "divMenyStott": menySideUi = "Hovedmeny Støtt"; break;
+    }
+
     plausible('hovedknapper', {
       props: {
         side: divTrykketPaa,
+        sideUi: menySideUi,
       }
     })
   }catch(e){
