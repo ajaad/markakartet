@@ -41,6 +41,7 @@ var hovedMenySlide;
 var touchbar;
 var startX = 0, startY = 0, moveX = 0, moveY = 0, prevMoveX = 0, prevMoveY = 0; endX = 0, endY = 0;
 var hovedVinduContainerMarginBottomWhenScroll = "80px"; // Samme som: style > Mobile > hovedVinduContainer > marginBottom.
+// var hovedVinduContainerMarginBottomWhenScroll = "0px"; // Samme som: style > Mobile > hovedVinduContainer > marginBottom.
 var hovedVinduContainerMarginBottomWhenHidden; // Basically WhenScroll - 36px. Defineres senere.
 var minHovedMarginTop = 140; // Default. 
 var maxHovedMarginTop = 512; // Touchbar.
@@ -98,6 +99,8 @@ var kalenderTurerSisteOpacity = -1;
 var midlertidigFeatureIkonKlone = null;
 var midlertidigFeatureKlone = null;
 
+var currentZoom;
+
 function addGroupLinkListener(classIndex){
 
   mainMenuClassGroupLink[classIndex].addEventListener("click", function(){
@@ -121,12 +124,6 @@ function addGroupLinkListener(classIndex){
 
   });
 
-}
-
-function leggTilLagLenkeListener(gruppe, lag, indeks, lagLenkeKlasse){
-  lagLenkeKlasse[indeks].addEventListener("click", function () {
-    forandreSynlighetKartlag(gruppe, lag, indeks);
-  });
 }
 
 // Bruker htmlKartLagListe.
@@ -207,7 +204,7 @@ function lagKartMenyHTML(){
 
       // Som Anders har gjort det:
       // ... Måtte ta bort mellomrommet her: "', '" ---> "','"
-      var forandreSynlighetFunksjon = "forandreSynlighetKartlag('" + gruppeNavn + "','" + lagNavn + "'," + lagIndeks + ")";
+      var forandreSynlighetFunksjon = "forandreSynlighetKartlag('" + gruppeNavn + "','" + lagNavn + "'," + lagIndeks + "," + true + ")";
 
       htmlKartMenyGruppe += "<li><div class='lagLenke' href='#' onclick=" + forandreSynlighetFunksjon + ">";
       htmlKartMenyGruppe += "<div class='indicator'></div><div><span class='kartlagTekst'>" + uiLagNavn + "</span></div></div></li>";
@@ -443,27 +440,56 @@ $(document).ready(function(){
     overlays: [popupOverlay]
   });
 
+  console.log("map er definert!");
+
+  // Legger til midlertidige kartlag til kartet. De vises ikke under aktive kartlag.
+  // Disse må vel legges til før visInfoSide, ettersom den funksjonen bruker de midlertidige kartlagene.
+  // leggTilKartlag("Naturopplevelser", vektorLagMidlertidig);
+  // leggTilKartlag("Naturopplevelser", vektorlagMidlertidigIkoner);
+
+  forutsetningerKlareForInfoSideProgrammatisk();
+
+  async function forutsetningerKlareForInfoSideProgrammatisk(){
+    console.log("forutsetningerKlareForInfoSideProgrammatisk ~ start!");
+
+    leggTilKartlag("Naturopplevelser", vektorLagMidlertidig);
+    leggTilKartlag("Naturopplevelser", vektorlagMidlertidigIkoner);
+    // let kalenderturerKlare = await behandleKalenderturer();
+    // let naturstiKlar = await behandleNaturstiData();
+    let turerKlare = await Promise.all([
+      behandleKalenderturer(),
+      behandleNaturstiData()
+    ]);
+
+    console.log("forutsetningerKlareForInfoSideProgrammatisk ~ ferdig!");
+  }
+
+  currentZoom = map.getView().getZoom();
+
   // En sjekk for popup:
   // map.getOverlays().getArray().forEach(overlay => { var overlayName = overlay["options"]["name"]; console.log("overlay name: " + overlayName); });
 
   lagWMTSLag(); // Lager dem async.
 
   // SKJULE BAKGRUNNSKART FRA MENYEN
-  forandreSynlighetKartlagUtenIndeks("Bakgrunnskart", "bakgrunnskartOSM");
+  // Hm, hvis bakgrunnskart som ikke er OSM er hentet fra URL parameter, bytte når WMTS-laget er klart?
+  forandreSynlighetKartlagUtenIndeks("Bakgrunnskart", "bakgrunnskartOSM", false);
 
-  // Aktivere kartlag fra URL her.
-  if(lagListeFraURL != null){
-    console.log("lagListeFraURL er ikke null!");
-    aktiverKartlagMedNavn();
+  // Funker!
+  if(kartlagListeFraUrlParam.length > 0){
+    for(var i = 0; i < kartlagListeFraUrlParam.length; i++){
+      forandreSynlighetKartlagMedBareNavn(kartlagListeFraUrlParam[i]);
+    }
   } else {
-    forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa");
-    // forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGeometri");
-    forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGPS");
+    forandreSynlighetKartlagUtenIndeks("Naturopplevelser", "vektorLagMarkagrensa", false);
+    forandreSynlighetKartlagUtenIndeks("Geometri", "vektorLagGPS", false);
   }
 
-  // Legger til midlertidige kartlag til kartet. De vises ikke under aktive kartlag.
-  leggTilKartlag("Naturopplevelser", vektorLagMidlertidig);
-  leggTilKartlag("Naturopplevelser", vektorlagMidlertidigIkoner);
+  // // Legger til midlertidige kartlag til kartet. De vises ikke under aktive kartlag.
+  // leggTilKartlag("Naturopplevelser", vektorLagMidlertidig);
+  // leggTilKartlag("Naturopplevelser", vektorlagMidlertidigIkoner);
+
+  // console.log("Midlertidige lag er lagt til i map!");
 
   // Test:
 
@@ -569,8 +595,7 @@ $(document).ready(function(){
 
   });
 
-  // Sukk... Egentlig best å ikke ha engang for mobil? Siden det ikke er hover der.
-  var hovered = null;
+  //
   map.on('pointermove', function (e) {
     // console.log("pointermove triggered?!");
 
@@ -587,22 +612,26 @@ $(document).ready(function(){
       console.log("Scriptet featureHoverSelect kjører ikke.");
       return;
     }
-    
-    // Debug
-    // document.getElementById("debugVinduTekst").innerHTML = "map on pointermove";
-
-    // // Funker! Hover med featureSelectionList.
-    if(featureClickSelectionList.includes(featureHovered)) {
-      // DEBUG:
-      // console.log("featureHovered is in featureSelectionList!");
-    } else if (featureHovered != null) {
-      nullstillFeatureHovered();
-      // Må gjøre denne hver gang også nå? Pga. ikonene.
-      // nullstillFeatureSelection();
-    }
 
     // Alltid nullstill først?
     skjulHoverInfo();
+
+    if(featureClickSelectionList.length > 0) {
+      // Essensielt deaktiverer hover mens featureClickSelection pågår.
+
+      map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
+        // var lagNavn = layer.get("name"); // navn på kartlaget
+        var clickable = layer.get("clickable");
+        if(clickable && feature){
+          document.body.style.cursor = "pointer"; // Bare for å få pointer pekeren.
+        }
+      });
+
+      return; // Genial løsning?! Hm, ser ut til å virke foreløpig, i hvertfall.
+
+    } else {
+      nullstillFeatureHoveredList();
+    }
   
     map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
 
@@ -617,25 +646,100 @@ $(document).ready(function(){
         document.body.style.cursor = "pointer";
 
         if(!lagNavn.includes("Ikon") && !lagNavn.includes("ikon")){
+
+          // Sjekke etter andre turer i samme måned først?
+          const aar = feature.get("AAR");
+          // console.log("aar: " + aar);
+          const maaned = feature.get("MAANED");
+          // console.log("maaned: " + maaned);
+          let hovedrute = feature;
+
+          // Skal ikke gjelde for naturstien
+          if(aar && maaned){
+            // console.log("aar og maaned er definerte, så det er en kalendertur!");
+            const features = layer.getSource().getFeaturesCollection().getArray();
+            // console.log(features);
+            for(var j = 0; j < features.length; j++){
+              const currentFeature = features[j];
+              const fAAR = currentFeature.get("AAR");
+              const fMAANED = currentFeature.get("MAANED");
+              const stiplet = currentFeature.get("Stiplet");
+              // console.log("fAAR: " + fAAR + ", fMAANED: " + fMAANED);
+
+              if(aar == fAAR && maaned == fMAANED){
+                // console.log("Fant tur for samme år og måned! tur: " + features[j].get("overskrift"));
+                leggTilIFeatureHoveredList(currentFeature, layer, false);
+                if(stiplet == "0") hovedrute = currentFeature;
+              }
+            }
+          } else {
+            leggTilIFeatureHoveredList(feature, layer, false);
+          }
           
-          settFeatureHovered(feature, layer, false);
+          // settFeatureHovered(feature, layer, false);
+          // leggTilIFeatureHoveredList(feature, layer, false);
 
           // Hover? Hm.
           // visHoverInfo(e.pixel, feature, layer, false);
 
-          // Hvis popup er aktivert, bare hvis hover info hvis popup ikke vises.
-          // Hvis popup er uaktivert, alltid hvis hover info.
+          // Hvis popup er aktivert, bare vis hover info hvis popup ikke vises.
+          // Hvis popup er uaktivert, alltid vis hover info.
           if(popupKjorer){
             if(!popupVises && !kalenderTurerErSkjult){
-              visHoverInfo(e.pixel, feature, layer, false);
+              visHoverInfo(e.pixel, hovedrute, layer, false);
             }
           } else {
-            visHoverInfo(e.pixel, feature, layer, false);
+            visHoverInfo(e.pixel, hovedrute, layer, false);
           }
 
           return true;
         } else {
           // Hover over ikon
+
+          // // Hente rutekartlag for ikon
+          // const ruteKartlag = hentKartlagMedLagNavn(layer.get("ruteKartlagNavn"));
+          // // hentRuteForIkon(feature);
+          // console.log(feature);
+          // console.log(ruteKartlag);
+
+          const cluster = feature.get("features");
+          const clusterFeature = cluster[cluster.length - 1]; // Siste i lista er ikonet som er hoveret?
+          const featureRute = clusterFeature.get("featureRute");
+          const ruteKartlag = clusterFeature.get("ruteKartlag");
+          console.log(featureRute);
+          console.log(ruteKartlag);
+
+          // Sjekke etter andre turer i samme måned først?
+          const aar = featureRute.get("AAR");
+          // console.log("aar: " + aar);
+          const maaned = featureRute.get("MAANED");
+          // console.log("maaned: " + maaned);
+          let hovedrute = feature;
+
+          // Skal ikke gjelde for naturstien
+          if(aar && maaned){
+            // console.log("aar og maaned er definerte, så det er en kalendertur!");
+            const features = ruteKartlag.getSource().getFeaturesCollection().getArray();
+            // console.log(features);
+            for(var j = 0; j < features.length; j++){
+              const currentFeature = features[j];
+              const fAAR = currentFeature.get("AAR");
+              const fMAANED = currentFeature.get("MAANED");
+              const stiplet = currentFeature.get("Stiplet");
+              // console.log("fAAR: " + fAAR + ", fMAANED: " + fMAANED);
+
+              if(aar == fAAR && maaned == fMAANED){
+                // console.log("Fant tur for samme år og måned! tur: " + features[j].get("overskrift"));
+                leggTilIFeatureHoveredList(currentFeature, ruteKartlag, false);
+              }
+            }
+          } else {
+            // Måtte kommentere ut for at natursti-ikonene ikke skulle phase ut til en annen dimensjon :/ ...
+            // leggTilIFeatureHoveredList(feature, ruteKartlag, false);
+          }
+
+          // settFeatureHovered(feature, layer, true);
+          // leggTilIFeatureHoveredList(feature, layer, true);
 
           // Hvis popup er aktivert, bare hvis hover info hvis popup ikke vises.
           // Hvis popup er uaktivert, alltid hvis hover info.
@@ -646,8 +750,6 @@ $(document).ready(function(){
           } else {
             visHoverInfo(e.pixel, feature, layer, true);
           }
-
-          settFeatureHovered(feature, layer, true);
 
           return true;
         }
@@ -661,7 +763,15 @@ $(document).ready(function(){
 
   // Sette zoom...
   map.on('moveend', function(e) {
-    
+
+    currentZoom = map.getView().getZoom();
+    // fadeInnogUtDebugMelding(currentZoom, 3000);
+
+    // var viewCenter = map.getView().getCenter();
+    // console.log("view center: " + viewCenter);
+
+    lagUrl();
+
   });
 
   // BYTTING AV BAKGRUNN (knapp)
@@ -670,75 +780,42 @@ $(document).ready(function(){
   containerBytteBakgrunn.style.display = "none";
   //
   byttBakgrunn.onclick = function(){
-    console.log("byttBakgrunn clicked!");
+    // console.log("byttBakgrunn clicked!");
     toggleByttBakgrunn();
   }
   containerBytteBakgrunn.onclick = function(){
-    console.log("containerBytteBakgrunn clicked!");
+    // console.log("containerBytteBakgrunn clicked!");
   }
   bytteBakgrunnOSM.onclick = function(){
-    console.log("bytteBakgrunnOSM clicked!");
-    // Hm... Skal ikke gjøre noe hvis kartlaget allerede er aktivt.
-    
-    try{
-      visBakgrunnskartlag(bakgrunnskartOSM.get("name"));
-      byttBakgrunn.src = "./images/bakgrunn-osm-350x350.jpg";
-      deaktiverByttBakgrunn();
-    }catch(exception){
-      console.log("bytteBakgrunnOSM klikk error: " + error);
-    }
+    // console.log("bytteBakgrunnOSM clicked!");
+    byttBakgrunnFunksjon(bakgrunnskartOSM);
   }
   bytteBakgrunnSatelitt.onclick = function(){
-    console.log("bytteBakgrunnSatelitt clicked!");
-    // try catch her, siden kartlaget kan være null.
-    try{
-      visBakgrunnskartlag(bakgrunnskartNorgeIBilder.get("name"));
-      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-satelitt-350x350.jpg";
-      deaktiverByttBakgrunn();
-    }catch(exception){
-      console.log("bytteBakgrunnSatelitt klikk error: " + error);
-    }
+    // console.log("bytteBakgrunnSatelitt clicked!");
+    byttBakgrunnFunksjon(bakgrunnskartNorgeIBilder);
   }
   bytteBakgrunnTopografisk.onclick = function(){
-    console.log("bytteBakgrunnTopografisk clicked!");
-    try{
-      visBakgrunnskartlag(bakgrunnskartTopo4.get("name"));
-      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-topografisk-350x350.jpg";
-      deaktiverByttBakgrunn();
-    }catch(exception){
-      console.log("bytteBakgrunnTopografisk klikk error: " + error);
-    }
+    // console.log("bytteBakgrunnTopografisk clicked!");
+    byttBakgrunnFunksjon(bakgrunnskartTopo4);
   }
   bytteBakgrunnTopografiskGraa.onclick = function(){
-    console.log("bytteBakgrunnTopografiskGraa clicked!");
-    try{
-      visBakgrunnskartlag(bakgrunnskartTopoGraa.get("name"));
-      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-topografisk-graa-350x350.jpg";
-      deaktiverByttBakgrunn();
-    }catch(exception){
-      console.log("bytteBakgrunnTopografiskGraa klikk error: " + error);
-    }
+    // console.log("bytteBakgrunnTopografiskGraa clicked!");
+    byttBakgrunnFunksjon(bakgrunnskartTopoGraa);
   }
   bytteBakgrunnForenklet.onclick = function(){
-    console.log("bytteBakgrunnForenklet clicked!");
-    try{
-      visBakgrunnskartlag(bakgrunnskartEnkel.get("name"));
-      byttBakgrunn.src = originWithSlash + "./images/bakgrunn-forenklet-350x350.jpg";
-      deaktiverByttBakgrunn();
-    }catch(exception){
-      console.log("bytteBakgrunnForenklet klikk error: " + error);
-    }
+    // console.log("bytteBakgrunnForenklet clicked!");
+    byttBakgrunnFunksjon(bakgrunnskartEnkel);
   }
 
   // 
 
   document.getElementById("lukkeHovedVinduKnapp").addEventListener("click", function(){
-    console.log("Du klikket på lukkeHovedVinduKnapp!");
+    // console.log("Du klikket på lukkeHovedVinduKnapp!");
     visHovedMenyPaaDesktop(false);
   });
 
   aapneHovedMenyKnapp.addEventListener("click", function(){
-    console.log("Du klikket på aapneHovedVinduKnapp!");
+    // console.log("Du klikket på aapneHovedVinduKnapp!");
     visHovedMenyPaaDesktop(true);
   });
 
@@ -750,7 +827,7 @@ $(document).ready(function(){
   // 
 
   featureTilbakeKnapp.addEventListener("click", function(){
-    featureTilbakeKnappFunksjon();
+    featureTilbakeKnappFunksjon(false);
   });
 
   finnKnapp.addEventListener("click", function(){
@@ -764,14 +841,14 @@ $(document).ready(function(){
   settRiktigStilForTabKnapperUtenEndreBoolean();
 
   tabAlleKnapp.addEventListener("click", function () {
-    console.log("tabAlleKnapp klikket!");
+    // console.log("tabAlleKnapp klikket!");
     if(aktiveLagVises){
       byttTilAlleLagSiden();
     }
   });
 
   tabAktivKnapp.addEventListener("click", function () {
-    console.log("tabAktivKnapp klikket!");
+    // console.log("tabAktivKnapp klikket!");
     if(!aktiveLagVises){
       byttTilAktiveLagSiden();
     }
@@ -892,7 +969,7 @@ let touchHandler = function (e) {
 
     var yDifference = moveY - prevMoveY;
     var yDiffRounded = Math.round(yDifference); // Rounds to nearest integer!
-    console.log("yDifference: " + yDifference + ", yDiffRounded: " + yDiffRounded); // + down, - up
+    // console.log("yDifference: " + yDifference + ", yDiffRounded: " + yDiffRounded); // + down, - up
 
     hovedVinduContainerTopMargin = hentHovedVinduContainerTopMargin();
     hovedVinduPixelHeight = hentHovedVinduPixelHeight();
@@ -910,7 +987,7 @@ let touchHandler = function (e) {
       }
 
       hovedVinduContainer.style.marginTop = nyTopMarginOpp + "px";
-      console.log("yDiffRounded: " + yDiffRounded + ", minHovedMarginTop: " + minHovedMarginTop + ". Ny marginTop er: " + nyTopMarginOpp);
+      // console.log("yDiffRounded: " + yDiffRounded + ", minHovedMarginTop: " + minHovedMarginTop + ". Ny marginTop er: " + nyTopMarginOpp);
     
     } else if(yDiffRounded > 0){
       // Nedover hvis marginTop større.
@@ -934,7 +1011,7 @@ let touchHandler = function (e) {
       }
 
       hovedVinduContainer.style.marginTop = nyTopMarginNed + "px";
-      console.log("yDiffRounded: " + yDiffRounded + ", maxHovedMarginTop: " + maxHovedMarginTop + ". Ny marginTop er: " + nyTopMarginNed);
+      // console.log("yDiffRounded: " + yDiffRounded + ", maxHovedMarginTop: " + maxHovedMarginTop + ". Ny marginTop er: " + nyTopMarginNed);
     }
 
   }
@@ -1611,6 +1688,8 @@ function leggTilKartlag(gruppe, kartlag){
       // 
       group.setLayers(layers); // Funka nå! På Stack exchange eller noe.
 
+      console.log("leggTilKartlag ~ lagt til kartlag: " + kartlag.get("name"));
+      // console.log("leggTilKartlag ~ kartlag: " + kartlag.get("name") + " til gruppen: " + gruppe);
       // console.log("La til kartlaget " + kartlag.get("name") + " til gruppen " + group.get("name") + ".");
     }
 
@@ -1680,9 +1759,9 @@ function skjulKartlagMedLagNavn(lagNavn){
       var lagIndeks = -1;
       try {
         lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-        console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+        // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
       } catch (error) {
-        console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+        console.log("skjulKartlagMedLagNavn ~ Noe error med å hente lagIndeks fra htmlKartLagDict. error: " + error);
       }
       skjulKartlag(layer, lagIndeks); // Denne inneholder errorsjekk for lagIndeks -1.
   } else {
@@ -1690,6 +1769,7 @@ function skjulKartlagMedLagNavn(lagNavn){
   }
 }
 
+// Bare for bakgrunnskart?
 function skjulKartlag(layer, lagIndeks){
   if (layer.get("visible") == true){
     layer.setVisible(false);
@@ -1706,11 +1786,17 @@ function skjulKartlag(layer, lagIndeks){
       ikonLag.setVisible(false);
       // console.log(lagNavn + " har et ikonLag! Gjør det usynlig. ikonLagNavn: " + ikonLag.get("name"));
     }
-    console.log(lagNavn + " er nå skjult! visible: " + layer.get("visible"));
+    // console.log(lagNavn + " er nå skjult! visible: " + layer.get("visible"));
+
+    // Ta bort fra aktiveKartlagListe
+    //  slettFraAktiveKartlagListen(lagNavn);
   }
 }
 
-function visKartlag(layer, lagIndeks){
+// OBS! Hm, litt usikker på forskjellen her på visKartlag og forandreSynlighet...
+
+// bare for bakgrunnskart?
+function visKartlag(layer, lagIndeks, analyse){
   if(layer.get("visible") == false){
     layer.setVisible(true);
     if(lagIndeks > -1){
@@ -1726,50 +1812,105 @@ function visKartlag(layer, lagIndeks){
       // console.log(lagNavn + " har et ikonLag! Gjør det synlig! ikonLagNavn: " + ikonLag.get("name"));
     }
     // console.log(lagNavn + " er nå synlig! visible: " + layer.get("visible"));
+
+    // Legge til aktiveKartlagListe
+    // leggTilIAktiveKartlagListen(lagNavn);
+    aktivtBakgrunnskart = lagNavn;
+    console.log("aktivtBakgrunnskart: " + aktivtBakgrunnskart);
+    lagUrl();
+
+    // Plausible Analytics
+    if(analyse){
+      try {
+        plausible("Aktivert bakgrunnskartlag", {
+          props: {
+            aktivert_bakgrunnskartlag: layer.get("uiName")
+          },
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
   }
 }
 
-function settSynlighetKartlag(layer, lagIndeks){
+function settSynlighetKartlag(layer, lagIndeks, analyse) {
+  // 
+  let lagNavn = layer.get("name");
+  let ruteKartlag;
+  let ruteKartlagNavn;
+
+  const lagType = layer.get("type");
+  // Hente ruteKartlag og navnet på rutekartlaget, hvis kartlaget er et ikon-lag.
+  // layer er et ikon kartlag
+  if (lagType == "ikonLag") {
+    ruteKartlag = hentKartlagMedLagNavn(layer.get("ruteKartlagNavn"));
+    if (ruteKartlag) {
+      ruteKartlagNavn = ruteKartlag.get("name");
+    }
+  }
+
+  const ikonLag = layer.get("ikonLag");
+
   // OBS! Spesiell regel for kalenderrutene!
-  const lagNavn = layer.get("name");
-  if(lagNavn.includes("kalender") || lagNavn.includes("Kalender")){
+  // let lagNavn = layer.get("name");
+  if (lagNavn.includes("kalender") || lagNavn.includes("Kalender")) {
     tilbakestillMidlertidigeKartlag();
     // I tilfelle bruker klikket inn på rute via popup
     skjulPopupContainer();
   }
 
-  const ikonLag = layer.get("ikonLag");
   // console.log(ikonLag);
   if (layer.get("visible") == true) {
     layer.setVisible(false);
-    if(lagIndeks > -1){
+    if (lagIndeks > -1) {
       // hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0";
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "0.1";
     }
-    if(ikonLag){
+
+    if (ikonLag) {
       ikonLag.setVisible(false);
     }
+
+    // Slette fra rutekartlaget til aktiveKartlagListen.
+    if (ruteKartlagNavn) {
+      slettFraAktiveKartlagListen(ruteKartlagNavn);
+    } else {
+      slettFraAktiveKartlagListen(lagNavn);
+    }
+
     // console.log(layer.get("name") + " er nå skjult! visible: " + layer.get("visible"));
   } else {
     layer.setVisible(true);
     if (lagIndeks > -1) {
       hovedMenyKlasseIndikator[lagIndeks].style.opacity = "1";
     }
+
     if (ikonLag) {
       ikonLag.setVisible(true);
     }
+
+    // Legge til rutekartlaget til aktiveKartlagListen.
+    if (ruteKartlagNavn) {
+      leggTilIAktiveKartlagListen(ruteKartlagNavn);
+    } else {
+      leggTilIAktiveKartlagListen(lagNavn);
+    }
+
     // console.log(layer.get("name") + " er nå synlig! visible: " + layer.get("visible"));
 
-    // Plausible Analytics test
-    try {
-      plausible("kartlag_gjort_synlig", {
-        props: {
-          synlig_kartlag: lagNavn,
-          synlig_kartlag_ui: layer.get("uiName"),
-        },
-      });
-    } catch (e) {
-      console.log(e);
+    // Plausible Analytics
+    if (analyse) {
+      try {
+        plausible("Aktivert kartlag fra hovedmenyen", {
+          props: {
+            aktivert_kartlag: layer.get("uiName")
+          },
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
 
   }
@@ -1777,7 +1918,7 @@ function settSynlighetKartlag(layer, lagIndeks){
 
 // Spesielt for Bakgrunnskart! // Hm, egentlig samme kode som i forandreSynlighetKartlagUtenIndeks().
 // bakgrunnskartlagNavn : string (navnet på bakgrunnskartlaget)
-function visBakgrunnskartlag(bakgrunnskartlagNavn){
+function visBakgrunnskartlag(bakgrunnskartlagNavn, analyse){
   map.getLayers().getArray().forEach(group => {
     var gruppeNavn = group.get("name");
 
@@ -1795,13 +1936,13 @@ function visBakgrunnskartlag(bakgrunnskartlagNavn){
 
         try {
           lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-          console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+          // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
         } catch (error) {
           console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
         }
 
         if (lagNavn === bakgrunnskartlagNavn) {
-          visKartlag(layer, lagIndeks);
+          visKartlag(layer, lagIndeks, analyse);
         } else {
           skjulKartlag(layer, lagIndeks);
         }
@@ -1810,6 +1951,35 @@ function visBakgrunnskartlag(bakgrunnskartlagNavn){
 
     } // gruppeNavn == "Bakgrunnskart"
 
+  });
+}
+
+// For alle kartlag bortsett fra bakgrunnskartlag.
+function forandreSynlighetKartlagMedBareNavn(kartlagNavn, analyse){
+  map.getLayers().getArray().forEach(group => {
+    var gruppeNavn = group.get("name");
+    if(gruppeNavn != "bakgrunnskart"){
+      group.getLayers().forEach(layer => {
+
+        var lagNavn = layer.get("name");
+        if (lagNavn === kartlagNavn) {
+
+          // Hent lagIndeks:
+          var lagIndeks = -1;
+
+          try {
+            lagIndeks = htmlKartLagDict[kartlagNavn]["lagIndeks"];
+            // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+          } catch (error) {
+            console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil? error: " + error);
+          }
+
+          settSynlighetKartlag(layer, lagIndeks, analyse);
+
+        }
+
+     });
+    }
   });
 }
 
@@ -1822,7 +1992,7 @@ function visBakgrunnskartlag(bakgrunnskartlagNavn){
 // For bakgrunnskart:   lagIndeks = htmlKartLagDict[lagNavn]
 // Dette fordi at for bakgrunnskart sjekkes alle kartlagene ved å aktivere kartlagNavn og deaktivere resten.
 // For vanlige kartlag gjøres en "toggle" på den, altså hvis synlig, gjør den usynlig, vice versa.
-function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
+function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn, analyse) {
   map.getLayers().getArray().forEach(group => {
     var gruppeNavn = group.get("name");
 
@@ -1843,20 +2013,23 @@ function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
 
           try {
             lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-            console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+            // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
           } catch (error) {
-            console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+            console.log("forandreSynlighetKartlagUtenIndeks ~ Noe error med å hente lagIndeks fra htmlKartLagDict. error: " + error);
           }
 
+          // Viser det ene bakgrunnskartet og skjuler de andre.
           if (lagNavn === kartlagNavn) {
-            visKartlag(layer, lagIndeks);
+            visKartlag(layer, lagIndeks, analyse);
           } else {
             skjulKartlag(layer, lagIndeks);
           }
 
         });
 
-      } else {
+      } 
+      // For alle andre kartlag som ikke er bakgrunnskart
+      else {
         group.getLayers().forEach(layer => {
 
           var lagNavn = layer.get("name");
@@ -1869,10 +2042,10 @@ function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
               lagIndeks = htmlKartLagDict[kartlagNavn]["lagIndeks"];
               // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
             } catch (error) {
-              console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+              console.log("forandreSynlighetKartlagUtenIndeks ~ Noe error med å hente lagIndeks fra htmlKartLagDict. error: " + error);
             }
 
-            settSynlighetKartlag(layer, lagIndeks);
+            settSynlighetKartlag(layer, lagIndeks, analyse);
 
           }
 
@@ -1885,15 +2058,12 @@ function forandreSynlighetKartlagUtenIndeks(kartlagGruppe, kartlagNavn) {
 }
 
 // Funker!
-function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
+function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks, analyse) {
 
   // Blokkering ved åpning av hovedVindu på mobil:
   if(blokkerHovedVinduTrykk) return;
 
-  // clicky logging av forsøk på visning av kartlag // Ikke i bruk
-  // try{ clicky.log("#kartlag-forandre-synlighet", kartlagNavn); }catch(e){ console.log(e); }
-
-  console.log("kartlagGruppe: " + kartlagGruppe + ", kartlagNavn: " + kartlagNavn + ", kartLagIndeks: " + kartLagIndeks);
+  // console.log("kartlagGruppe: " + kartlagGruppe + ", kartlagNavn: " + kartlagNavn + ", kartLagIndeks: " + kartLagIndeks);
 
   map.getLayers().getArray().forEach(group => {
 
@@ -1901,12 +2071,12 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
     // console.log(gruppeNavn);
 
     if(gruppeNavn == kartlagGruppe){
-      console.log("gruppeNavn matcher kartlagGruppe! gruppeNavn: " + gruppeNavn + ", kartlagGruppe: " + kartlagGruppe);
+      // console.log("gruppeNavn matcher kartlagGruppe! gruppeNavn: " + gruppeNavn + ", kartlagGruppe: " + kartlagGruppe);
 
       if(kartlagGruppe == "Bakgrunnskart"){
 
         if(lagFinnesIKartObjektet(kartlagGruppe, kartlagNavn) == false){
-          console.log("Bakgrunnskart --- kartlaget " + kartlagNavn + " finnes ikke i kart-objektet, så returnerer tidlig.");
+          // console.log("Bakgrunnskart --- kartlaget " + kartlagNavn + " finnes ikke i kart-objektet, så returnerer tidlig.");
           return; // Hvis det ikke eksisterer, returner tidlig?
         }
 
@@ -1922,11 +2092,11 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
             lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
             // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
           } catch (error) {
-            console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+            console.log("forandreSynlighetKartlag ~ Noe error med å hente lagIndeks fra htmlKartLagDict. error: " + error);
           }
 
           if (lagNavn === kartlagNavn) {
-            visKartlag(layer, lagIndeks);
+            visKartlag(layer, lagIndeks, analyse);
           } else {
             skjulKartlag(layer, lagIndeks);
           }
@@ -1940,7 +2110,7 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
           // console.log(lagNavn);
           
           if(lagNavn == kartlagNavn){
-            settSynlighetKartlag(layer, kartLagIndeks); // NOTE: kartLagIndeks er fra funksjon argument.
+            settSynlighetKartlag(layer, kartLagIndeks, analyse); // NOTE: kartLagIndeks er fra funksjon argument.
           }
   
         });
@@ -1967,6 +2137,7 @@ function forandreSynlighetKartlag(kartlagGruppe, kartlagNavn, kartLagIndeks) {
 //   settFeatureSelectionListeOgLagPopup(pixel);
 // };
 
+// Hm... Muligens slette, hvis ikke i bruk?
 function hentFeatureMedNavn(featureNavn){
   var featureNavnFunnet = false;
   var endeligeNavn;
@@ -2044,38 +2215,6 @@ function skjulAlleLag(){
 
 }
 
-// Aktiverer alle kartlag UNNTATT bakgrunnskartlag!
-// Hm, ikke bruke?
-function visAlleLag(){
-  if(blokkerKnappAlleTrykk) return;
-
-  console.log("visAlleLag triggered!");
-
-  map.getLayers().getArray().forEach(group => {
-    if(group.get("name") != "Bakgrunnskart"){
-      
-      group.getLayers().forEach(layer => {
-        var lagNavn = layer.get("name");
-        // console.log(lagNavn);
-
-        // Må hente lagIndeks:
-        var lagIndeks = -1;
-        try {
-          lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-          console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
-        } catch (error) {
-          console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
-        }
-
-        visKartlag(layer, lagIndeks);
-
-      });
-
-    }
-  });
-
-}
-
 // Ikke brukt nå?
 function toggleKartKnapperEtterDelay(TillattPointerEvents, delay){
   console.log("toggleKartKnapperEtterDelay triggered!");
@@ -2131,25 +2270,7 @@ function tillattKartKnapperEtterDelay(){
 }, 500); // Prøve med et halvt sekund istedenfor? Kanskje det holder?
 }
 
-function aktiverKartlagMedKoder(){
-
-  map.getLayers().getArray().forEach(group => {
-    var gruppeNavn = group.get("name");
-    if(gruppeNavn != "bakgrunnskart"){
-      group.getLayers().forEach(layer => {
-        var kode = layer.get("kode");
-        if(lagListeFraURL.includes(kode)){
-          var lagNavn = layer.get("name");
-          // console.log("aktiverKartlagMedKoder ~ layer i lagListeFraURL! kode: " + kode + ", lagNavn: " + lagNavn);
-          forandreSynlighetKartlagUtenIndeks(gruppeNavn, lagNavn);
-        }
-      });
-    }
-  });
-
-}
-
-function aktiverKartlagMedNavn(){
+function aktiverKartlagMedNavn(analyse){
 
   map.getLayers().getArray().forEach(group => {
     var gruppeNavn = group.get("name");
@@ -2159,7 +2280,7 @@ function aktiverKartlagMedNavn(){
         if(lagListeFraURL.includes(navn)){
           var lagNavn = layer.get("name");
           // console.log("aktiverKartlagMedKoder ~ layer i lagListeFraURL! kode: " + kode + ", lagNavn: " + lagNavn);
-          forandreSynlighetKartlagUtenIndeks(gruppeNavn, lagNavn);
+          forandreSynlighetKartlagUtenIndeks(gruppeNavn, lagNavn, analyse);
         }
       });
     }
@@ -2310,6 +2431,15 @@ async function lagBakgrunnskartWMTS(capabilityURL, kartlagWMTS, lagNavn, lagKode
       // Temp for debug:
       settInnKartlagIMasterListe(lagNavn, kartLagUt);
       // console.log(hentKartlagIMasterListe(lagNavn));
+
+      // 
+      if(bakgrunnFraUrlParam){
+        if(lagNavn == bakgrunnFraUrlParam){
+          // forandreSynlighetKartlagUtenIndeks("Bakgrunnskart", lagNavn);
+          // visBakgrunnskartlag(lagNavn);
+          byttBakgrunnFunksjon(kartLagUt);
+        }
+      }
 
     } else {
       console.log("kartLagUt feilet for lagNavn: " + lagNavn);
@@ -2496,6 +2626,15 @@ function byttTilAktiveLagSiden(){
   settRiktigStilForTabKnapperUtenEndreBoolean();
   // TEST: Hente kartlag her.
   hentSynligeKartlagForAktiveLagSiden();
+
+  // Plausible Analytics
+  try {
+    plausible("Trykk på 'Aktive lag' knappen", {
+    });
+  } catch (e) {
+    console.log(e);
+  }
+
 }
 function visAlleLagSide(){
   aktiveLagVises = false;
@@ -2578,14 +2717,14 @@ function skjulSider(){
   sideStott.style.display = "none";
 }
 
-function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapneHovedVindu){
+function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
 
   // Åpne meny hvis hovedvinduet er skjult mens brukeren trykker på en navigasjonstab.
-  if(aapneHovedVindu && !hovedVinduVises){
+  if(aapnerHovedVindu && !hovedVinduVises){
     aapneHovedVindu();
   }
 
-  console.log("kartMenySideKlikk ~ divTrykketPaa: " + divTrykketPaa + ", sisteMenyAktiv: " + sisteMenyAktiv + ", inVisFeatureInfo: " + inVisFeatureInfo);
+  // console.log("kartMenySideKlikk ~ divTrykketPaa: " + divTrykketPaa + ", sisteMenyAktiv: " + sisteMenyAktiv + ", inVisFeatureInfo: " + inVisFeatureInfo + ", aapnerHovedVindu: " + aapnerHovedVindu);
   // resetBorderBottom(); // For enkelhetsskyld, resetter alle? ...
 
   // Deaktivering av den siste som var aktiv.
@@ -2673,23 +2812,19 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapneHovedVindu){
       break;
   }
 
-  // clicky manuell logging // Ikke i bruk
-  // try{ clicky.log("#informasjonsside-trykk", divTrykketPaa); }catch(e){ console.log(e); }
-
-  // Plausible Analytics test
+  // Plausible Analytics
   try{
     let menySideUi = "Ingen side";
 
     switch(divTrykketPaa){
-      case "divMenyKart": menySideUi = "Hovedmeny Kart"; break;
-      case "divMenyDel": menySideUi = "Hovedmeny Del"; break;
-      case "divMenyOm": menySideUi = "Hovedmeny Om"; break;
-      case "divMenyStott": menySideUi = "Hovedmeny Støtt"; break;
+      case "divMenyKart": menySideUi = "Kart"; break;
+      case "divMenyDel": menySideUi = "Del"; break;
+      case "divMenyOm": menySideUi = "Om"; break;
+      case "divMenyStott": menySideUi = "Støtt"; break;
     }
 
-    plausible('hovedknapper', {
+    plausible('Trykk av hovedknapper', {
       props: {
-        side: divTrykketPaa,
         sideUi: menySideUi,
       }
     })
@@ -2699,12 +2834,43 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapneHovedVindu){
 
 }
 
+//
+function byttBakgrunnFunksjon(bakgrunnskartlag){
+  try{
+    switch(bakgrunnskartlag){
+      case bakgrunnskartOSM:
+          visBakgrunnskartlag(bakgrunnskartOSM.get("name"), true);
+          byttBakgrunn.src = "./images/bakgrunn-osm-350x350.jpg";
+        break;
+      case bakgrunnskartNorgeIBilder:
+          visBakgrunnskartlag(bakgrunnskartNorgeIBilder.get("name"), true);
+          byttBakgrunn.src = originWithSlash + "./images/bakgrunn-satelitt-350x350.jpg";
+        break;
+      case bakgrunnskartTopo4:
+          visBakgrunnskartlag(bakgrunnskartTopo4.get("name"), true);
+          byttBakgrunn.src = originWithSlash + "./images/bakgrunn-topografisk-350x350.jpg";
+        break;
+      case bakgrunnskartTopoGraa:
+          visBakgrunnskartlag(bakgrunnskartTopoGraa.get("name"), true);
+          byttBakgrunn.src = originWithSlash + "./images/bakgrunn-topografisk-graa-350x350.jpg";
+        break;
+      case bakgrunnskartEnkel:
+          visBakgrunnskartlag(bakgrunnskartEnkel.get("name"), true);
+          byttBakgrunn.src = originWithSlash + "./images/bakgrunn-forenklet-350x350.jpg";
+        break;
+    }
+    deaktiverByttBakgrunn();
+  } catch(error){
+    console.log("byttBakgrunn ~ error: " + error);
+  }
+}
+
 // Spesifikt for kalender turer
 function tilbakestillMidlertidigeKartlag(){
   if(kalenderTurerErSkjult){
     kalenderOpacityErLagret = false;
     kalenderTurerErSkjult = false;
-    console.log("tilbakestillMidlertidigeKartlag ~ kalenderTurerSisteOpacity: " + kalenderTurerSisteOpacity);
+    // console.log("tilbakestillMidlertidigeKartlag ~ kalenderTurerSisteOpacity: " + kalenderTurerSisteOpacity);
     midlertidigFeatureIconsCollection.clear();
     midlertidigFeatureCollection.clear();
     vektorLagKalenderRuter2021.setOpacity(kalenderTurerSisteOpacity);
@@ -2714,29 +2880,30 @@ function tilbakestillMidlertidigeKartlag(){
   }
 }
 
-// 
-function visFeatureInfoSide(feature, featureNavn, kartlag, aapneHovedMeny){
-  console.log("visFeatureInfoSide triggered!");
+// Kanskje kreve at kartlaget ikke kan være et ikonlag?
+function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHovedMeny){
+  // console.log("visFeatureInfoSide triggered!");
   // console.log(feature);
+  // console.log(kartlag);
+  // console.log("stipletter: ");
+  // console.log(stipletter);
 
-  // clicky logging av visning av tur side // Ikke i bruk
-  // try{ clicky.log("#visning-av-rute", featureNavn); }catch(e){ console.log(e); }
-
-  // Plausible Analytics test
-  try{
-    plausible('visning_av_infoSide', {
-      props: {
-        infoSide_ruteKartLag: kartlag.get("name"), 
-        infoSide_ruteNavn: featureNavn
-      }
-    })
-  }catch(e){
-    console.log(e);
+  // Sørge for at ikke ikonlag blir brukt videre.
+  if(kartlag.get("name").includes("Ikon") || kartlag.get("name").includes("ikon")){
+    kartlag = hentKartlagMedLagNavn(kartlag.get("ruteKartlagNavn"));
   }
+
+  // const harStiplet = stipletter ? "1" : "0";
+
+  // For lagring i URL
+  infoSideFeatureNavn = featureNavn; // Hm... Burde egentlig ha en enklere og strukturert identifier, som f.eks. ÅrMånedNr, f.eks. 2020februar2.
+  infoSideKartlagNavn = kartlag.get("name");
+  lagUrl();
 
   // Bare for kalender turer. Skal ikke påvirke naturstien.
   const kartlagNavn = kartlag.get("name");
   if(kartlagNavn.includes("kalender") || kartlagNavn.includes("Kalender")){
+
     // Idé: Lage ny feature mens man skjuler de andre kartlagene...
     // Lage feature for ruten og ikonet.
 
@@ -2749,25 +2916,78 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, aapneHovedMeny){
     // console.log(midlertidigFeatureIkon);
     // console.log(midlertidigFeature);
 
-    midlertidigFeatureIkonKlone = midlertidigFeatureIkon.clone();
-    midlertidigFeatureIkonKlone.setProperties(midlertidigFeatureIkon.getProperties());
+    // Stemmer det! Stiplet-ruter har ikke ikon mer. Derfor blir midlertidigFeatureIkon null.
+    if(midlertidigFeatureIkon){
+      midlertidigFeatureIkonKlone = midlertidigFeatureIkon.clone();
+      midlertidigFeatureIkonKlone.setProperties(midlertidigFeatureIkon.getProperties());
+      midlertidigFeatureIconsCollection.push(midlertidigFeatureIkonKlone);
+    }
+
     midlertidigFeatureKlone = midlertidigFeature.clone();
     midlertidigFeatureKlone.setProperties(midlertidigFeature.getProperties());
 
-    midlertidigFeatureIconsCollection.push(midlertidigFeatureIkonKlone);
+    // Ekstra sjekk? ... Prøve igjen hvis den er null?
+    if(!midlertidigFeatureKlone){
+      midlertidigFeatureIkonKlone = feature.clone();
+      midlertidigFeatureKlone.setProperties(feature.getProperties());
+    }
+
     midlertidigFeatureCollection.push(midlertidigFeatureKlone);
 
-    selectRute(midlertidigFeatureKlone, vektorLagMidlertidig);
+    // Hm, for å vise alle stiplet-rutene samtidig med hovedturen, legge de til i midlertidigFeatureCollection bare?
+
+    if(stipletter){
+      for(var i = 0; i < stipletter.length; i++){
+        const stiplet = stipletter[i];
+        const stipletKlone = stiplet.clone();
+        stipletKlone.setProperties(stiplet.getProperties());
+        // Sette selected stil for stiplettene
+        // Hm, midlertidg fiks? Men foreløpig tror jeg det skal gå bra. Setter select stil her,
+        // også blir stiplettene lagt til i selectionList i selectRute().
+        settFeatureSelectionStiler(stipletKlone, vektorLagMidlertidig);
+        midlertidigFeatureCollection.push(stipletKlone);
+      }
+    }
+
+    selectRute(midlertidigFeatureKlone, vektorLagMidlertidig, stipletter);
 
     if(!kalenderOpacityErLagret){
       kalenderOpacityErLagret = true;
       kalenderTurerSisteOpacity = vektorLagKalenderRuter2021.getOpacity();
-      console.log("visFeatureInfoSide ~ henter opacity fra vektorLagKalenderRuter2021. kalenderTurerSisteOpacity: " + kalenderTurerSisteOpacity);
+      // console.log("visFeatureInfoSide ~ henter opacity fra vektorLagKalenderRuter2021. kalenderTurerSisteOpacity: " + kalenderTurerSisteOpacity);
       vektorLagKalenderRuter2021.setOpacity(0);
       vektorlagKalenderRuter2021Ikoner.setOpacity(0);
     }
 
     kalenderTurerErSkjult = true; // Sørger for at tilbakestillMidlertidigeKartlag() ikke trigger for tidlig.
+
+    // Er kalendertur
+
+  // Plausible Analytics
+  try{
+    plausible('Åpnet info side for kalendertur', {
+      props: {
+        infoSide_kalendertur: featureNavn
+      }
+    })
+  }catch(e){
+    console.log(e);
+  }
+
+  } else {
+    // Er natursti
+
+  // Plausible Analytics
+  try{
+    plausible('Åpnet info side for natursti', {
+      props: { 
+        infoSide_natursti: featureNavn
+      }
+    })
+  }catch(e){
+    console.log(e);
+  }
+
   }
   
   // Åpne hovedvinduet hvis det er skjult (hidden).
@@ -2897,7 +3117,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, aapneHovedMeny){
     featureStartKoordinater = [
       parseFloat(coordinates3857x), parseFloat(coordinates3857y)
     ];
-    console.log("featureStartKoordinater: " + featureStartKoordinater);
+    // console.log("featureStartKoordinater: " + featureStartKoordinater);
   } catch(e){
     console.log("Klarte ikke hente koordinater fra featureStartString");
   }
@@ -2993,35 +3213,29 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, aapneHovedMeny){
   elFeatureTurenVidereContainer.style.display = turenVidere ? "block" : "none";
 
   // Lyd
-  // TEST: Vise lydspiller hvis turenVidere
-  // elFeatureLydContainer.style.display = kartlagType == "natursti" ? "block" : "none";
   elFeatureLydContainer.style.display = lyd ? "block" : "none";
   if(lyd){
     elFeatureLyd.load();
     elFeatureLyd.src = lyd;
-    // Re-load fix?
-    try{
-      // elFeatureLyd.play(); // Gir feilmelding...
-      // elFeatureLyd.load();
-    }catch(e){
-      // console.log(e);
-    }
-    // elFeatureLyd.play();
-    // elFeatureLyd.load();
-  } else {
-    // const rand = Math.random() * 100;
-    // elFeatureLyd.src = rand > 50 ? "./data/Epic Vocal Music  A World Of Imagination  by Cézame Trailers (Feat. Alina Lesnik).mp3" : "./data/Lost [Official Music Video] - Linkin Park.mp3";
   }
-
-  // const rand = Math.random() * 100;
-  // elFeatureLyd.src = rand > 50 ? "./data/Epic Vocal Music  A World Of Imagination  by Cézame Trailers (Feat. Alina Lesnik).mp3" : "./data/Lost [Official Music Video] - Linkin Park.mp3";
 
 }
 
-function featureTilbakeKnappFunksjon(){
-  console.log("featureTilbakeKnapp klikket!");
-  kartMenySideKlikk("divMenyKart", false, true);
+function featureTilbakeKnappFunksjon(aapneMeny){
+  // console.log("featureTilbakeKnappFunksjon kjører");
+  kartMenySideKlikk("divMenyKart", false, aapneMeny);
   hovedVindu.scrollTop = 0; // Scroller til toppen.
+  // Reset infoSide variabler:
+  infoSideFeatureNavn = undefined;
+  infoSideKartlagNavn = undefined;
+  lagUrl();
+  // Obs! Må de-selecte den aktive ruten.
+  if(featureHoverSelectKjorer){
+    // Tømme de midlertidige kartlagene
+    tilbakestillMidlertidigeKartlag();
+    // nullstillFeatureSelection();
+    nullstillFeatureClickSelection();
+  }
 }
 
 function featureFinnKnappFunksjon(){

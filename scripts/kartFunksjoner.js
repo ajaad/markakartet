@@ -4,6 +4,45 @@ function sentrerKart(coordinates){
 
 }
 
+// Genererer URL
+
+function lagUrl(){
+
+    var baseUrl = window.location.href.split("?")[0];
+    var generertUrl = baseUrl + "?";
+    // console.log("baseUrl: " + baseUrl);
+    // console.log("generertUrl: " + generertUrl);
+
+    // Zoom nivå
+    var zoom = map.getView().getZoom();
+    // console.log("zoom: " + zoom);
+    generertUrl += "&zoom=" + zoom;
+
+    // Senter koordinater
+    var viewCenter = map.getView().getCenter();
+    // console.log("view center: " + viewCenter);
+    generertUrl += "&center=" + viewCenter;
+
+    // Bakgrunnskartlag
+    generertUrl += "&bakgrunn=" + aktivtBakgrunnskart;
+
+    // Aktive kartlag
+    if(aktiveKartlagListe.length > 0){
+        generertUrl += "&kartlag=" + lagStrengForAktiveKartlagListen();
+    }
+
+    // Info side
+    if(infoSideFeatureNavn && infoSideKartlagNavn){
+        generertUrl += "&infoSideFeature=" + infoSideFeatureNavn;
+        generertUrl += "&infoSideKartlag=" + infoSideKartlagNavn;
+    }
+
+    history.replaceState(null, "", generertUrl); // Funker uten reload!
+
+    // console.log("lagUrl ~ oppdaterte url parametere: " + window.location.href.split("?")[1]);
+
+}
+
 // Hent kartlag fra map-objektet med kartlagets navn.
 function hentKartlagMedLagNavn(inLagNavn) {
 //   console.log("hentKartlagMedLagNavn ~ inLagNavn: " + inLagNavn);
@@ -380,10 +419,22 @@ function prepareView() {
     // Convert the startpoint to pseudomercator 
     var startpunktCoord = proj4(coordSysFull, coordSysPseudoMercator, [finalX, finalY]);
 
+    // 
+    if(zoomFraUrl){
+        finalZoom = zoomFraUrl;
+    }
+    // hvis senterkoordinater er satt i URL parameter, bruk den for startspunktet.
+    if(centerFraUrl){
+        startpunktCoord = centerFraUrl;
+    }
+
     // Make a view object
     var newView = new ol.View({
         center: startpunktCoord,
-        zoom: finalZoom
+        zoom: finalZoom,
+        // Flere alternativer
+        constrainRotation: 4,
+        multiWorld: false,
     });
 
     // 

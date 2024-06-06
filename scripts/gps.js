@@ -41,11 +41,20 @@ $(document).ready(function () {
   // positionFeature.setStyle(positionFeatureStilMedPil);
   vectorSourceGPS.addFeature(positionFeature);
 
-  if(gpsKnapp != null){
+  if (gpsKnapp != null) {
     gpsKnapp.addEventListener("click", function () {
-        console.log("gpsKnapp clicked!");
-        toggleTracking(!gpsErAktiv);
-      });
+      // console.log("gpsKnapp clicked!");
+      toggleTracking(!gpsErAktiv);
+
+      // Plausible Analytics
+      try {
+        plausible("Trykk på GPS knappen", {
+        });
+      } catch (e) {
+        console.log(e);
+      }
+
+    });
   } else {
     console.log("Ingen gpsKnapp med ID gpsButtonContainer er definert.");
   }
