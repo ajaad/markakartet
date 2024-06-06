@@ -41,11 +41,11 @@ $(document).ready(function () {
   // positionFeature.setStyle(positionFeatureStilMedPil);
   vectorSourceGPS.addFeature(positionFeature);
 
-  if(gpsKnapp != null){
+  if (gpsKnapp != null) {
     gpsKnapp.addEventListener("click", function () {
-        console.log("gpsKnapp clicked!");
-        toggleTracking(!gpsErAktiv);
-      });
+      // console.log("gpsKnapp clicked!");
+      toggleTracking(!gpsErAktiv);
+    });
   } else {
     console.log("Ingen gpsKnapp med ID gpsButtonContainer er definert.");
   }
@@ -54,6 +54,14 @@ $(document).ready(function () {
     // console.log("successFunction triggered");
     // console.log(position);
     ordneGPS(true);
+
+    // Plausible Analytics
+    try {
+      plausible("Aktivert GPS", {
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
   function errorFunction(error){
     // console.log("errorFunction triggered");

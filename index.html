@@ -14,12 +14,12 @@
 
     <meta http-equiv="Content-Language" content="text/html;charset=utf-8" />
 
-    <!-- Plausible Analytics Test -->
-    <script defer data-domain="markakartet.no" src="https://plausible.io/js/script.js"></script>
+    <!-- Plausible Analytics -->
+     <script defer data-domain="markakartet.no" src="https://plausible.io/js/script.js"></script>
     <script>window.plausible = window.plausible || function() { 
         (window.plausible.q = window.plausible.q || []).push(arguments) }
     </script>
-
+     
     <title>Markakartet</title>
 </head>
 
@@ -60,7 +60,6 @@
         </div>
 
         <button id="thresholdTestButton">Test</button>
-
         <div id="slideTextTest">Test Info</div>
 
         <div class="hovedVinduContainer" id="kartHovedMenyContainer">
@@ -142,7 +141,8 @@
                     <div class="featureInfoDivider"></div>
                     
                     <div class="featureBilder" id="featureBilder">
-                        <img class="featureHovedBilde" id="featureHovedBilde" src="./images/test-cat.jpg"/>
+                        <!-- <img class="featureHovedBilde" id="featureHovedBilde" src="./images/test-cat.jpg"/> -->
+                        <img class="featureHovedBilde" id="featureHovedBilde" src=""/>
                     </div>
 
                     <br />
@@ -608,11 +608,7 @@
                             fane)</a>.
                     </p>
 
-                    <!-- Bruker ikke analytics  -->
-<!--                     <a title="GDPR-compliant Web Analytics" href="https://clicky.com/101450407"><img alt="Clicky" src="//static.getclicky.com/media/links/badge.gif" /></a>
-                    <script async data-id="101450407" src="//static.getclicky.com/js"></script>  -->
-
-                    <br />
+                    <br /><br />
 
                     <div class="undertittel">
                         Finansiering
@@ -704,8 +700,19 @@
                     </div>
                     <p>
                         For mer informasjon om medlemskap
-                        <a href="https://naturvernforbundet.no/bli-medlem/" target="_blank"
-                            rel="noopener noreferrer">klikk her (ny fanLogonoae).</a>
+                        <a href="https://naturvernforbundet.no/bli-medlem/" target="_blank" onclick="klikkPaaBliMedlem();"
+                            rel="noopener noreferrer">klikk her (ny fane).</a>
+                        <script>
+                            function klikkPaaBliMedlem() {
+                                // Plausible Analytics
+                                try {
+                                    plausible("Trykk på 'Mer informasjon om medlemskap' lenke", {
+                                    });
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            }
+                        </script>
                     </p>
 
                     <br />

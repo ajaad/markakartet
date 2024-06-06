@@ -7,6 +7,8 @@ let popupKjorer = false;
 let featureHoverSelectKjorer = false;
 let KartKjorer = false;
 
+let debugHandler;
+
 // Bruke til alle slags feilmeldinger?
 let debugGPSContainer = document.getElementById("debugGPSContainer");
 var debugGPS = document.getElementById("debugGPS"); // Teksten
@@ -15,7 +17,8 @@ function fadeInnogUtDebugMelding(melding, varighet){
     debugGPS.innerHTML = melding;
     debugGPSContainer.classList.remove("opacity0");
     debugGPSContainer.classList.add("opacity1");
-    setTimeout(() => {
+    if(debugHandler) clearTimeout(debugHandler); // Kansellere pågående timer
+    debugHandler = setTimeout(() => {
       debugGPSContainer.classList.remove("opacity1");
       debugGPSContainer.classList.add("opacity0");
   }, varighet);
@@ -253,26 +256,117 @@ function hentTurstiIkonForPostnr(postnr){
     }
 }
 
+// URL PARAMETERE
+
+// Definerer den her bare. Aktive kartlag fra URL:
+var lagListeFraURL; // Utgått - ikke i bruk
+
+let zoomFraUrl;
+let centerFraUrl;
+
+let infoSideFeatureNavn;
+let infoSideFeatureNavnFraUrl;
+
+let infoSideKartlagNavn;
+let infoSideKartlagNavnFraUrl;
+
+let infoSideStartFullfort = false;
+
+//
+var aktivtBakgrunnskart = "bakgrunnskartOSM"; // Default bakgrunnskart. Best å håndtere bakgrunnskart som en egen URL parameter...
+var bakgrunnFraUrlParam = "";
+
+// string[] med kartlag id
+var aktiveKartlagListe = [];
+var kartlagListeFraUrlParam = [];
+
+function leggTilIAktiveKartlagListen(kartlagNavn){
+    if(!aktiveKartlagListe.includes(kartlagNavn)){
+        aktiveKartlagListe.push(kartlagNavn);
+        // console.log(aktiveKartlagListe);
+        lagUrl();
+    }
+}
+// Sletter første instans funnet av kartlagNavn
+function slettFraAktiveKartlagListen(kartlagNavn){
+    for(var i = 0; i < aktiveKartlagListe.length; i++){
+        if(kartlagNavn == aktiveKartlagListe[i]){
+            aktiveKartlagListe.splice(i, 1);
+            // console.log(aktiveKartlagListe);
+            lagUrl();
+            return;
+        }
+    }
+}
+// Fra liste til streng
+function lagStrengForAktiveKartlagListen(){
+    let endeligeStreng = "";
+    const antallAktiveKartlag = aktiveKartlagListe.length;
+    // console.log("antallAktiveKartlag: " + antallAktiveKartlag);
+
+    for(var i = 0; i < antallAktiveKartlag; i++){
+        if(i < antallAktiveKartlag - 1){
+            endeligeStreng += aktiveKartlagListe[i] + ",";
+
+        } else {
+            endeligeStreng += aktiveKartlagListe[i];
+        }
+    }
+    // console.log("endeligeStreng: " + endeligeStreng);
+    return endeligeStreng;
+}
+// Fra streng til liste
+function fyllAktiveKartlagListenFraStreng(streng){
+    aktiveKartlagListe = streng.split(",");
+    console.log(aktiveKartlagListe);
+}
+
 const pathName = loc.pathname;
-// console.log("pathName: " + pathName);
+console.log("pathName: " + pathName);
 
 const href = window.location.href;
-// console.log("href: " + href);
+console.log("href: " + href);
 
 // URL PARAMETERS
 
 const url = window.location.search;
-// console.log(url);
+console.log(url);
 
 const urlParameters = new URLSearchParams(url);
-// console.log(urlParameters);
+console.log(urlParameters);
 
 for (var entry of urlParameters.entries()) {
     // console.log(entry);
+    //
+    switch(entry[0]){
+        case "zoom":
+            zoomFraUrl = parseFloat(entry[1]);
+            // console.log("zoomFraUrl: " + zoomFraUrl);
+            break;
+        case "center":
+            const koordinater = entry[1].split(",");
+            centerFraUrl = [parseFloat(koordinater[0]), parseFloat(koordinater[1])];
+            // console.log("centerFraUrl: " + centerFraUrl);
+            break;
+        case "bakgrunn":
+            bakgrunnFraUrlParam = entry[1];
+            // console.log("bakgrunnFraUrlParam:" + bakgrunnFraUrlParam);
+            break;
+        case "kartlag":
+            // console.log(entry[1]);
+            kartlagListeFraUrlParam = entry[1].split(",");
+            // console.log(aktiveKartlagListe);
+            break;
+        case "infoSideFeature":
+            // console.log(entry[1]);
+            infoSideFeatureNavnFraUrl = entry[1];
+            break;
+        case "infoSideKartlag":
+            // console.log(entry[1]);
+            infoSideKartlagNavnFraUrl = entry[1];
+            break;
+    }
 }
-
-// Definerer den her bare. Aktive kartlag fra URL:
-var lagListeFraURL;
 
 //
 const DEFAULT_OPACITY = 0.8;
@@ -280,7 +374,7 @@ const DEFAULT_OPACITY = 0.8;
 // Add coordinate available systems 
 
 // 
-const defaultCoordSysFull = "EPSG:4236";
+const defaultCoordSysFull = "EPSG:4326"; // Obs! Hadde en skrivefeil her. Skal være 4326, ikke 4236!
 const defaultCoordSysType = "EPSG";
 const defaultCoordSysCode = "4326";
 
@@ -496,7 +590,10 @@ var mapGruppeGeometri = new ol.layer.Group({
     visible: true,
     layers: [
         // vektorLagGeometri, // NOTE: Ikke i bruk nå?
-        vektorLagGPS
+        vektorLagGPS,
+        //
+        // vektorLagMidlertidig,
+        // vektorLagMidlertidigIkoner,
     ]
   });
 
@@ -1513,167 +1610,241 @@ async function fetchJSON(url) {
   });
 }
 
-// TODO: Hm, lage en funksjon til gjenbruk? Som ruter for andre kalenderår kan bruke.
-// Kjøre dette etter å ha definert rutene og ikonene.
-var data = fetchJSON(kalenderRuter2021Data[1]["data"]).then(function (data) {
-  var features = geoJSONFormat.readFeatures(data);
-  features.forEach((feature) => {
-    // Funker! Men må fikse slik at den blir satt tilbake til dashed etter highlight også trykke vekk.
-    try {
-      // console.log(feature);
+// behandleKalenderturer();
 
-    //   var featureName = feature.get("name");
-    var featureName = feature.get("NAVN");
-      var featureStart = feature.get("start_3857");
-      var featurePageUrl = feature.get("side_url");
-      var featurePictureUrl = feature.get("bilde_url");
-      var featureGrad = feature.get("grad");
-      var featureTurType = feature.get("tur_type");
-    //   console.log("featureName: " + featureName);
-    //   console.log("featureGrad: " + featureGrad);
-    //   console.log("featureStart: " + featureStart);
-    //   console.log("featurePageUrl: " + featurePageUrl);
-    //   console.log("featurePictureUrlName: " + featurePictureUrl + "\n\n");
+async function behandleKalenderturer() {
+    // TODO: Hm, lage en funksjon til gjenbruk? Som ruter for andre kalenderår kan bruke.
+    // Kjøre dette etter å ha definert rutene og ikonene.
+    var data = await fetchJSON(kalenderRuter2021Data[1]["data"]).then(function (data) {
+        var features = geoJSONFormat.readFeatures(data);
+        features.forEach((feature) => {
+            // Funker! Men må fikse slik at den blir satt tilbake til dashed etter highlight også trykke vekk.
+            try {
+                // console.log(feature);
 
-      const featureGeometry = feature.get("geometry");
-      const featureGeometryType = featureGeometry.getType(); // Gir geometri-typen.
-      const length = ol.sphere.getLength(featureGeometry); // Gir lengden i meter.
-      let lengthRounded = Math.round((length/1000)*10) / 10; // I km med en desimal.
+                //   var featureName = feature.get("name");
+                var featureName = feature.get("NAVN");
+                var featureStart = feature.get("start_3857");
+                var featurePageUrl = feature.get("side_url");
+                var featurePictureUrl = feature.get("bilde_url");
+                var featureGrad = feature.get("grad");
+                var featureTurType = feature.get("tur_type");
+                //   console.log("featureName: " + featureName);
+                //   console.log("featureGrad: " + featureGrad);
+                //   console.log("featureStart: " + featureStart);
+                //   console.log("featurePageUrl: " + featurePageUrl);
+                //   console.log("featurePictureUrlName: " + featurePictureUrl + "\n\n");
 
-      let featureGeometryExtent = featureGeometry.getExtent();
-      let featureGeometryExtentCenter = ol.extent.getCenter(featureGeometryExtent);
+                const featureGeometry = feature.get("geometry");
+                const featureGeometryType = featureGeometry.getType(); // Gir geometri-typen.
+                const length = ol.sphere.getLength(featureGeometry); // Gir lengden i meter.
+                let lengthRounded = Math.round((length / 1000) * 10) / 10; // I km med en desimal.
 
-      feature.set("geometriType", featureGeometryType);
-      feature.set("lengdeKm", lengthRounded);
-      feature.set("geometriMidtKoordinater", featureGeometryExtentCenter);
-    //   console.log(feature);
+                let featureGeometryExtent = featureGeometry.getExtent();
+                let featureGeometryExtentCenter = ol.extent.getCenter(featureGeometryExtent);
 
-        // Sette kartlag type. Så langt to typer: kalender_tur og natursti
-        feature.set("kartlagType", "kalender_tur");
+                feature.set("geometriType", featureGeometryType);
+                feature.set("lengdeKm", lengthRounded);
+                feature.set("geometriMidtKoordinater", featureGeometryExtentCenter);
+                //   console.log(feature);
 
-      // Er det en snarvei (stiplet)?
-      let erEnStiplet = false;
+                // Sette kartlag type. Så langt to typer: kalender_tur og natursti
+                feature.set("kartlagType", "kalender_tur");
 
-      var maanedstur = feature.get("MAANEDSTUR");
-      if (maanedstur != null) {
-        var snarvei = feature.get("Stiplet");
-        if (snarvei != null) {
-          var snarveiVerdi = parseInt(snarvei);
-          if (snarveiVerdi > 0) {
-            erEnStiplet = true;
-          }
-        }
-      }
+                // Er det en snarvei (stiplet)?
+                let erEnStiplet = false;
 
-      // Egen stil for hvert ikon (feature):
+                // Notat: Tror jeg kan sjekke noe annet enn "MAANEDSTUR" om at det er en kalendertur.
+                var maanedstur = feature.get("MAANEDSTUR");
+                if (maanedstur != null) {
+                    var snarvei = feature.get("Stiplet");
+                    if (snarvei != null) {
+                        var snarveiVerdi = parseInt(snarvei);
+                        if (snarveiVerdi > 0) {
+                            erEnStiplet = true;
+                        }
+                    }
+                }
 
-      featureGrad = String(featureGrad); // Ser ut som at denne fikser en annen bug, som tar bort fargene hvis man zoomer veldig langt ut og zoomer inn igjen.
+                // Egen stil for hvert ikon (feature):
 
-      var bildeUrl = "";
+                featureGrad = String(featureGrad); // Ser ut som at denne fikser en annen bug, som tar bort fargene hvis man zoomer veldig langt ut og zoomer inn igjen.
 
-      bildeUrl = hentRiktigTurIkonPlassering(featureGrad, featureTurType)[0];
+                var bildeUrl = "";
 
-      // Sette både ikoner og turstilene!
-      // Støtter bare string, så konverter grad til string først.
-      switch (featureGrad) {
-        case "lett": case "1":
-        //   bildeUrl = ikonLett;
-          if(!erEnStiplet){
-            feature.setStyle(vektorLagKalenderRuter2021.get("lettStil"));
-          } else {
-            feature.setStyle(vektorLagKalenderRuter2021.get("lettStilDashed"));
-          }
-          break;
-        case "middels": case "2":
-        //   bildeUrl = ikonMiddels;
-          if(!erEnStiplet){
-            feature.setStyle(vektorLagKalenderRuter2021.get("middelsStil"));
-          } else {
-            feature.setStyle(vektorLagKalenderRuter2021.get("middelsStilDashed"));
-          }
-          break;
-        case "vanskelig": case "3":
-        //   bildeUrl = ikonVanskelig;
-          if(!erEnStiplet){
-            feature.setStyle(vektorLagKalenderRuter2021.get("vanskeligStil"));
-          } else {
-            feature.setStyle(vektorLagKalenderRuter2021.get("vanskeligStilDashed"));
-          }
-          break;
-        case "lars_monsen": case "4":
-            if(!erEnStiplet){
-                feature.setStyle(vektorLagKalenderRuter2021.get("larsMonsenStil"));
-              } else {
-                feature.setStyle(vektorLagKalenderRuter2021.get("larsMonsenStilDashed"));
-              }
-            break;
-        case "fridjof_nansen": case "9":
-            if(!erEnStiplet){
-                feature.setStyle(vektorLagKalenderRuter2021.get("fridjofNansenStil"));
-              } else {
-                feature.setStyle(vektorLagKalenderRuter2021.get("fridjofNansenStilDashed"));
-              }
-            break;
-        default:
-        //   bildeUrl = ikonUkjent;
-          if(!erEnStiplet){
-            feature.setStyle(vektorLagKalenderRuter2021.get("ukjentStil"));
-          } else {
-            feature.setStyle(vektorLagKalenderRuter2021.get("ukjentStilDashed"));
-          }
-          break;
-      }
+                bildeUrl = hentRiktigTurIkonPlassering(featureGrad, featureTurType)[0];
 
-      var clusterStyle = new ol.style.Style({
-        image: new ol.style.Icon({
-          scale: 0.12,
-          anchorXUnits: "fraction",
-          anchorYUnits: "pixels",
-          src: bildeUrl,
-        }),
-      });
+                // Sette både ikoner og turstilene!
+                // Støtter bare string, så konverter grad til string først.
+                switch (featureGrad) {
+                    case "lett": case "1":
+                        //   bildeUrl = ikonLett;
+                        if (!erEnStiplet) {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("lettStil"));
+                        } else {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("lettStilDashed"));
+                        }
+                        break;
+                    case "middels": case "2":
+                        //   bildeUrl = ikonMiddels;
+                        if (!erEnStiplet) {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("middelsStil"));
+                        } else {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("middelsStilDashed"));
+                        }
+                        break;
+                    case "vanskelig": case "3":
+                        //   bildeUrl = ikonVanskelig;
+                        if (!erEnStiplet) {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("vanskeligStil"));
+                        } else {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("vanskeligStilDashed"));
+                        }
+                        break;
+                    case "lars_monsen": case "4":
+                        if (!erEnStiplet) {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("larsMonsenStil"));
+                        } else {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("larsMonsenStilDashed"));
+                        }
+                        break;
+                    case "fridjof_nansen": case "9":
+                        if (!erEnStiplet) {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("fridjofNansenStil"));
+                        } else {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("fridjofNansenStilDashed"));
+                        }
+                        break;
+                    default:
+                        //   bildeUrl = ikonUkjent;
+                        if (!erEnStiplet) {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("ukjentStil"));
+                        } else {
+                            feature.setStyle(vektorLagKalenderRuter2021.get("ukjentStilDashed"));
+                        }
+                        break;
+                }
 
-      var coordinates3857String = featureStart.split(",");
+                var clusterStyle = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        scale: 0.12,
+                        anchorXUnits: "fraction",
+                        anchorYUnits: "pixels",
+                        src: bildeUrl,
+                    }),
+                });
 
-      try {
-        var coordinates3857x = parseFloat(coordinates3857String[0]);
-        var coordinates3857y = parseFloat(coordinates3857String[1]);
+                var coordinates3857String = featureStart.split(",");
 
-        const iconFeature = new ol.Feature({
-          geometry: new ol.geom.Point([
-            parseFloat(coordinates3857x),
-            parseFloat(coordinates3857y),
-          ]),
-          name: featureName,
-          featureStart: coordinates3857String,
-          featurePageUrl: featurePageUrl,
-          featurePictureUrl: featurePictureUrl,
-          featureGrad: featureGrad,
-          ikonStil: clusterStyle, // Egen stil for punktet!
-          featureRute: feature, // Ruten til ikonet.
-          featureRuteNavn: feature.get("NAVN"),
-          ruteKartlag: vektorLagKalenderRuter2021,
+                try {
+                    var coordinates3857x = parseFloat(coordinates3857String[0]);
+                    var coordinates3857y = parseFloat(coordinates3857String[1]);
+
+                    const iconFeature = new ol.Feature({
+                        geometry: new ol.geom.Point([
+                            parseFloat(coordinates3857x),
+                            parseFloat(coordinates3857y),
+                        ]),
+                        name: featureName,
+                        featureStart: coordinates3857String,
+                        featurePageUrl: featurePageUrl,
+                        featurePictureUrl: featurePictureUrl,
+                        featureGrad: featureGrad,
+                        ikonStil: clusterStyle, // Egen stil for punktet!
+                        featureRute: feature, // Ruten til ikonet.
+                        featureRuteNavn: feature.get("NAVN"),
+                        ruteKartlag: vektorLagKalenderRuter2021,
+                    });
+
+                    // ruter2021FeatureIconsCollection.push(iconFeature);
+
+                    // Prøve å ikke inkludere ikon for stiplet.
+                    if (!erEnStiplet) ruter2021FeatureIconsCollection.push(iconFeature);
+
+                } catch (e) {
+                    console.log("exception under laging av featureIcon: " + e);
+                }
+
+            } catch (exception) {
+                console.log("Noe error når jeg gjorde feature.get()... e: " + exception);
+            }
+
+            kalenderRuter2021FeatureCollection.push(feature);
         });
 
-        ruter2021FeatureIconsCollection.push(iconFeature);
-      } catch (e) {
-        console.log("exception under laging av featureIcon: " + e);
-      }
+        // do what you want to do with `data` here...
+        data.features.forEach(function (feature) {
+            // console.log(feature);
+            // var symbol = feature.properties['icon'];
+            // console.log(symbol);
+        });
 
-    } catch (exception) {
-      console.log("Noe error når jeg gjorde feature.get()... e: " + exception);
-    }
+        // 
+        // console.log("Rutene er klare?");
+        //   console.log(kalenderRuter2021FeatureCollection);
 
-    kalenderRuter2021FeatureCollection.push(feature);
-  });
+        // Hm. Tenkte å gjøre to ting... Legge til hovedrute til stiplet, og stiplettene til hovedruten? ... Oof...
 
-  // do what you want to do with `data` here...
-  data.features.forEach(function (feature) {
-    // console.log(feature);
-    // var symbol = feature.properties['icon'];
-    // console.log(symbol);
-  });
-});
+        // Loop i loop... Men bare for turer som har "har_stiplet" egenskapen.
+        const featuresArray = kalenderRuter2021FeatureCollection.getArray();
+        for (var j = 0; j < featuresArray.length; j++) {
+            const f = featuresArray[j];
+            const har_stiplet = f.get("har_stiplet");
+            if (har_stiplet) {
+
+                if (har_stiplet == "1") {
+
+                    const aar = f.get("AAR");
+                    const maaned = f.get("MAANED");
+                    const stipletteneTilRuten = [];
+
+                    // 
+                    for (var k = 0; k < featuresArray.length; k++) {
+                        const f2 = featuresArray[k];
+                        const stiplet = f2.get("Stiplet");
+                        // Trenger ikke sjekke om Stiplet eksisterer, siden alle ruter har den definert.
+                        if (stiplet == "1") {
+                            const aar2 = f2.get("AAR");
+                            const maaned2 = f2.get("MAANED");
+
+                            if (aar == aar2 && maaned == maaned2) {
+                                // Kan også legge til hovedruten til stiplet!
+                                f2.set("hovedrute", f);
+                                //
+                                stipletteneTilRuten.push(f2);
+                            }
+                        }
+                    }
+
+                    // 
+                    if (stipletteneTilRuten.length > 0) {
+                        f.set("stipletter", stipletteneTilRuten);
+                    }
+
+                }
+
+            }
+        }
+
+        // Selecte tur programmatisk, hvis turen er valgt ifølge URL parameter?
+        if (infoSideFeatureNavnFraUrl && infoSideKartlagNavnFraUrl) {
+
+            if (infoSideKartlagNavnFraUrl == vektorLagKalenderRuter2021.get("name")) {
+                // console.log("Kalenderturer! Kjører visInfoSideProgrammatisk");
+                visInfoSideProgrammatisk(true);
+            }
+
+        }
+
+        console.log("behandleKalenderturer resolved!");
+        return true;
+
+    }).catch(function (error) {
+        console.log("behandleKalenderturer ~ error! error: " + error);
+        return false;
+    });
+
+}
 
 var kartMenyLagDictKalenderRuter2021 = {
     lagNavn: vektorLagKalenderRuter2021.get("name"),
@@ -1742,7 +1913,8 @@ var vektorlagNaturstiIkoner = new ol.layer.Vector({
             stilListe.push(currentFeatures[i].get("ikonStil"));
         }
         return stilListe;
-    }
+    },
+    ruteKartlagNavn: "vektorLagNatursti",
 })
 
 // Definere ikoner slutt
@@ -1765,100 +1937,105 @@ var vektorLagNatursti = new ol.layer.Vector({
     visible: false
 });
 
-// var tempFeatureIconsCollection = []; // Brukt til baklengs loop.
-var fetchData = fetchJSON(naturstiData[1]["data"]).then(function (fetchData) {
-  var features = geoJSONFormat.readFeatures(fetchData);
-  features.forEach((feature) => {
-    try {
-      // console.log(feature);
+// behandleNaturstiData();
 
-      var postnr = feature.get("postnr");
-      var koordinater = feature.get("koordinater");
+async function behandleNaturstiData() {
+    // var tempFeatureIconsCollection = []; // Brukt til baklengs loop.
+    var fetchData = await fetchJSON(naturstiData[1]["data"]).then(function (fetchData) {
+        var features = geoJSONFormat.readFeatures(fetchData);
+        features.forEach((feature) => {
+            try {
+                // console.log(feature);
 
-      const featureGeometry = feature.get("geometry");
-      const length = ol.sphere.getLength(featureGeometry); // Gir lengden i meter.
-      const lengthMeterRounded = Math.round((length * 10)) / 10; // Meter runded av til en desimal.
-      const lengthMeterNoDecimals = Math.round(length);
-      let lengthRounded = Math.round((length / 1000) * 10) / 10; // I km med en desimal.
+                var postnr = feature.get("postnr");
+                var koordinater = feature.get("koordinater");
 
-      feature.set("lengdeMeter", lengthMeterNoDecimals);
-      feature.set("lengdeKm", lengthRounded);
+                const featureGeometry = feature.get("geometry");
+                const length = ol.sphere.getLength(featureGeometry); // Gir lengden i meter.
+                const lengthMeterRounded = Math.round((length * 10)) / 10; // Meter runded av til en desimal.
+                const lengthMeterNoDecimals = Math.round(length);
+                let lengthRounded = Math.round((length / 1000) * 10) / 10; // I km med en desimal.
 
-    //   console.log("type: " + typeof(postnr) + ", lengthMeterRounded: " + lengthMeterRounded + ", lengthMeterNoDecimals: " + lengthMeterNoDecimals);
-    //   console.log("postnr: " + postnr + ", koordinater: " + koordinater + ", lengde i meter: " + length + ", km: " + lengthRounded );
+                feature.set("lengdeMeter", lengthMeterNoDecimals);
+                feature.set("lengdeKm", lengthRounded);
 
-        // Definere kartlag type. Hittil to typer: kalender_rute og natursti
-        feature.set("kartlagType", "natursti");
+                //   console.log("type: " + typeof(postnr) + ", lengthMeterRounded: " + lengthMeterRounded + ", lengthMeterNoDecimals: " + lengthMeterNoDecimals);
+                //   console.log("postnr: " + postnr + ", koordinater: " + koordinater + ", lengde i meter: " + length + ", km: " + lengthRounded );
 
-        // For ikoner start
+                // Definere kartlag type. Hittil to typer: kalender_rute og natursti
+                feature.set("kartlagType", "natursti");
 
-        let bildeUrl = hentTurstiIkonForPostnr(postnr);
+                // For ikoner start
 
-      const clusterStyle = new ol.style.Style({
-        image: new ol.style.Icon({
-          scale: 0.12,
-          anchorXUnits: "fraction",
-          anchorYUnits: "pixels",
-          src: bildeUrl,
-        }),
-      });
+                let bildeUrl = hentTurstiIkonForPostnr(postnr);
 
-      var koordinaterStreng = koordinater.split(",");
+                const clusterStyle = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        scale: 0.12,
+                        anchorXUnits: "fraction",
+                        anchorYUnits: "pixels",
+                        src: bildeUrl,
+                    }),
+                });
 
-      try {
-        var koordinaterX = parseFloat(koordinaterStreng[0]);
-        var koordinaterY = parseFloat(koordinaterStreng[1]);
+                var koordinaterStreng = koordinater.split(",");
 
-        const iconFeature = new ol.Feature({
-          geometry: new ol.geom.Point([
-            parseFloat(koordinaterX),
-            parseFloat(koordinaterY),
-          ]),
-          postnr: postnr,
-          koordinater: koordinaterStreng,
-          ikonStil: clusterStyle, // Egen stil for punktet!
-          featureRute: feature, // Ruten til ikonet.
-          featureRuteNavn: feature.get("navn"),
-          ruteKartlag: vektorLagNatursti,
+                try {
+                    var koordinaterX = parseFloat(koordinaterStreng[0]);
+                    var koordinaterY = parseFloat(koordinaterStreng[1]);
+
+                    const iconFeature = new ol.Feature({
+                        geometry: new ol.geom.Point([
+                            parseFloat(koordinaterX),
+                            parseFloat(koordinaterY),
+                        ]),
+                        postnr: postnr,
+                        koordinater: koordinaterStreng,
+                        ikonStil: clusterStyle, // Egen stil for punktet!
+                        featureRute: feature, // Ruten til ikonet.
+                        featureRuteNavn: feature.get("navn"),
+                        ruteKartlag: vektorLagNatursti,
+                    });
+
+                    // console.log(feature);
+
+                    naturstiFeatureIconsCollection.push(iconFeature);
+                    // tempFeatureIconsCollection.push(iconFeature);
+                    // console.log(tempFeatureIconsCollection);
+                } catch (e) {
+                    console.log("exception under laging av featureIcon: " + e);
+                }
+
+                // For ikoner slutt
+
+            } catch (exception) {
+                console.log(
+                    "Natursti ~ Noe error når jeg gjorde feature.get()... e: " + exception
+                );
+            }
+
+            naturstiFeatureCollection.push(feature);
         });
 
-        // console.log(feature);
+        fetchData.features.forEach(function (feature) { });
 
-        naturstiFeatureIconsCollection.push(iconFeature);
-        // tempFeatureIconsCollection.push(iconFeature);
-        // console.log(tempFeatureIconsCollection);
-      } catch (e) {
-        console.log("exception under laging av featureIcon: " + e);
-      }
+        if (infoSideFeatureNavnFraUrl && infoSideKartlagNavnFraUrl) {
 
-      // For ikoner slutt
+            if (infoSideKartlagNavnFraUrl == vektorLagNatursti.get("name")) {
+                // console.log("Natursti! Kjører visInfoSideProgrammatisk");
+                visInfoSideProgrammatisk(false);
+            }
 
-    } catch (exception) {
-      console.log(
-        "Natursti ~ Noe error når jeg gjorde feature.get()... e: " + exception
-      );
-    }
+        }
 
-    naturstiFeatureCollection.push(feature);
-  });
+        console.log("behandleNaturstiData ~ resolved!");
+        return true;
 
-//   console.log(tempFeatureIconsCollection);
-//   for(let i = tempFeatureIconsCollection.length-1; i >= 0; i--){
-//     console.log("i: " + i);
-//     naturstiFeatureIconsCollection.push(tempFeatureIconsCollection[i]);
-//     }
-
-  fetchData.features.forEach(function (feature) {});
-});
-
-// Prøve å legge til featureIcons med baklengs loop? Kan det gjøre at "1" kommer over "15"? ...
-// console.log(tempFeatureIconsCollection);
-// console.log(tempFeatureIconsCollection.getArray());
-// console.log("temp length: " + tempFeatureIconsCollection.getArray().length);
-// console.log("temp length: " + tempFeatureIconsCollection.length);
-// for(let i = tempFeatureIconsCollection.length-1; i >= 0; i--){
-//     console.log("i: " + i);
-// }
+    }).catch(function (error) {
+        console.log("behandleNaturstiData ~ error! error: " + error);
+        return false;
+    });
+}
 
 var kartMenyLagDictNatursti = {
     lagNavn: vektorLagNatursti.get("name"),
@@ -2357,8 +2534,71 @@ var wmsLagOsloArealFriluftslivomraader = new ol.layer.Image({
     // capabilitiesURL: "https://kart.miljodirektoratet.no/arcgis/services/friluftsliv_kartlagt/mapserver/WMSServer?service=wms&request=getcapabilities",
     visible: false,
     name: "wmsLagOsloArealFriluftslivomraader",
-    uiName: "Friluftslivområder"
+    uiName: "Friluftslivområder",
+    // minZoom: 1
 });
+
+// wmsLagOsloArealFriluftslivomraader.on('change', function(e) {
+//     console.log("wmsLagOsloArealFriluftslivomraader ~ change");
+//     console.log(e);
+// });
+wmsLagOsloArealFriluftslivomraader.on('change:extent', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:extent");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:maxResolution', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:maxResolution");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:maxZoom', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:maxZoom");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:minResolution', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:minResolution");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:minZoom', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:minZoom");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:opacity', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:opacity");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:source', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:source");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:visible', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:visible");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('change:zIndex', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ change:zIndex");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('error', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ error");
+    console.log(e);
+});
+// wmsLagOsloArealFriluftslivomraader.on('postrender', function(e) {
+//     console.log("wmsLagOsloArealFriluftslivomraader ~ postrender");
+//     console.log(e);
+// });
+// wmsLagOsloArealFriluftslivomraader.on('prerender', function(e) {
+//     console.log("wmsLagOsloArealFriluftslivomraader ~ prerender");
+//     console.log(e);
+// });
+wmsLagOsloArealFriluftslivomraader.on('propertychange', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ propertychange");
+    console.log(e);
+});
+wmsLagOsloArealFriluftslivomraader.on('sourceready', function(e) {
+    console.log("wmsLagOsloArealFriluftslivomraader ~ sourceready");
+    console.log(e);
+});
+
 var kartMenyLagDictOsloArealFriluftslivomraader = {
     lagNavn: "wmsLagOsloArealFriluftslivomraader",
     uiLagNavn: "Friluftslivsområder",
@@ -2390,7 +2630,6 @@ var wmsLagHovedelv = new ol.layer.Image({
     name: "wmsLagHovedelv",
     uiName: "Hovedelver"
 });
-
 // Innsjøer - WMS
 var wmsLagInnsjoer = new ol.layer.Image({
     source: new ol.source.ImageWMS({
@@ -2945,31 +3184,52 @@ function makeStripedPattern(lineWidth, spacing, slope, color){
 function hentIkonForRute(rute, ikonKartlag){
     const ruteNavn = hentFeatureNavnMedBackup(rute);
 
-    // const features = vektorlagKalenderRuter2021Ikoner.getFeatures();
-    // console.log(features);
-    const source = ikonKartlag.getSource();
-    // console.log(source);
+    console.log("hentIkonForRute ~ For rute: " + ruteNavn);
 
+    const source = ikonKartlag.getSource();
+    // console.log("source: ");
+    // console.log(source);
     const features = source.getFeatures();
+    // console.log("features: ");
     // console.log(features);
+    const sourceFeatures = source.getSource().getFeatures();
+    // console.log("sourceFeatures: ");
+    // console.log(sourceFeatures);
 
     let ikonFeature = null;
 
-    for(var i = 0; i < features.length; i++){
-        const featureGroup = features[i].get("features");
-        // console.log(featureGroup);
-        for(j = 0; j < featureGroup.length; j++){
-            ikonFeature = featureGroup[j];
-            // console.log(ikonFeature);
-            // console.log("feature navn: " + feature.get("name"));
-            const navn = ikonFeature.get("featureRuteNavn");
-            // console.log("feature rute navn: " + ikonFeature.get("featureRuteNavn"));
+    if(sourceFeatures){
+
+        // console.log("sourceFeatures funker denne gangen?!");
+
+        for(var i = 0; i < sourceFeatures.length; i++){
+            const ikonF = sourceFeatures[i];
+            const navn = ikonF.get("featureRuteNavn");
             if(ruteNavn == navn){
-                console.log("Fant ikon feature med rute navnet!");
-                return ikonFeature;
+                // console.log("Fant ikon feature med rute navnet!");
+                return ikonF;
             }
         }
+
+    } else {
+
+        // console.log("sourceFeatures er null. Prøve med features...");
+
+        for(var i = 0; i < features.length; i++){
+            const featureGroup = features[i].get("features");
+            // console.log(featureGroup);
+            for(j = 0; j < featureGroup.length; j++){
+                const ikonF = featureGroup[j];
+                const navn = ikonF.get("featureRuteNavn");
+                if(ruteNavn == navn){
+                    // console.log("Fant ikon feature med rute navnet!");
+                    return ikonF;
+                }
+            }
+        }
+
     }
+
     return ikonFeature;
 }
 
@@ -3081,3 +3341,63 @@ var vektorLagMidlertidig = new ol.layer.Vector({
   clickable: true,
   visible: true
 });
+
+// 
+
+// Hm, for naturstier også?
+function visInfoSideProgrammatisk(erKalenderTur){
+    // if(!map){
+    //     console.log("visInfoSideProgrammatisk ~ Ops, kartobjektet er ikke definert enda. For tidlig!");
+    //     return;
+    // }
+
+    // if(infoSideStartFullfort){
+    //     console.log("visInfoSideProgrammatisk ~ er allerede kjørt. Returnerer!");
+    //     return;
+    // }
+
+    const kartlag = hentKartlagMedLagNavn(infoSideKartlagNavnFraUrl);
+    // console.log("visInfoSideProgrammatisk ~ kartlag: ");
+    // console.log(kartlag);
+
+    // const features = kartlag.getFeatures();
+    const features = kartlag.getSource().getFeaturesCollection().getArray();
+    // console.log("visInfoSideProgrammatisk ~ features: ");
+    // console.log(features);
+
+    let feature;
+    let featureNavn;
+
+    for(var i = 0; i < features.length; i++){
+        const f = features[i];
+        const navn = hentFeatureNavnMedBackup(f);
+        if(navn == infoSideFeatureNavnFraUrl){
+            feature = f;
+            featureNavn = navn;
+            // console.log("visInfoSideProgrammatisk ~ Fant feature! navn: " + navn);
+            // console.log(feature);
+        }
+    }
+
+    // Hvis både feature og kartlag ble funnet, kan vi åpne info siden!
+    if(feature && kartlag){
+
+        infoSideStartFullfort = true; // Eventuelt stoppe her, siden det er koden under som gjør noe endring.
+
+        if(erKalenderTur){
+            // console.log("visInfoSideProgrammatisk ~ erKalenderTur er sann! feature: ");
+            // console.log(feature);
+            const stipletter = feature.get("stipletter");
+            // console.log("visInfoSideProgrammatisk ~ stipletter: ");
+            // console.log(stipletter);
+            visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, false);
+        } else {
+            visFeatureInfoSide(feature, featureNavn, kartlag, null, false);
+        }
+    }
+}
+
+// Leter i kartlag for å finne feature.
+function hentFeatureFraKartlag(featureNavn){
+
+}
