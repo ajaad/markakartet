@@ -1,6 +1,12 @@
 
 # Markakartet - versjonslogg
 
+# v3.1 (06.06.2024)
+
+- Lagt til test av personvern-vennlig analyse
+- Dynamisk url som kan kopieres og åpne egen visning
+- Stipletter åpnes samtidig med hovedrute
+
 # v3 (07.05.2024)
 
 - La til tidligere kalenderturer og mye funksjonalitet for turer.
