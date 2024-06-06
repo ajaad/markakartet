@@ -45,15 +45,6 @@ $(document).ready(function () {
     gpsKnapp.addEventListener("click", function () {
       // console.log("gpsKnapp clicked!");
       toggleTracking(!gpsErAktiv);
-
-      // Plausible Analytics
-      try {
-        plausible("Trykk på GPS knappen", {
-        });
-      } catch (e) {
-        console.log(e);
-      }
-
     });
   } else {
     console.log("Ingen gpsKnapp med ID gpsButtonContainer er definert.");
@@ -63,6 +54,14 @@ $(document).ready(function () {
     // console.log("successFunction triggered");
     // console.log(position);
     ordneGPS(true);
+
+    // Plausible Analytics
+    try {
+      plausible("Aktivert GPS", {
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
   function errorFunction(error){
     // console.log("errorFunction triggered");
