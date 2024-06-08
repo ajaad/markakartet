@@ -2785,6 +2785,8 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
         visHovedMenyTabsKnapper();
         // Unikt for hovedmenyen. Vise riktig mellom "alle" og "aktive".
         visRiktigLagSideForMenyUtenEndreBoolean();
+        // 
+        loggMenySide(divTrykketPaa);
       }
 
       break;
@@ -2793,27 +2795,36 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
       headerKnappDel.style.color = "white";
       headerKnappDel.style.borderBottom = "3px solid white";
       visSide(sideDelKartvisning);
-      // Test
+      //
       document.getElementById("colorPickerButton").jscolor.show();
       // Kjør genererURL når divMenyDel velges, siden kartlag kanskje har blitt forandret.
       // genererURL();
+      //
+      loggMenySide(divTrykketPaa);
       break;
     case "divMenyOm":
       divMenyOmBilde.src = "./images/information-white.png";
       headerKnappOm.style.color = "white";
       headerKnappOm.style.borderBottom = "3px solid white";
       visSide(sideOmMarkakartet);
+      //
+      loggMenySide(divTrykketPaa);
       break;
     case "divMenyStott":
       divMenyStottBilde.src = "./images/favicon-only-inner-large-white.png";
       headerKnappStott.style.color = "white";
       headerKnappStott.style.borderBottom = "3px solid white";
       visSide(sideStott);
+      //
+      loggMenySide(divTrykketPaa);
       break;
     default:
       break;
   }
 
+}
+
+function loggMenySide(divTrykketPaa){
   // Plausible Analytics
   try{
     let menySideUi = "Ingen side";
@@ -2834,7 +2845,6 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
   }catch(e){
     console.log(e);
   }
-
 }
 
 //
