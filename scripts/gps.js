@@ -57,7 +57,7 @@ $(document).ready(function () {
 
     // Plausible Analytics
     try {
-      plausible("Aktivert GPS", {
+      plausible("Mål 7: Aktivert GPS", {
       });
     } catch (e) {
       console.log(e);

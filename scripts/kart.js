@@ -1822,9 +1822,10 @@ function visKartlag(layer, lagIndeks, analyse){
     // Plausible Analytics
     if(analyse){
       try {
-        plausible("Aktivert bakgrunnskartlag", {
+        plausible("Mål 2: Aktivert bakgrunnskartlag", {
           props: {
-            aktivert_bakgrunnskartlag: layer.get("uiName")
+            // aktivert_bakgrunnskartlag: layer.get("uiName")
+            "2.1: Aktivert bakgrunnskartlag": layer.get("uiName")
           },
         });
       } catch (e) {
@@ -1903,9 +1904,10 @@ function settSynlighetKartlag(layer, lagIndeks, analyse) {
     // Plausible Analytics
     if (analyse) {
       try {
-        plausible("Aktivert kartlag fra hovedmenyen", {
+        plausible("Mål 1: Aktivert kartlag fra hovedmenyen", {
           props: {
-            aktivert_kartlag: layer.get("uiName")
+            // aktivert_kartlag: layer.get("uiName")
+            "1.1: Aktivert kartlag": layer.get("uiName")
           },
         });
       } catch (e) {
@@ -2629,7 +2631,7 @@ function byttTilAktiveLagSiden(){
 
   // Plausible Analytics
   try {
-    plausible("Trykk på 'Aktive lag' knappen", {
+    plausible("Mål 6: Trykk på 'Aktive lag' knappen", {
     });
   } catch (e) {
     console.log(e);
@@ -2823,9 +2825,10 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
       case "divMenyStott": menySideUi = "Støtt"; break;
     }
 
-    plausible('Trykk av hovedknapper', {
+    plausible('Mål 5: Åpnet side for hovednavigasjon', {
       props: {
-        sideUi: menySideUi,
+        // sideUi: menySideUi,
+        "5.1: Åpnet side for hovednavigasjon": menySideUi,
       }
     })
   }catch(e){
@@ -2965,9 +2968,10 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
 
   // Plausible Analytics
   try{
-    plausible('Åpnet info side for kalendertur', {
+    plausible('Mål 3: Åpnet info side for kalendertur', {
       props: {
-        infoSide_kalendertur: featureNavn
+        // infoSide_kalendertur: featureNavn
+        "3.1: Åpnet kalendertur": featureNavn
       }
     })
   }catch(e){
@@ -2979,9 +2983,10 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
 
   // Plausible Analytics
   try{
-    plausible('Åpnet info side for natursti', {
+    plausible('Mål 4: Åpnet info side for natursti', {
       props: { 
-        infoSide_natursti: featureNavn
+        // infoSide_natursti: featureNavn
+        "4.1: Åpnet natursti-post": featureNavn
       }
     })
   }catch(e){
