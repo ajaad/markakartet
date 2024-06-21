@@ -1,6 +1,10 @@
 
 # Markakartet - versjonslogg
 
+# v3.2 (21.06.2024)
+
+- Endret på noen turbeskrivelser etter korrekturgjennomgang
+
 # v3.1 (06.06.2024)
 
 - Lagt til test av personvern-vennlig analyse
