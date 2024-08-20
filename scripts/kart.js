@@ -464,6 +464,13 @@ $(document).ready(function(){
     console.log("forutsetningerKlareForInfoSideProgrammatisk ~ ferdig!");
   }
 
+  // // Setter selection for område feature fra url
+  // if(omraadeFeatureFraUrl && omraadeKartlagFraUrl){
+  //   console.log("omraadeFeatureFraUrl og omraadeKartlagFraUrl er definerte. Kjører selectRute og visFeatureInfoSide.")
+  //   selectRute(omraadeFeatureFraUrl, omraadeKartlagFraUrl, null);
+  //   visFeatureInfoSide(feature, featureNavn, kartlag, null, false);
+  // }
+
   currentZoom = map.getView().getZoom();
 
   // En sjekk for popup:
@@ -488,10 +495,7 @@ $(document).ready(function(){
   // // Legger til midlertidige kartlag til kartet. De vises ikke under aktive kartlag.
   // leggTilKartlag("Naturopplevelser", vektorLagMidlertidig);
   // leggTilKartlag("Naturopplevelser", vektorlagMidlertidigIkoner);
-
   // console.log("Midlertidige lag er lagt til i map!");
-
-  // Test:
 
   function settKartlagetsUITekstfargeUtenIndeks(lagNavn, farge){
     try {
@@ -706,8 +710,8 @@ $(document).ready(function(){
           const clusterFeature = cluster[cluster.length - 1]; // Siste i lista er ikonet som er hoveret?
           const featureRute = clusterFeature.get("featureRute");
           const ruteKartlag = clusterFeature.get("ruteKartlag");
-          console.log(featureRute);
-          console.log(ruteKartlag);
+          // console.log(featureRute);
+          // console.log(ruteKartlag);
 
           // Sjekke etter andre turer i samme måned først?
           const aar = featureRute.get("AAR");
@@ -1821,6 +1825,7 @@ function visKartlag(layer, lagIndeks, analyse){
 
     // Plausible Analytics
     if(analyse){
+      /*
       try {
         plausible("Mål 2: Aktivert bakgrunnskartlag", {
           props: {
@@ -1831,6 +1836,7 @@ function visKartlag(layer, lagIndeks, analyse){
       } catch (e) {
         console.log(e);
       }
+      */
     }
 
   }
@@ -1903,6 +1909,7 @@ function settSynlighetKartlag(layer, lagIndeks, analyse) {
 
     // Plausible Analytics
     if (analyse) {
+      /*
       try {
         plausible("Mål 1: Aktivert kartlag fra hovedmenyen", {
           props: {
@@ -1913,6 +1920,7 @@ function settSynlighetKartlag(layer, lagIndeks, analyse) {
       } catch (e) {
         console.log(e);
       }
+      */
     }
 
   }
@@ -2785,8 +2793,6 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
         visHovedMenyTabsKnapper();
         // Unikt for hovedmenyen. Vise riktig mellom "alle" og "aktive".
         visRiktigLagSideForMenyUtenEndreBoolean();
-        // 
-        loggMenySide(divTrykketPaa);
       }
 
       break;
@@ -2795,36 +2801,27 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
       headerKnappDel.style.color = "white";
       headerKnappDel.style.borderBottom = "3px solid white";
       visSide(sideDelKartvisning);
-      //
+      // Test
       document.getElementById("colorPickerButton").jscolor.show();
       // Kjør genererURL når divMenyDel velges, siden kartlag kanskje har blitt forandret.
       // genererURL();
-      //
-      loggMenySide(divTrykketPaa);
       break;
     case "divMenyOm":
       divMenyOmBilde.src = "./images/information-white.png";
       headerKnappOm.style.color = "white";
       headerKnappOm.style.borderBottom = "3px solid white";
       visSide(sideOmMarkakartet);
-      //
-      loggMenySide(divTrykketPaa);
       break;
     case "divMenyStott":
       divMenyStottBilde.src = "./images/favicon-only-inner-large-white.png";
       headerKnappStott.style.color = "white";
       headerKnappStott.style.borderBottom = "3px solid white";
       visSide(sideStott);
-      //
-      loggMenySide(divTrykketPaa);
       break;
     default:
       break;
   }
 
-}
-
-function loggMenySide(divTrykketPaa){
   // Plausible Analytics
   try{
     let menySideUi = "Ingen side";
@@ -2845,6 +2842,7 @@ function loggMenySide(divTrykketPaa){
   }catch(e){
     console.log(e);
   }
+
 }
 
 //
@@ -2991,17 +2989,19 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   } else {
     // Er natursti
 
-  // Plausible Analytics
-  try{
-    plausible('Mål 4: Åpnet info side for natursti', {
-      props: { 
-        // infoSide_natursti: featureNavn
-        "4.1: Åpnet natursti-post": featureNavn
-      }
-    })
-  }catch(e){
-    console.log(e);
-  }
+    // Obs! Kan være område feature også?
+
+  // // Plausible Analytics
+  // try{
+  //   plausible('Mål 4: Åpnet info side for natursti', {
+  //     props: { 
+  //       // infoSide_natursti: featureNavn
+  //       "4.1: Åpnet natursti-post": featureNavn
+  //     }
+  //   })
+  // }catch(e){
+  //   console.log(e);
+  // }
 
   }
   
@@ -3017,7 +3017,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   kartMenySideKlikk("divMenyKart", true, aapneHovedMeny);
 
   const elFeatureInfoTittel = document.getElementById("featureInfoTittel");
-  const elFeatureHovedBilde = document.getElementById("featureHovedBilde");
+  const elFeatureTagContainer = document.getElementById("featureTagContainer");
   const elFeatureInfoGrad = document.getElementById("featureInfoGrad");
   const elFeatureLengde = document.getElementById("featureLengde");
   //
@@ -3032,6 +3032,8 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   //
   const elFeatureTagsContainer = document.getElementById("featureTagsContainer");
   const elFeatureBilder = document.getElementById("featureBilder");
+  const elFeatureHovedBilde = document.getElementById("featureHovedBilde");
+  const elFeatureHovedBildeBeskrivelse = document.getElementById("featureHovedBildeBeskrivelse");
   const elFeatureIngressContainer = document.getElementById("featureIngressContainer");
   const elFeatureTransportContainer = document.getElementById("featureTransportContainer");
   const elFeatureBeskrivelseContainer = document.getElementById("featureBeskrivelseContainer");
@@ -3046,25 +3048,75 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   // const elFeatureLydKilde = document.getElementById("featureLydKilde");
 
   elFeatureInfoTittel.innerHTML = featureNavn;
-  elFeatureHovedBilde.src = feature.get("bilde_url");
-  elFeatureHovedBilde.onerror = function(){
-    elFeatureHovedBilde.style.display = "none";
-  }
-  elFeatureHovedBilde.onload = function(){
-    elFeatureHovedBilde.style.display = "block";
+
+  // Hovedbilde
+
+  const hovedBildeUrl = feature.get("hoved_bilde");
+  if (hovedBildeUrl) {
+    console.log("hovedbilde eksisterer");
+    let hovedBildeBeskrivelse = feature.get("hoved_bilde_beskrivelse");
+    const hovedBildeBeskrivelseHTML = feature.get("hoved_bilde_beskrivelseHTML");
+    if(hovedBildeBeskrivelseHTML) hovedBildeBeskrivelse = hovedBildeBeskrivelseHTML
+
+    elFeatureBilder.style.display = "block";
+    elFeatureHovedBilde.src = hovedBildeUrl;
+
+    elFeatureHovedBilde.onerror = function (e) {
+      elFeatureHovedBilde.style.display = "none";
+      elFeatureHovedBilde.alt = "";
+      console.log("hovedbilde onerror");
+      // console.log(e)
+    };
+    elFeatureHovedBilde.onload = function () {
+      elFeatureHovedBilde.style.display = "block";
+      elFeatureHovedBilde.alt = hovedBildeBeskrivelse ? hovedBildeBeskrivelse : "";
+      elFeatureHovedBilde.title = hovedBildeBeskrivelse ? hovedBildeBeskrivelse : "";
+      console.log("hovedbilde loaded!");
+    };
+
+    elFeatureHovedBildeBeskrivelse.innerHTML = hovedBildeBeskrivelse;
+    elFeatureHovedBildeBeskrivelse.style.display = hovedBildeBeskrivelse ? "block" : "none";
+
+  } else {
+    elFeatureBilder.style.display = "none";
+    // elFeatureHovedBilde.style.display = "none";
+    console.log("hovedbilde er null");
   }
 
   const kartlagType = feature.get("kartlagType");
   if(kartlagType){
-    if(kartlagType == "natursti"){
-      elFeatureTagsContainer.style.display = "none";
-    } else {
-      // Vis for kalender ruter.
-      elFeatureTagsContainer.style.display = "flex";
+    switch(kartlagType){
+      // Kanskje lage static variabler for kartlag typene og ikke hardcode?
+      case "natursti": 
+        elFeatureTagsContainer.style.display = "none";
+        // elFeatureTagContainer.style.display = "none";
+      break;
+      case "kalender_tur": 
+        elFeatureTagsContainer.style.display = "flex";
+        // elFeatureTagContainer.style.display = "block";
+        elFeatureInfoGrad.style.display = "block";
+      break;
+      case "omraade": 
+        elFeatureTagsContainer.style.display = "flex";
+        // elFeatureTagContainer.style.display = "none";
+        elFeatureInfoGrad.style.display = "none";
+      break;
+      default: 
+        elFeatureTagsContainer.style.display = "flex";
+        elFeatureInfoGrad.style.display = "block";
+        // elFeatureTagContainer.style.display = "block";
+      break;
     }
+
+    // if(kartlagType == "natursti"){
+    //   elFeatureTagsContainer.style.display = "none";
+    // } else {
+    //   // Vis for kalender ruter.
+    //   elFeatureTagsContainer.style.display = "flex";
+    // }
   } else {
       // Hvis kartlagType ikke er definert, vis by default.
-      elFeatureTagsContainer.style.display = "flex";
+      // elFeatureTagsContainer.style.display = "flex";
   }
 
   const grad = feature.get("grad");
@@ -3137,16 +3189,17 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
     console.log("Klarte ikke hente koordinater fra featureStartString");
   }
 
-  elFeatureLengde.innerHTML = feature.get("lengdeKm") + " km";
-
   const lagetAv = feature.get("laget_av");
   const organisasjon = feature.get("organisasjon");
   const ingress = feature.get("ingress");
+  const ingressLengde = feature.get("ingressLengde");
+  const ingressHTML = feature.get("ingressHTML");
   const transport = feature.get("transport");
   const hovedbilde = feature.get("hoved_bilde");
   const bilder = feature.get("bilder");
   const tur_type = feature.get("tur_type");
   const tekst = feature.get("tekst"); // beskrivelsen
+  const tekstHTML = feature.get("tekstHTML"); // Modifisert tekst for HTML. Se kartData og lagHTMLTekst().
   const merket = feature.get("merket");
   const maanedfra = feature.get("maanedfra");
   const maanedtil = feature.get("maanedtil");
@@ -3155,8 +3208,24 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   //
   const turenVidere = feature.get("turen_videre");
   const lyd = feature.get("lyd");
+  //
+  const lengde = feature.get("lengdeKm");
+  const areal = feature.get("arealKm2");
+  // const arealEnDesimal = Math.round(areal * 10) / 10;
+
+  if(!lengde && !areal){
+    elFeatureLengde.style.display = "none";
+  } else {
+    elFeatureLengde.style.display = "block";
+    elFeatureLengde.innerHTML = lengde ? lengde + " km" : areal + " km²";
+  }
+
+  // elFeatureLengde.innerHTML = feature.get("lengdeKm") + " km";
 
   // console.log("maanedfra: " + maanedfra + ", maanedtil: " + maanedtil);
+
+  // Debug:
+  // console.log(tekst)
 
   if(maanedfra && maanedtil){
     let maanedfraStreng = "";
@@ -3202,13 +3271,38 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   }
 
   // elFeatureSkaper.innerHTML = lagetAv ? lagetAv : "";
-  elFeatureIngress.innerText = ingress;
+
+  if(ingress){
+    console.log(`ingress lengde: ${ingressLengde}, length: ${ingress.length}`)
+    // Sentrerer ingress-teksten, hvis den er kortere enn 30 tegn.
+    const lengde = ingressLengde ? ingressLengde : ingress.length;
+    elFeatureIngress.style.textAlign = lengde > 30 ? "left" : "center";
+    // elFeatureIngress.style.textAlign = ingress.length > 30 ? "left" : "center";
+  }
+
+  if(ingressHTML){
+    elFeatureIngress.innerHTML = ingressHTML;
+  } else {
+    elFeatureIngress.innerText = ingress;
+  }
+  // elFeatureIngress.innerText = ingress;
+
   elFeatureIngressContainer.style.display = ingress ? "block" : "none";
 
   elFeatureTransport.innerText = transport;
   elFeatureTransportContainer.style.display = transport ? "block" : "none";
 
-  elFeatureBeskrivelse.innerText = tekst;
+  // Tidligere brukte innerText, men denne kan ikke håndtere lenker (HTML elementer).
+  // elFeatureBeskrivelse.innerText = tekst;
+
+  // Obs! Må bruke "tekst", hvis tekstHTML ikke eksisterer.
+  if(tekstHTML){
+    elFeatureBeskrivelse.innerHTML = tekstHTML;
+  } else {
+    elFeatureBeskrivelse.innerText = tekst;
+  }
+  // elFeatureBeskrivelse.innerHTML = tekstHTML;
+
   elFeatureBeskrivelseContainer.style.display = tekst ? "block" : "none";
 
   elFeatureSkaperContainer.style.display = (!lagetAv && !organisasjon) ? "none" : "block";
@@ -3222,7 +3316,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   elFeatureSkaperOrganisasjon.style.paddingTop = (organisasjon && lagetAv) ? "4px" : "0px";
   elFeatureSkaperOrganisasjon.style.fontSize = (organisasjon && !lagetAv) ? "medium" : "small";
 
-  ////
+  // Bilde
 
   elFeatureTurenVidere.innerText = turenVidere;
   elFeatureTurenVidereContainer.style.display = turenVidere ? "block" : "none";

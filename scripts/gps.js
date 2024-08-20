@@ -57,8 +57,10 @@ $(document).ready(function () {
 
     // Plausible Analytics
     try {
+      /*
       plausible("Mål 7: Aktivert GPS", {
       });
+      */
     } catch (e) {
       console.log(e);
     }
