@@ -873,7 +873,7 @@ var vektorLagforeslatteLVO = new ol.layer.Vector({
     style: lagStilFraGeoJSON(foreslatteLVOdata, false),
     name: "vektorLagforeslatteLVO",
     uiName: "Landskapsvernområder",
-    // type: "omraadeLag",
+    type: "omraadeLag",
     stilSelect: lagStilFraGeoJSON(foreslatteLVOdata, true),
     strokeColorSelect: hentOgKonverterFargeArray(foreslatteLVOdata, 'strokeColorSelect'),
     fillColorSelect: hentOgKonverterFargeArray(foreslatteLVOdata, 'fillColorSelect'),
@@ -881,7 +881,7 @@ var vektorLagforeslatteLVO = new ol.layer.Vector({
     clickable: true,
     visible: false
 });
-forberedFaktasiderForOmraadeVektorlag(vektorLagforeslatteLVO, true);
+forberedFaktasiderForOmraadeVektorlag(vektorLagforeslatteLVO, false);
 
 var reservatKandidatFeatureCollection = new ol.Collection();
 var vektorKildeReservatKandidat = new ol.source.Vector({
