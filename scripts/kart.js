@@ -1792,8 +1792,13 @@ function skjulKartlag(layer, lagIndeks){
     }
     // console.log(lagNavn + " er nå skjult! visible: " + layer.get("visible"));
 
-    // Ta bort fra aktiveKartlagListe
-    //  slettFraAktiveKartlagListen(lagNavn);
+    // Obs! Må slette fra aktivekartlag listen.
+    // Ta bort fra aktive kartlaglisten
+    // Obs - ikke ta bort GPS vektorlaget.
+    if(lagNavn != "vektorLagGPS"){
+      slettFraAktiveKartlagListen(lagNavn);
+    }
+    
   }
 }
 
