@@ -28,12 +28,20 @@ function visHoverInfo(pixel, feature, layer, erIkonLag){
   let endeligeNavn = "";
   if(!erIkonLag){
     endeligeNavn = hentFeatureNavnMedBackup(feature);
-    // feature er en tur
-    if(feature.get("grad")){
+    // Hm, heller vise lyseblå/turkis farge, hvis kartlagType er satt.
+    if(feature.get("kartlagType")){
       hoverInfo.style.color = "var(--andre-farger-light-aqua)";
     } else {
       hoverInfo.style.color = "white";
     }
+
+    // // feature er en tur
+    // if(feature.get("grad")){
+    //   hoverInfo.style.color = "var(--andre-farger-light-aqua)";
+    // } else {
+    //   hoverInfo.style.color = "white";
+    // }
+
   } else {
     // erIkonLag er sann
     // console.log(feature);
@@ -952,6 +960,9 @@ function settFeatureSelectionListeOgLagPopup(pixel, koordinater) {
       } else {
         // TRYKK PÅ KARTLAG SOM IKKE ER ET IKON-KARTLAG
 
+        const featureType = feature.get("kartlagType");
+        console.log(`settFeatureSelectionListeOgLagPopup ~ featureType: ${featureType}`)
+
         // Bare for kalenderturer
         let featureNavn = feature.get("overskrift");
         let stiplet = feature.get("Stiplet");
@@ -964,6 +975,114 @@ function settFeatureSelectionListeOgLagPopup(pixel, koordinater) {
         // Hm, hvis stiplet, finne dets hovedrute. ... Hvordan?
 
         var eksisterer = false;
+
+        // // Hm. Bytte til en switch her med featureType? Siden det blir tre(+) typer nå.
+        // switch(featureType){
+        //   case "kalender_tur":
+
+        //   if (stiplet) {
+        //     // For kalenderturer
+  
+        //     // Håndtere når bruker trykker på bare en stiplet.
+        //     // Hm, egentlig bare håndtere alt med hovedruter herfra.
+        //     let hovedrute = null;
+        //     if (stiplet == "1") {
+        //       hovedrute = feature.get("hovedrute");
+  
+        //       if (hovedrute) {
+        //         feature = hovedrute; // Lurer på om dette går bra?
+        //         // console.log("settFeatureSelectionListeOgLagPopup ~ Fant hovedrute for stiplet. feature er nå: ");
+        //         // console.log(feature);
+        //         // Oppdatere variabler
+        //         featureNavn = feature.get("overskrift");
+        //         stiplet = feature.get("Stiplet");
+        //       }
+        //     }
+  
+        //     eksisterer = featureEksistererIFeatureClickSelection(feature);
+  
+        //     if (!eksisterer) {
+        //       settStilerOgLeggTilIFeatureClickSelection(feature, layer);
+  
+        //       // Lager bare popup linje for hovedruter, ikke for stiplets.
+        //       if (stiplet == "0") {
+        //         // currentItems++;
+  
+        //         // Sjekke etter stipletter
+        //         stipletter = feature.get("stipletter");
+        //         if (stipletter) {
+        //           // console.log("settFeatureSelectionListeOgLagPopup ~ ruten " + featureNavn + " har stipletter! antall: " + stipletter.length);
+        //           for (var l = 0; l < stipletter.length; l++) {
+        //             settStilerOgLeggTilIFeatureClickSelection(stipletter[l], layer);
+        //           }
+        //         }
+  
+        //         // currentItems og maxItems gjelder vel bare popup teksten.
+        //         if (currentItems < maxItems) {
+        //           currentItems++;
+        //           fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //         }
+        //         // fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+  
+        //       }
+  
+        //     } // Hvis ikke eksisterer allerede i click selection
+  
+        //   }
+
+        //   break;
+        //   case "natursti":
+
+        //   // For natursti
+        //   // Er egentlig ikke et problem foreløpig, siden naturstier ikke har ruter, men i tilfelle de skulle få ruter i fremtiden.
+
+        //   eksisterer = featureEksistererIFeatureClickSelection(feature);
+        //   // var endeligeNavn = hentFeatureNavnMedBackup(feature);
+        //   // console.log("kartlag " + endeligeNavn + " eksisterer i featureSelectionList: " + eksisterer);
+        //   if (!eksisterer) {
+        //     // currentItems++;
+        //     // fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //     settStilerOgLeggTilIFeatureClickSelection(feature, layer);
+        //     if (currentItems < maxItems) {
+        //       currentItems++;
+        //       fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //     }
+        //   }
+            
+        //   break;
+        //   case "omraade":
+
+        //   eksisterer = featureEksistererIFeatureClickSelection(feature);
+        //   // var endeligeNavn = hentFeatureNavnMedBackup(feature);
+        //   // console.log("kartlag " + endeligeNavn + " eksisterer i featureSelectionList: " + eksisterer);
+        //   if (!eksisterer) {
+        //     // currentItems++;
+        //     // fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //     settStilerOgLeggTilIFeatureClickSelection(feature, layer);
+        //     if (currentItems < maxItems) {
+        //       currentItems++;
+        //       fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //     }
+        //   }
+            
+        //   break;
+        //   default:
+
+        //   eksisterer = featureEksistererIFeatureClickSelection(feature);
+        //   // var endeligeNavn = hentFeatureNavnMedBackup(feature);
+        //   // console.log("kartlag " + endeligeNavn + " eksisterer i featureSelectionList: " + eksisterer);
+        //   if (!eksisterer) {
+        //     // currentItems++;
+        //     // fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //     settStilerOgLeggTilIFeatureClickSelection(feature, layer);
+        //     if (currentItems < maxItems) {
+        //       currentItems++;
+        //       fullTekst += lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater);
+        //     }
+        //   }
+            
+        //   break;
+        // }
 
         // Først sjekke at det er en kalendertur.
         if (stiplet) {
@@ -1018,6 +1137,8 @@ function settFeatureSelectionListeOgLagPopup(pixel, koordinater) {
           // For natursti
           // Er egentlig ikke et problem foreløpig, siden naturstier ikke har ruter, men i tilfelle de skulle få ruter i fremtiden.
 
+          // Hm, samme for område kartlag tro?
+
           eksisterer = featureEksistererIFeatureClickSelection(feature);
           // var endeligeNavn = hentFeatureNavnMedBackup(feature);
           // console.log("kartlag " + endeligeNavn + " eksisterer i featureSelectionList: " + eksisterer);
@@ -1055,7 +1176,7 @@ function settFeatureSelectionListeOgLagPopup(pixel, koordinater) {
 
   if ((featureClickSelectionList.length == 1 || currentItems == 1) && featureInfoData.length > 0) {
     // console.log(featureClickSelectionList);
-    console.log(featureInfoData);
+    // console.log(featureInfoData);
 
     skjulPopupContainer();
 
@@ -1132,6 +1253,7 @@ function lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater){
   //   popupTekst += "<span class='divNavn' style='color: var(--andre-farger-light-aqua)'>";
   // }
 
+  // Nice -- hvis kartlagType er definert så får den en lyseblå tekstfarge.
   popupTekst += kartlagType ? "<span class='divNavn' style='color: var(--andre-farger-light-aqua)'>" : "<span class='divNavn'>";
 
   popupTekst += endeligeNavn;
@@ -1142,6 +1264,7 @@ function lagFeatureSelectionPopupTekst(feature, layer, stipletter, koordinater){
 }
 
 // Setter stil (style) for feature som er selected.
+// Hm, spørsmålet er om den funker for område features? Altså som ikke er kalenderturer eller naturstier.
 function settFeatureSelectionStiler(feature, layer) {
   var endeligeNavn = hentFeatureNavnMedBackup(feature);
 
@@ -1202,6 +1325,9 @@ function settFeatureSelectionStiler(feature, layer) {
       if (useDefaultWhiteStyle) {
         featureSelection.setStyle(defaultWhiteSelectStyle);
       } else {
+        // Notat: Her blir nok select stil satt for område features.
+        console.log(`settFeatureSelectionStiler ~ natursti eller område feature`);
+
         var stilSelect = layer.get("stilSelect");
         if (stilSelect != null) {
           featureSelection.setStyle(stilSelect);
@@ -1290,7 +1416,7 @@ function settFeatureSelectionStiler(feature, layer) {
 
     // Debug
     // document.getElementById("debugVinduTekst").innerHTML += " | satt dashed for snarvei: " + NAVN;
-  }
+  } // Tur snarvei slutt
 
   return featureSelection;
 }
@@ -1359,6 +1485,7 @@ function hentFeatureOgNavnMedUID(featureUID, kartlag){
 
 }
 
+// Hm... Få denne til å virke med område features?
 function featureKlikkIPopup(featureUID, lagNavn, harStiplet){
   // console.log("featureKlikkIPopup klikket! featureUID: " + featureUID + ", lagNavn: " + lagNavn + ", harStiplet: " + harStiplet);
 
@@ -1376,9 +1503,11 @@ function featureKlikkIPopup(featureUID, lagNavn, harStiplet){
   kartlagFeatureNavn = featureOgNavn[1];
 
   if(kartlagFeature != null){
-    // console.log("Fant kartlagFeature med UID! featureNavn: " + kartlagFeatureNavn);
-    // console.log(kartlagFeature);
+    console.log("Fant kartlagFeature med UID! featureNavn: " + kartlagFeatureNavn);
+    console.log(kartlagFeature);
     // console.log(kartlag);
+
+    const kartlagType = kartlagFeature.get("kartlagType");
 
     let stipletter = null;
     if(harStiplet){
@@ -1387,6 +1516,7 @@ function featureKlikkIPopup(featureUID, lagNavn, harStiplet){
 
     // Feature info side!
     // Hm, bare vise for turer? Altså, ikke for alle vektorlag.
+    // For kalenderturer og natursti poster?
     if(KartKjorer && (kartlag.get("ikonLag"))){
       // selectRute(kartlagFeature, kartlag);
 
@@ -1397,6 +1527,10 @@ function featureKlikkIPopup(featureUID, lagNavn, harStiplet){
 
     } else {
       console.log("featureKlikkIPopup ~ Kartlaget er ikke et turkartlag!");
+      // Hvis kartlagType er omraade -- eller kanskje bare sjekke at den ikke er null.
+      if(kartlagType != null){
+        visFeatureInfoSide(kartlagFeature, kartlagFeatureNavn, kartlag, stipletter, false);
+      }
     }
 
   } else {

@@ -1,6 +1,12 @@
 
 # Markakartet - versjonslogg
 
+# v3.3 (20.08.2024)
+
+- Gjort til rette for at område-vektorlag kan ha infoside.
+- Slått sammen trekkene i kartlaget for sammenhengende villmark.
+- Fiks for "Skjul alle" knappen.
+
 # v3.2 (21.06.2024)
 
 - Endret på noen turbeskrivelser etter korrekturgjennomgang
