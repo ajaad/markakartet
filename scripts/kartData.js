@@ -3662,14 +3662,14 @@ function forberedFaktasiderForOmraadeVektorlag(kartlag, aktiverFaktasider) {
             // console.log(`faktiskIngressLengde: ${kalkulerFaktiskTekstLengde(ingress)}`)
         }
         // console.log(props.feature)
-        console.log(`${kartlagNavn} ~ addfeature ~ featureNavn: ${hentFeatureNavnMedBackup(props.feature)}`)
+        // console.log(`${kartlagNavn} ~ addfeature ~ featureNavn: ${hentFeatureNavnMedBackup(props.feature)}`)
     })
     // Callback når features er ferdig lastet
     kilde.on("featuresloadend", function (props) {
-        console.log(`${kartlagNavn} ~ features er ferdig loadet!`)
+        // console.log(`${kartlagNavn} ~ features er ferdig loadet!`)
         if (infoSideFeatureNavnFraUrl && infoSideKartlagNavnFraUrl) {
             if (infoSideKartlagNavnFraUrl == kartlagNavn) {
-                console.log(`${kartlagNavn} Kjører visInfoSideProgrammatisk!"`);
+                // console.log(`${kartlagNavn} Kjører visInfoSideProgrammatisk!"`);
                 // visInfoSideProgrammatisk(false);
                 visInfoSideProgrammatisk();
             }

@@ -549,7 +549,7 @@ $(document).ready(function(){
   });
 
   map.on('click',function(e){
-    console.log("Klikket på kartet!");
+    // console.log("Klikket på kartet!");
 
     // Debug
     // document.getElementById("debugVinduTekst").innerHTML = "map on click";
@@ -557,7 +557,7 @@ $(document).ready(function(){
     var coordSys = "EPSG:" + document.getElementById("epsgForm").value;
     var koordinaterKonv = proj4(viewProjection, coordSys, e.coordinate);
 
-    console.log("Koordinatsystem: " + coordSys + ", koordinater: " + e.coordinate + ", koordinaterKonv: " + koordinaterKonv);
+    // console.log("Koordinatsystem: " + coordSys + ", koordinater: " + e.coordinate + ", koordinaterKonv: " + koordinaterKonv);
 
     // // Deaktivere nå siden delefunksjonen ikke brukes.
     // // Kan nå bruke funksjonen lageSirkelPaaKartKlikk().
@@ -3053,7 +3053,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
 
   const hovedBildeUrl = feature.get("hoved_bilde");
   if (hovedBildeUrl) {
-    console.log("hovedbilde eksisterer");
+    // console.log("hovedbilde eksisterer");
     let hovedBildeBeskrivelse = feature.get("hoved_bilde_beskrivelse");
     const hovedBildeBeskrivelseHTML = feature.get("hoved_bilde_beskrivelseHTML");
     if(hovedBildeBeskrivelseHTML) hovedBildeBeskrivelse = hovedBildeBeskrivelseHTML
@@ -3064,14 +3064,14 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
     elFeatureHovedBilde.onerror = function (e) {
       elFeatureHovedBilde.style.display = "none";
       elFeatureHovedBilde.alt = "";
-      console.log("hovedbilde onerror");
+      // console.log("hovedbilde onerror");
       // console.log(e)
     };
     elFeatureHovedBilde.onload = function () {
       elFeatureHovedBilde.style.display = "block";
       elFeatureHovedBilde.alt = hovedBildeBeskrivelse ? hovedBildeBeskrivelse : "";
       elFeatureHovedBilde.title = hovedBildeBeskrivelse ? hovedBildeBeskrivelse : "";
-      console.log("hovedbilde loaded!");
+      // console.log("hovedbilde loaded!");
     };
 
     elFeatureHovedBildeBeskrivelse.innerHTML = hovedBildeBeskrivelse;

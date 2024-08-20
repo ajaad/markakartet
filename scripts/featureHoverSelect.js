@@ -1176,7 +1176,7 @@ function settFeatureSelectionListeOgLagPopup(pixel, koordinater) {
 
   if ((featureClickSelectionList.length == 1 || currentItems == 1) && featureInfoData.length > 0) {
     // console.log(featureClickSelectionList);
-    console.log(featureInfoData);
+    // console.log(featureInfoData);
 
     skjulPopupContainer();
 
