@@ -1792,6 +1792,9 @@ function skjulKartlag(layer, lagIndeks){
     }
     // console.log(lagNavn + " er nå skjult! visible: " + layer.get("visible"));
 
+    // Ta bort fra aktiveKartlagListe
+    //  slettFraAktiveKartlagListen(lagNavn);
+
     // Obs! Må slette fra aktivekartlag listen.
     // Ta bort fra aktive kartlaglisten
     // Obs - ikke ta bort GPS vektorlaget.
@@ -2216,9 +2219,9 @@ function skjulAlleLag(){
         var lagIndeks = -1;
         try {
           lagIndeks = htmlKartLagDict[lagNavn]["lagIndeks"];
-          console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
+          // console.log("Fant lagIndeks med htmlKartLagDict. Kartlaget " + lagNavn + " har indeks " + lagIndeks);
         } catch (error) {
-          console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. Skrivefeil?");
+          console.log("Noe error med å hente lagIndeks fra htmlKartLagDict. error: " + error);
         }
 
         skjulKartlag(layer, lagIndeks);
@@ -2827,26 +2830,26 @@ function kartMenySideKlikk(divTrykketPaa, inVisFeatureInfo, aapnerHovedVindu){
       break;
   }
 
-  // Plausible Analytics
-  try{
-    let menySideUi = "Ingen side";
+  // // Plausible Analytics
+  // try{
+  //   let menySideUi = "Ingen side";
 
-    switch(divTrykketPaa){
-      case "divMenyKart": menySideUi = "Kart"; break;
-      case "divMenyDel": menySideUi = "Del"; break;
-      case "divMenyOm": menySideUi = "Om"; break;
-      case "divMenyStott": menySideUi = "Støtt"; break;
-    }
+  //   switch(divTrykketPaa){
+  //     case "divMenyKart": menySideUi = "Kart"; break;
+  //     case "divMenyDel": menySideUi = "Del"; break;
+  //     case "divMenyOm": menySideUi = "Om"; break;
+  //     case "divMenyStott": menySideUi = "Støtt"; break;
+  //   }
 
-    plausible('Mål 5: Åpnet side for hovednavigasjon', {
-      props: {
-        // sideUi: menySideUi,
-        "5.1: Åpnet side for hovednavigasjon": menySideUi,
-      }
-    })
-  }catch(e){
-    console.log(e);
-  }
+  //   plausible('Mål 5: Åpnet side for hovednavigasjon', {
+  //     props: {
+  //       // sideUi: menySideUi,
+  //       "5.1: Åpnet side for hovednavigasjon": menySideUi,
+  //     }
+  //   })
+  // }catch(e){
+  //   console.log(e);
+  // }
 
 }
 
@@ -2980,16 +2983,18 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
     // Er kalendertur
 
   // Plausible Analytics
-  try{
-    plausible('Mål 3: Åpnet info side for kalendertur', {
-      props: {
-        // infoSide_kalendertur: featureNavn
-        "3.1: Åpnet kalendertur": featureNavn
-      }
-    })
-  }catch(e){
-    console.log(e);
-  }
+  
+  // try{
+    
+  //   plausible('Mål 3: Åpnet info side for kalendertur', {
+  //     props: {
+  //       // infoSide_kalendertur: featureNavn
+  //       "3.1: Åpnet kalendertur": featureNavn
+  //     }
+  //   })
+  // }catch(e){
+  //   console.log(e);
+  // }
 
   } else {
     // Er natursti
@@ -3047,18 +3052,35 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   const elFeatureSkaperOrganisasjon = document.getElementById("featureSkaperOrganisasjon");
   //
   const elFeatureTurenVidere = document.getElementById("featureTurenVidere");
+  const elFeatureLesMerContainer = document.getElementById("featureLesMerContainer");
+  const elFeatureLesMer = document.getElementById("featureLesMer");
   // Lyd
   const elFeatureLydContainer = document.getElementById("featureLydContainer");
   const elFeatureLyd = document.getElementById("featureLyd");
   // const elFeatureLydKilde = document.getElementById("featureLydKilde");
 
-  elFeatureInfoTittel.innerHTML = featureNavn;
+  // elFeatureInfoTittel.innerHTML = featureNavn;
 
   // Hovedbilde
 
-  const hovedBildeUrl = feature.get("hoved_bilde");
+  let bildePlassering = "";
+
+  if(isGithubSite){
+    bildePlassering = originWithSlash + "/images/";
+  } else if(erMarkakartetDomene){
+    bildePlassering = "/images/";
+  } else {
+    bildePlassering = "../images/";
+  }
+
+  console.log(`bildePlassering: ${bildePlassering}`)
+
+  // Prioritet for lokale bilder
+  const hovedBildeUrl = feature.get("hoved_bilde_lokalt") ? (bildePlassering + feature.get("hoved_bilde_lokalt")) : feature.get("hoved_bilde");
+  console.log(`hovedBildeUrl: ${hovedBildeUrl}`)
+  
   if (hovedBildeUrl) {
-    // console.log("hovedbilde eksisterer");
+    console.log("hovedbilde eksisterer");
     let hovedBildeBeskrivelse = feature.get("hoved_bilde_beskrivelse");
     const hovedBildeBeskrivelseHTML = feature.get("hoved_bilde_beskrivelseHTML");
     if(hovedBildeBeskrivelseHTML) hovedBildeBeskrivelse = hovedBildeBeskrivelseHTML
@@ -3069,14 +3091,14 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
     elFeatureHovedBilde.onerror = function (e) {
       elFeatureHovedBilde.style.display = "none";
       elFeatureHovedBilde.alt = "";
-      // console.log("hovedbilde onerror");
+      console.log("hovedbilde onerror");
       // console.log(e)
     };
     elFeatureHovedBilde.onload = function () {
       elFeatureHovedBilde.style.display = "block";
       elFeatureHovedBilde.alt = hovedBildeBeskrivelse ? hovedBildeBeskrivelse : "";
       elFeatureHovedBilde.title = hovedBildeBeskrivelse ? hovedBildeBeskrivelse : "";
-      // console.log("hovedbilde loaded!");
+      console.log("hovedbilde loaded!");
     };
 
     elFeatureHovedBildeBeskrivelse.innerHTML = hovedBildeBeskrivelse;
@@ -3085,7 +3107,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   } else {
     elFeatureBilder.style.display = "none";
     // elFeatureHovedBilde.style.display = "none";
-    console.log("hovedbilde er null");
+    // console.log("hovedbilde er null");
   }
 
   const kartlagType = feature.get("kartlagType");
@@ -3200,8 +3222,8 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   const ingressLengde = feature.get("ingressLengde");
   const ingressHTML = feature.get("ingressHTML");
   const transport = feature.get("transport");
-  const hovedbilde = feature.get("hoved_bilde");
-  const bilder = feature.get("bilder");
+  // const hovedbilde = feature.get("hoved_bilde"); // Se oppe for hovedBildeUrl
+  const bilder = feature.get("bilder"); // Ikke implementert
   const tur_type = feature.get("tur_type");
   const tekst = feature.get("tekst"); // beskrivelsen
   const tekstHTML = feature.get("tekstHTML"); // Modifisert tekst for HTML. Se kartData og lagHTMLTekst().
@@ -3212,11 +3234,15 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   const overskrift = feature.get("overskrift"); // Som regel samme som "NAVN".
   //
   const turenVidere = feature.get("turen_videre");
+  const lesMer = feature.get("les_mer");
   const lyd = feature.get("lyd");
   //
   const lengde = feature.get("lengdeKm");
   const areal = feature.get("arealKm2");
   // const arealEnDesimal = Math.round(areal * 10) / 10;
+
+  // Overskrift
+  elFeatureInfoTittel.innerHTML = overskrift ? overskrift : featureNavn;
 
   if(!lengde && !areal){
     elFeatureLengde.style.display = "none";
@@ -3321,10 +3347,18 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   elFeatureSkaperOrganisasjon.style.paddingTop = (organisasjon && lagetAv) ? "4px" : "0px";
   elFeatureSkaperOrganisasjon.style.fontSize = (organisasjon && !lagetAv) ? "medium" : "small";
 
-  // Bilde
-
+  // Turen videre
   elFeatureTurenVidere.innerText = turenVidere;
   elFeatureTurenVidereContainer.style.display = turenVidere ? "block" : "none";
+
+  // les mer
+  elFeatureLesMerContainer.style.display = lesMer ? "block" : "none";
+  // console.log(`lesMer: ${lesMer}`)
+
+  if(lesMer){
+    // console.log(`lesMer: ${lesMer}`)
+    elFeatureLesMer.innerHTML = lagHTMLTekst(lesMer, "medium")
+  }
 
   // Lyd
   elFeatureLydContainer.style.display = lyd ? "block" : "none";

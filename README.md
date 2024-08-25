@@ -1,6 +1,11 @@
 
 # Markakartet - versjonslogg
 
+# v3.4 (25.08.2024)
+
+- Gjort kartlagene LVO og sammenhengende villmark trykkbare med informasjon.
+- Lagt til mer type info for infosidene.
+
 # v3.3 (20.08.2024)
 
 - Gjort til rette for at område-vektorlag kan ha infoside.
