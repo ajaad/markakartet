@@ -14,11 +14,19 @@
 
     <meta http-equiv="Content-Language" content="text/html;charset=utf-8" />
 
-    <!-- Plausible Analytics -->
-     <script defer data-domain="markakartet.no" src="https://plausible.io/js/script.js"></script>
+    <!-- Trial med Plausible Analytics -->
+     <!--
+    <script defer data-domain="erlendkh.github.io" src="https://plausible.io/js/script.js"></script>
     <script>window.plausible = window.plausible || function() { 
         (window.plausible.q = window.plausible.q || []).push(arguments) }
     </script>
+    -->
+
+    <!-- Plausible Analytics -->
+<!--     <script defer data-domain="markakartet.no" src="https://plausible.io/js/script.js"></script>
+    <script>window.plausible = window.plausible || function() { 
+        (window.plausible.q = window.plausible.q || []).push(arguments) }
+    </script> -->
      
     <title>Markakartet</title>
 </head>
@@ -143,6 +151,7 @@
                     <div class="featureBilder" id="featureBilder">
                         <!-- <img class="featureHovedBilde" id="featureHovedBilde" src="./images/test-cat.jpg"/> -->
                         <img class="featureHovedBilde" id="featureHovedBilde" src=""/>
+                        <div class="featureHovedBildeBeskrivelse" id="featureHovedBildeBeskrivelse"></div>
                     </div>
 
                     <br />
@@ -159,7 +168,7 @@
                     </div>
 
                     <div id="featureTransportContainer">
-                        <div class="undertittel">Transport</div>
+                        <div class="undertittel">Startsted og transport</div>
                         <div class="featureTransport" id="featureTransport"></div>
                         <br />
                     </div>
@@ -179,6 +188,12 @@
                     <div id="featureTurenVidereContainer">
                         <div class="undertittel">Turen videre</div>
                         <div class="featureTurenVidere" id="featureTurenVidere"></div>
+                        <br />
+                    </div>
+
+                    <div id="featureLesMerContainer">
+                        <div class="undertittel">Les mer</div>
+                        <div class="featureLesMer" id="featureLesMer"></div>
                         <br />
                     </div>
 
@@ -705,12 +720,14 @@
                         <script>
                             function klikkPaaBliMedlem() {
                                 // Plausible Analytics
+                                /*
                                 try {
                                     plausible("Mål 8: Trykk på 'Mer informasjon om medlemskap' lenke", {
                                     });
                                 } catch (e) {
                                     console.log(e);
                                 }
+                                */
                             }
                         </script>
                     </p>
