@@ -3107,7 +3107,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
   } else {
     elFeatureBilder.style.display = "none";
     // elFeatureHovedBilde.style.display = "none";
-    console.log("hovedbilde er null");
+    // console.log("hovedbilde er null");
   }
 
   const kartlagType = feature.get("kartlagType");
@@ -3353,7 +3353,7 @@ function visFeatureInfoSide(feature, featureNavn, kartlag, stipletter, aapneHove
 
   // les mer
   elFeatureLesMerContainer.style.display = lesMer ? "block" : "none";
-  console.log(`lesMer: ${lesMer}`)
+  // console.log(`lesMer: ${lesMer}`)
 
   if(lesMer){
     // console.log(`lesMer: ${lesMer}`)
