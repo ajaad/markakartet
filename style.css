@@ -1257,6 +1257,7 @@ trykbart 100% av bredden, må man ha teksten i div også i span. */
 }
 
 .featureHovedBildeBeskrivelse{
+  margin-top: 0.25em;
   font-size: small;
   font-style: italic;
   text-align:center; /* Sentrerer bildebeskrivelsen her. */
